@@ -12,6 +12,8 @@ export const purchasesData: Purchase[] = [
     quantity: 10,
     unitPrice: 150000,
     totalAmount: 1500000,
+    totalPaid: 750000,
+    balance: 750000,
     status: 'impayée'
   },
   {
@@ -24,6 +26,8 @@ export const purchasesData: Purchase[] = [
     quantity: 20,
     unitPrice: 15000,
     totalAmount: 300000,
+    totalPaid: 300000,
+    balance: 0,
     status: 'payée'
   },
   {
@@ -36,6 +40,8 @@ export const purchasesData: Purchase[] = [
     quantity: 50,
     unitPrice: 5000,
     totalAmount: 250000,
+    totalPaid: 250000,
+    balance: 0,
     status: 'payée'
   },
   {
@@ -48,6 +54,8 @@ export const purchasesData: Purchase[] = [
     quantity: 100,
     unitPrice: 2000,
     totalAmount: 200000,
+    totalPaid: 50000,
+    balance: 150000,
     status: 'impayée'
   },
   {
@@ -60,6 +68,8 @@ export const purchasesData: Purchase[] = [
     quantity: 30,
     unitPrice: 12000,
     totalAmount: 360000,
+    totalPaid: 200000,
+    balance: 160000,
     status: 'impayée'
   }
 ];

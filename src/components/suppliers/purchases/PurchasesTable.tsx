@@ -46,6 +46,8 @@ export const PurchasesTable = ({ purchases, onEdit, onDelete }: PurchasesTablePr
           <TableHead>Quantité</TableHead>
           <TableHead>Prix unitaire</TableHead>
           <TableHead>Total</TableHead>
+          <TableHead>Versé</TableHead>
+          <TableHead>Solde</TableHead>
           <TableHead>Statut</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -60,6 +62,8 @@ export const PurchasesTable = ({ purchases, onEdit, onDelete }: PurchasesTablePr
             <TableCell>{purchase.quantity}</TableCell>
             <TableCell>{formatCurrency(purchase.unitPrice)}</TableCell>
             <TableCell>{formatCurrency(purchase.totalAmount)}</TableCell>
+            <TableCell>{formatCurrency(purchase.totalPaid || 0)}</TableCell>
+            <TableCell>{formatCurrency(purchase.balance || (purchase.totalAmount - (purchase.totalPaid || 0)))}</TableCell>
             <TableCell>
               <Badge variant={purchase.status === 'payée' ? 'success' : 'destructive'}>
                 {purchase.status}

@@ -9,5 +9,7 @@ export interface Purchase {
   quantity: number;
   unitPrice: number;
   totalAmount: number;
+  totalPaid: number;
+  balance: number;
   status: 'payée' | 'impayée';
 }
