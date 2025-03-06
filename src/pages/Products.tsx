@@ -15,8 +15,8 @@ const Products = () => {
   const { toast } = useToast();
   const [items, setItems] = useState<Item[]>(initialItems);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedType, setSelectedType] = useState<string>("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
 
   // For debugging
@@ -32,14 +32,14 @@ const Products = () => {
       ));
     
     // Filter by category (products only)
-    const matchesCategory = selectedCategory 
-      ? (item.type === "product" && (item as Product).category === selectedCategory) 
-      : true;
+    const matchesCategory = selectedCategory === "all"
+      ? true
+      : (item.type === "product" && (item as Product).category === selectedCategory);
     
     // Filter by type (product or service)
-    const matchesType = selectedType 
-      ? item.type === selectedType
-      : true;
+    const matchesType = selectedType === "all"
+      ? true
+      : item.type === selectedType;
     
     return matchesSearch && matchesCategory && matchesType;
   });

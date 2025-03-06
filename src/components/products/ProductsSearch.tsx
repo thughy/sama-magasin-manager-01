@@ -46,7 +46,7 @@ export const ProductsSearch = ({
             <SelectValue placeholder="Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tous les types</SelectItem>
+            <SelectItem value="all">Tous les types</SelectItem>
             <SelectItem value="product">Articles</SelectItem>
             <SelectItem value="service">Services</SelectItem>
           </SelectContent>
@@ -56,7 +56,7 @@ export const ProductsSearch = ({
             <SelectValue placeholder="Catégorie" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes les catégories</SelectItem>
+            <SelectItem value="all">Toutes les catégories</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category} value={category}>
                 {category}
