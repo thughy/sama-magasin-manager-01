@@ -26,11 +26,13 @@ export function AddProductDialog({ open, onOpenChange, onAdd }: AddProductDialog
 
   const handleProductSubmit = (data: ProductFormValues) => {
     onAdd(data, "product");
+    // Fermer le dialogue après l'ajout
     onOpenChange(false);
   };
 
   const handleServiceSubmit = (data: ServiceFormValues) => {
     onAdd(data, "service");
+    // Fermer le dialogue après l'ajout
     onOpenChange(false);
   };
 

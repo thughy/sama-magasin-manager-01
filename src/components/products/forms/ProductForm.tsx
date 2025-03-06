@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -65,19 +64,8 @@ export function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
 
   const handleSubmit = (data: ProductFormValues) => {
     onSubmit(data);
-    // Reset the form after submission
-    form.reset({
-      barcode: "",
-      name: "",
-      sellPrice: 0,
-      purchasePrice: 0,
-      category: "",
-      minStock: 0,
-    });
-    // Focus on the name field after form reset
-    setTimeout(() => {
-      nameInputRef.current?.focus();
-    }, 0);
+    // Note: We're no longer resetting the form here because the dialog will close
+    // and the component will unmount
   };
 
   return (

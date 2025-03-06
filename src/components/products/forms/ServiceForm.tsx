@@ -37,20 +37,13 @@ export function ServiceForm({ onSubmit, onCancel }: ServiceFormProps) {
     },
   });
 
-  // Reference to the name input for focusing
+  // Reference to the name input for focusing (nous le gardons pour l'autocomplétion)
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleSubmit = (data: ServiceFormValues) => {
     onSubmit(data);
-    // Reset the form after submission
-    form.reset({
-      name: "",
-      amount: 0,
-    });
-    // Focus on the name field after form reset
-    setTimeout(() => {
-      nameInputRef.current?.focus();
-    }, 0);
+    // Note: We're no longer resetting the form here because the dialog will close
+    // and the component will unmount
   };
 
   return (
