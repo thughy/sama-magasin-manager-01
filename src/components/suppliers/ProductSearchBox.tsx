@@ -3,9 +3,10 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Barcode, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Product } from "@/types/purchaseOrder";
+import { ProductSearchResults } from "./ProductSearchResults";
+import { ProductCreateDialog } from "./ProductCreateDialog";
 
 // Sample product data (in a real app, this would come from an API)
 const sampleProducts: Product[] = [
@@ -26,12 +27,6 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [newProduct, setNewProduct] = useState<Partial<Product>>({
-    barcode: "",
-    name: "",
-    purchasePrice: 0,
-    sellPrice: 0
-  });
 
   useEffect(() => {
     if (searchTerm.length >= 2) {
@@ -56,46 +51,16 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
     setShowResults(false);
   };
 
-  const handleCreateProduct = () => {
-    if (!newProduct.name || !newProduct.barcode) return;
-    
-    // Create a new product
-    const newId = Math.max(...sampleProducts.map(p => p.id)) + 1;
-    const createdProduct: Product = {
-      id: newId,
-      barcode: newProduct.barcode || "",
-      name: newProduct.name || "",
-      purchasePrice: Number(newProduct.purchasePrice) || 0,
-      sellPrice: Number(newProduct.sellPrice) || 0
-    };
-    
+  const handleCreateProduct = (newProduct: Product) => {
     // Add to products data (in a real app, this would be an API call)
-    sampleProducts.push(createdProduct);
+    sampleProducts.push(newProduct);
     
     // Select the new product
-    onSelectProduct(createdProduct);
+    onSelectProduct(newProduct);
     
-    // Reset form and close dialog
-    setNewProduct({
-      barcode: "",
-      name: "",
-      purchasePrice: 0,
-      sellPrice: 0
-    });
+    // Close dialog and reset search
     setShowCreateDialog(false);
     setSearchTerm("");
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    let parsedValue: string | number = value;
-    
-    // Parse numeric values
-    if (name === "purchasePrice" || name === "sellPrice") {
-      parsedValue = value === "" ? 0 : Number(value);
-    }
-    
-    setNewProduct(prev => ({ ...prev, [name]: parsedValue }));
   };
 
   const handleShowCreateDialog = () => {
@@ -130,102 +95,18 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
         </div>
       </div>
 
-      {showResults && (
-        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-          {searchResults.length > 0 ? (
-            <ul className="py-1">
-              {searchResults.map((product) => (
-                <li 
-                  key={product.id} 
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleSelectProduct(product)}
-                >
-                  <div className="font-medium">{product.name}</div>
-                  <div className="text-sm text-gray-500">
-                    <span className="mr-2">Code: {product.barcode}</span>
-                    <span>Prix: {product.purchasePrice.toLocaleString()} F CFA</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="p-4 text-center">
-              <p className="mb-2 text-gray-500">Aucun article trouvé</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleShowCreateDialog}
-                className="flex items-center gap-1"
-              >
-                <Plus className="h-3 w-3" /> Créer un nouvel article
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+      <ProductSearchResults
+        showResults={showResults}
+        searchResults={searchResults}
+        onSelectProduct={handleSelectProduct}
+        onShowCreateDialog={handleShowCreateDialog}
+      />
 
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Ajouter un nouvel article</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="barcode" className="text-right">Code barre</Label>
-              <div className="col-span-3 flex gap-2">
-                <Input
-                  id="barcode"
-                  name="barcode"
-                  value={newProduct.barcode}
-                  onChange={handleInputChange}
-                  className="flex-1"
-                />
-                <Button variant="outline" size="icon" title="Scanner">
-                  <Barcode className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">Nom</Label>
-              <Input
-                id="name"
-                name="name"
-                value={newProduct.name}
-                onChange={handleInputChange}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="purchasePrice" className="text-right">Prix d'achat</Label>
-              <Input
-                id="purchasePrice"
-                name="purchasePrice"
-                type="number"
-                value={newProduct.purchasePrice}
-                onChange={handleInputChange}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="sellPrice" className="text-right">Prix de vente</Label>
-              <Input
-                id="sellPrice"
-                name="sellPrice"
-                type="number"
-                value={newProduct.sellPrice}
-                onChange={handleInputChange}
-                className="col-span-3"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-              Annuler
-            </Button>
-            <Button onClick={handleCreateProduct}>Ajouter</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ProductCreateDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onCreateProduct={handleCreateProduct}
+      />
     </div>
   );
 };
