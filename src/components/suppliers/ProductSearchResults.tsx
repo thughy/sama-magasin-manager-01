@@ -30,9 +30,10 @@ export const ProductSearchResults = ({
               onClick={() => onSelectProduct(product)}
             >
               <div className="font-medium">{product.name}</div>
-              <div className="text-sm text-gray-500">
-                <span className="mr-2">Code: {product.barcode}</span>
-                <span>Prix: {product.purchasePrice.toLocaleString()} F CFA</span>
+              <div className="text-sm text-gray-500 flex flex-wrap gap-2">
+                <span>Code: {product.barcode}</span>
+                <span>Prix d'achat: {product.purchasePrice.toLocaleString()} FCFA</span>
+                <span>Prix de vente: {product.sellPrice.toLocaleString()} FCFA</span>
               </div>
             </li>
           ))}

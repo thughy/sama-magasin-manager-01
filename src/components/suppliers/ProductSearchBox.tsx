@@ -7,15 +7,20 @@ import { Plus, Search } from "lucide-react";
 import { Product } from "@/types/purchaseOrder";
 import { ProductSearchResults } from "./ProductSearchResults";
 import { ProductCreateDialog } from "./ProductCreateDialog";
+import { initialItems } from "@/data/productsData";
 
-// Sample product data (in a real app, this would come from an API)
-const sampleProducts: Product[] = [
-  { id: 1, barcode: "123456789", name: "Clavier sans fil", purchasePrice: 15000, sellPrice: 25000 },
-  { id: 2, barcode: "234567890", name: "Souris optique", purchasePrice: 5000, sellPrice: 8500 },
-  { id: 3, barcode: "345678901", name: "Écouteurs Bluetooth", purchasePrice: 12000, sellPrice: 19500 },
-  { id: 4, barcode: "456789012", name: "Chargeur USB-C", purchasePrice: 4500, sellPrice: 7500 },
-  { id: 5, barcode: "567890123", name: "Câble HDMI 2m", purchasePrice: 3000, sellPrice: 5500 },
-];
+// Transform products from our data structure to the expected format
+const getProductsFromItems = () => {
+  return initialItems
+    .filter(item => item.type === "product")
+    .map(item => ({
+      id: parseInt(item.id.replace('PRD', '')) || item.id,
+      barcode: (item.type === "product") ? item.barcode : "",
+      name: item.name,
+      purchasePrice: (item.type === "product") ? item.buyPrice : 0,
+      sellPrice: (item.type === "product") ? item.sellPrice : 0
+    }));
+};
 
 interface ProductSearchBoxProps {
   onSelectProduct: (product: Product) => void;
@@ -27,23 +32,29 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  // Initialize products from our data
+  useEffect(() => {
+    setProducts(getProductsFromItems());
+  }, []);
 
   useEffect(() => {
     if (searchTerm.length >= 2) {
-      const results = sampleProducts.filter(product => 
+      const results = products.filter(product => 
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.barcode.includes(searchTerm)
       );
       
       // Filter out products that are already in the list
-      const filteredResults = results.filter(product => !currentItems.includes(product.id));
+      const filteredResults = results.filter(product => !currentItems.includes(Number(product.id)));
       
       setSearchResults(filteredResults);
       setShowResults(true);
     } else {
       setShowResults(false);
     }
-  }, [searchTerm, currentItems]);
+  }, [searchTerm, currentItems, products]);
 
   const handleSelectProduct = (product: Product) => {
     onSelectProduct(product);
@@ -52,8 +63,8 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
   };
 
   const handleCreateProduct = (newProduct: Product) => {
-    // Add to products data (in a real app, this would be an API call)
-    sampleProducts.push(newProduct);
+    // Add to products data
+    setProducts([...products, newProduct]);
     
     // Select the new product
     onSelectProduct(newProduct);
