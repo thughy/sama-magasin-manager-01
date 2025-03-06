@@ -54,11 +54,10 @@ export const PurchaseOrderForm = ({
           contact: '',
           phone: '',
           email: '',
-          address: '',
-          status: 'payée',
           balance: 0,
           totalInvoice: 0,
-          totalPaid: 0
+          totalPaid: 0,
+          status: 'payée'
         });
       }
     }
