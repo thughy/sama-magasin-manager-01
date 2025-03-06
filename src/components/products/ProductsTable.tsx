@@ -23,9 +23,11 @@ import { Item, Product, Service } from "@/types/product";
 
 interface ProductsTableProps {
   items: Item[];
+  onEdit: (item: Item) => void;
+  onDelete: (item: Item) => void;
 }
 
-export const ProductsTable = ({ items }: ProductsTableProps) => {
+export const ProductsTable = ({ items, onEdit, onDelete }: ProductsTableProps) => {
   console.log("Items in ProductsTable:", items); // For debugging
   
   return (
@@ -62,7 +64,7 @@ export const ProductsTable = ({ items }: ProductsTableProps) => {
                   {item.type === "product" ? (
                     <div className="flex items-center">
                       <Barcode size={16} className="mr-2 text-muted-foreground" />
-                      {(item as Product).barcode}
+                      {(item as Product).barcode || "-"}
                     </div>
                   ) : (
                     "-"
@@ -111,7 +113,7 @@ export const ProductsTable = ({ items }: ProductsTableProps) => {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit(item)}>
                         <Edit size={14} className="mr-2" /> Modifier
                       </DropdownMenuItem>
                       {item.type === "product" && (
@@ -120,7 +122,10 @@ export const ProductsTable = ({ items }: ProductsTableProps) => {
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem 
+                        className="text-red-600"
+                        onClick={() => onDelete(item)}
+                      >
                         <Trash size={14} className="mr-2" /> Supprimer
                       </DropdownMenuItem>
                     </DropdownMenuContent>

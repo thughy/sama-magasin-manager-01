@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { ProductsTable } from "@/components/products/ProductsTable";
 import { AddProductDialog } from "@/components/products/AddProductDialog";
 import { initialItems } from "@/data/productsData";
 import { Item, Product, Service } from "@/types/product";
+import { EditProductDialog } from "@/components/products/EditProductDialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const Products = () => {
   const { toast } = useToast();
@@ -18,6 +20,8 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState<Item | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
 
   // For debugging
   console.log("Items in Products.tsx:", items);
@@ -65,7 +69,7 @@ const Products = () => {
         id: newId,
         type: "product",
         name: data.name,
-        barcode: data.barcode,
+        barcode: data.barcode || "", // Handle empty barcode
         category: data.category,
         buyPrice: data.purchasePrice,
         sellPrice: data.sellPrice,
@@ -90,6 +94,71 @@ const Products = () => {
     });
   };
 
+  const handleEditItem = (data: any, type: "product" | "service", id: string) => {
+    const updatedItems = items.map(item => {
+      if (item.id === id) {
+        if (type === "product") {
+          const updatedProduct: Product = {
+            ...item as Product,
+            name: data.name,
+            barcode: data.barcode || "",
+            category: data.category,
+            buyPrice: data.purchasePrice,
+            sellPrice: data.sellPrice,
+            minStock: data.minStock,
+          };
+          return updatedProduct;
+        } else {
+          const updatedService: Service = {
+            ...item as Service,
+            name: data.name,
+            amount: data.amount
+          };
+          return updatedService;
+        }
+      }
+      return item;
+    });
+    
+    setItems(updatedItems);
+    setItemToEdit(null);
+    
+    toast({
+      title: "Modifié avec succès",
+      description: `${type === "product" ? "Article" : "Service"} a été mis à jour.`,
+    });
+  };
+
+  const handleDeleteItem = (item: Item) => {
+    setItemToDelete(item);
+  };
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      const updatedItems = items.filter(item => item.id !== itemToDelete.id);
+      setItems(updatedItems);
+      
+      toast({
+        title: "Supprimé avec succès",
+        description: `${itemToDelete.type === "product" ? "Article" : "Service"} a été supprimé du catalogue.`,
+        variant: "destructive",
+      });
+      
+      setItemToDelete(null);
+    }
+  };
+
+  const refreshItems = () => {
+    // Dans une application réelle, ceci pourrait être un appel API
+    // Pour cette démo, nous réinitialisons simplement les données
+    setItems(initialItems);
+    
+    toast({
+      title: "Catalogue rafraîchi",
+      description: "Les données du catalogue ont été actualisées.",
+    });
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
@@ -100,10 +169,20 @@ const Products = () => {
               Gérez votre catalogue d'articles et de services
             </p>
           </div>
-          <Button className="bg-sama-600 hover:bg-sama-700" onClick={() => setShowAddDialog(true)}>
-            <Plus size={16} className="mr-2" />
-            Nouvel article/service
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={refreshItems}
+              className="gap-2"
+            >
+              <RefreshCw size={16} />
+              Actualiser
+            </Button>
+            <Button className="bg-sama-600 hover:bg-sama-700" onClick={() => setShowAddDialog(true)}>
+              <Plus size={16} className="mr-2" />
+              Nouvel article/service
+            </Button>
+          </div>
         </div>
 
         <Card className="p-5">
@@ -117,7 +196,11 @@ const Products = () => {
             categories={categories}
           />
 
-          <ProductsTable items={filteredItems} />
+          <ProductsTable 
+            items={filteredItems} 
+            onEdit={setItemToEdit}
+            onDelete={handleDeleteItem}
+          />
         </Card>
       </div>
 
@@ -126,6 +209,36 @@ const Products = () => {
         onOpenChange={setShowAddDialog} 
         onAdd={handleAddItem} 
       />
+
+      {itemToEdit && (
+        <EditProductDialog 
+          open={!!itemToEdit}
+          onOpenChange={() => setItemToEdit(null)}
+          item={itemToEdit}
+          onSave={handleEditItem}
+        />
+      )}
+
+      <AlertDialog open={!!itemToDelete} onOpenChange={() => setItemToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cet élément ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action ne peut pas être annulée. Cet élément sera définitivement supprimé
+              du catalogue.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MainLayout>
   );
 };

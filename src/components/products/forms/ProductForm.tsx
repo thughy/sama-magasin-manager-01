@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -13,12 +13,19 @@ import { ProductDetails } from "./components/ProductDetails";
 interface ProductFormProps {
   onSubmit: (data: ProductFormValues) => void;
   onCancel: () => void;
+  initialValues?: ProductFormValues;
+  isEditMode?: boolean;
 }
 
-export function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
+export function ProductForm({ 
+  onSubmit, 
+  onCancel, 
+  initialValues,
+  isEditMode = false 
+}: ProductFormProps) {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
+    defaultValues: initialValues || {
       barcode: "",
       name: "",
       sellPrice: 0,
@@ -33,22 +40,34 @@ export function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
 
   const handleSubmit = (data: ProductFormValues) => {
     onSubmit(data);
-    // Reset the form after submission but don't close the dialog
-    form.reset({
-      barcode: "",
-      name: "",
-      sellPrice: 0,
-      purchasePrice: 0,
-      category: "",
-      minStock: 0,
-    });
-    // Focus on the name input after form reset
-    setTimeout(() => {
-      if (nameInputRef.current) {
-        nameInputRef.current.focus();
-      }
-    }, 0);
+    
+    // Only reset the form if not in edit mode
+    if (!isEditMode) {
+      // Reset the form after submission but don't close the dialog
+      form.reset({
+        barcode: "",
+        name: "",
+        sellPrice: 0,
+        purchasePrice: 0,
+        category: "",
+        minStock: 0,
+      });
+      
+      // Focus on the name input after form reset
+      setTimeout(() => {
+        if (nameInputRef.current) {
+          nameInputRef.current.focus();
+        }
+      }, 0);
+    }
   };
+
+  // Focus on name input when component mounts (only in add mode)
+  useEffect(() => {
+    if (!isEditMode && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditMode]);
 
   return (
     <Form {...form}>
@@ -61,7 +80,9 @@ export function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
           <Button type="button" variant="outline" onClick={onCancel}>
             Annuler
           </Button>
-          <Button type="submit">Enregistrer</Button>
+          <Button type="submit">
+            {isEditMode ? "Mettre à jour" : "Enregistrer"}
+          </Button>
         </DialogFooter>
       </form>
     </Form>

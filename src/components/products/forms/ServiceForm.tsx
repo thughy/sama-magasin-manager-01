@@ -26,12 +26,19 @@ export type ServiceFormValues = z.infer<typeof serviceSchema>;
 interface ServiceFormProps {
   onSubmit: (data: ServiceFormValues) => void;
   onCancel: () => void;
+  initialValues?: ServiceFormValues;
+  isEditMode?: boolean;
 }
 
-export function ServiceForm({ onSubmit, onCancel }: ServiceFormProps) {
+export function ServiceForm({ 
+  onSubmit, 
+  onCancel,
+  initialValues,
+  isEditMode = false
+}: ServiceFormProps) {
   const form = useForm<ServiceFormValues>({
     resolver: zodResolver(serviceSchema),
-    defaultValues: {
+    defaultValues: initialValues || {
       name: "",
       amount: 0,
     },
@@ -43,26 +50,29 @@ export function ServiceForm({ onSubmit, onCancel }: ServiceFormProps) {
   const handleSubmit = (data: ServiceFormValues) => {
     onSubmit(data);
     
-    // Reset form after submission
-    form.reset({
-      name: "",
-      amount: 0,
-    });
-    
-    // Focus on the name input after form reset
-    setTimeout(() => {
-      if (nameInputRef.current) {
-        nameInputRef.current.focus();
-      }
-    }, 100);
+    // Only reset the form if not in edit mode
+    if (!isEditMode) {
+      // Reset form after submission
+      form.reset({
+        name: "",
+        amount: 0,
+      });
+      
+      // Focus on the name input after form reset
+      setTimeout(() => {
+        if (nameInputRef.current) {
+          nameInputRef.current.focus();
+        }
+      }, 100);
+    }
   };
 
-  // Focus on name input when component mounts
+  // Focus on name input when component mounts (only in add mode)
   useEffect(() => {
-    if (nameInputRef.current) {
+    if (!isEditMode && nameInputRef.current) {
       nameInputRef.current.focus();
     }
-  }, []);
+  }, [isEditMode]);
 
   return (
     <Form {...form}>
@@ -99,7 +109,9 @@ export function ServiceForm({ onSubmit, onCancel }: ServiceFormProps) {
           <Button type="button" variant="outline" onClick={onCancel}>
             Annuler
           </Button>
-          <Button type="submit">Enregistrer</Button>
+          <Button type="submit">
+            {isEditMode ? "Mettre à jour" : "Enregistrer"}
+          </Button>
         </DialogFooter>
       </form>
     </Form>
