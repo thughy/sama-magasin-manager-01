@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { 
@@ -40,7 +39,6 @@ export const PurchaseOrderForm = ({
   const printRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Initialize form with initialOrder if provided
   useEffect(() => {
     if (initialOrder) {
       setOrderItems(initialOrder.items);
@@ -49,10 +47,7 @@ export const PurchaseOrderForm = ({
       setReference(initialOrder.reference);
       setStatus(initialOrder.status);
       
-      // Find the supplier from the initialOrder
       if (initialOrder.supplierId) {
-        // In a real app, you would fetch the supplier from an API
-        // For now, we'll just set the supplier name
         setSelectedSupplier({
           id: initialOrder.supplierId,
           name: initialOrder.supplierName,
@@ -60,7 +55,10 @@ export const PurchaseOrderForm = ({
           phone: '',
           email: '',
           address: '',
-          status: 'actif'
+          status: 'payée',
+          balance: 0,
+          totalInvoice: 0,
+          totalPaid: 0
         });
       }
     }
@@ -98,7 +96,7 @@ export const PurchaseOrderForm = ({
       )
     );
   };
-  
+
   const handlePrint = () => {
     if (!selectedSupplier) {
       toast({
@@ -154,7 +152,6 @@ export const PurchaseOrderForm = ({
 
     printWindow.document.close();
     
-    // If onSave is provided, call it with the purchase order data
     if (onSave && selectedSupplier) {
       const total = orderItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
       
