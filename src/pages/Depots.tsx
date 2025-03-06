@@ -10,10 +10,11 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash } from "lucide-react";
+import { Plus, Edit, Trash, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddDepotDialog } from "@/components/depots/AddDepotDialog";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 // Type for depot
 interface Depot {
@@ -35,6 +36,7 @@ const depotsMockData: Depot[] = [
 export default function Depots() {
   const [depots, setDepots] = useState<Depot[]>(depotsMockData);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const hasPrimaryDepot = depots.some(depot => depot.type === "principal");
 
@@ -61,6 +63,13 @@ export default function Depots() {
     setDepots(depots.filter(depot => depot.id !== id));
     toast.success("Dépôt supprimé avec succès!");
   };
+
+  // Filter depots based on search term
+  const filteredDepots = depots.filter(depot => 
+    depot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    depot.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    depot.manager.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Calculate total capacity
   const totalCapacity = depots.reduce((total, depot) => {
@@ -110,6 +119,18 @@ export default function Depots() {
           <CardTitle>Liste des Dépôts</CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 relative">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher par nom, emplacement ou responsable..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          
           <Table>
             <TableHeader>
               <TableRow>
@@ -122,36 +143,44 @@ export default function Depots() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {depots.map((depot) => (
-                <TableRow key={depot.id}>
-                  <TableCell className="font-medium">{depot.name}</TableCell>
-                  <TableCell>{depot.location}</TableCell>
-                  <TableCell>{depot.manager}</TableCell>
-                  <TableCell>{depot.capacity}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      depot.type === "principal" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
-                    }`}>
-                      {depot.type === "principal" ? "Principal" : "Secondaire"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="icon">
-                        <Edit size={16} />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
-                        className="text-destructive"
-                        onClick={() => handleDeleteDepot(depot.id)}
-                      >
-                        <Trash size={16} />
-                      </Button>
-                    </div>
+              {filteredDepots.length > 0 ? (
+                filteredDepots.map((depot) => (
+                  <TableRow key={depot.id}>
+                    <TableCell className="font-medium">{depot.name}</TableCell>
+                    <TableCell>{depot.location}</TableCell>
+                    <TableCell>{depot.manager}</TableCell>
+                    <TableCell>{depot.capacity}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        depot.type === "principal" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                      }`}>
+                        {depot.type === "principal" ? "Principal" : "Secondaire"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="icon">
+                          <Edit size={16} />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="text-destructive"
+                          onClick={() => handleDeleteDepot(depot.id)}
+                        >
+                          <Trash size={16} />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    Aucun dépôt trouvé pour cette recherche
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>

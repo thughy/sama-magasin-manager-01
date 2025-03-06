@@ -9,7 +9,8 @@ import {
   Settings,
   FileText,
   Warehouse,
-  ArrowRight
+  ArrowRight,
+  Boxes
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar";
 
@@ -34,7 +35,8 @@ export const navItems: NavItem[] = [
     href: "/depots",
     subItems: [
       { title: "Liste des dépôts", url: "/depots", icon: Warehouse },
-      { title: "Bon de sortie", url: "/depots/release-orders", icon: ArrowRight }
+      { title: "Bon de sortie", url: "/depots/release-orders", icon: ArrowRight },
+      { title: "Inventaire", url: "/depots/inventory", icon: Boxes }
     ]
   },
   { title: "Paramètres", icon: Settings, href: "/settings" },
