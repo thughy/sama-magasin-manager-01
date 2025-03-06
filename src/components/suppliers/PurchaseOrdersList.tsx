@@ -8,6 +8,8 @@ import { Eye, FileText, Trash2, Copy, FileCheck } from "lucide-react";
 import { PurchaseOrder } from "@/types/purchaseOrder";
 import { PrintablePurchaseOrder } from "./PrintablePurchaseOrder";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PurchaseOrderFilters } from "./PurchaseOrderFilters";
+import { isSameDay } from "date-fns";
 
 interface PurchaseOrdersListProps {
   orders: PurchaseOrder[];
@@ -26,6 +28,9 @@ export const PurchaseOrdersList = ({
 }: PurchaseOrdersListProps) => {
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedStatus, setSelectedStatus] = useState("");
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -42,6 +47,23 @@ export const PurchaseOrdersList = ({
     setIsPrintDialogOpen(false);
   };
 
+  // Filter orders based on search term, selected date, and status
+  const filteredOrders = orders.filter(order => {
+    // Filter by supplier name
+    const matchesSearch = searchTerm === "" || 
+      order.supplierName.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Filter by date
+    const matchesDate = !selectedDate || 
+      isSameDay(new Date(order.orderDate), selectedDate);
+    
+    // Filter by status
+    const matchesStatus = selectedStatus === "" || 
+      order.status === selectedStatus;
+    
+    return matchesSearch && matchesDate && matchesStatus;
+  });
+
   return (
     <>
       <Card>
@@ -52,7 +74,16 @@ export const PurchaseOrdersList = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {orders.length > 0 ? (
+          <PurchaseOrderFilters 
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            selectedStatus={selectedStatus}
+            setSelectedStatus={setSelectedStatus}
+          />
+
+          {filteredOrders.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -65,7 +96,7 @@ export const PurchaseOrdersList = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orders.map((order) => (
+                {filteredOrders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.reference}</TableCell>
                     <TableCell>{formatDate(order.orderDate)}</TableCell>
@@ -124,7 +155,9 @@ export const PurchaseOrdersList = ({
               <FileText className="mx-auto h-12 w-12 text-gray-300" />
               <h3 className="mt-4 text-lg font-medium">Aucun bon de commande</h3>
               <p className="mt-1 text-gray-500">
-                Commencez par créer un nouveau bon de commande pour un fournisseur
+                {searchTerm || selectedDate || selectedStatus 
+                  ? "Aucun résultat ne correspond à votre recherche"
+                  : "Commencez par créer un nouveau bon de commande pour un fournisseur"}
               </p>
             </div>
           )}
