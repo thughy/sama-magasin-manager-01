@@ -12,7 +12,8 @@ import {
   ArrowRight,
   Boxes,
   Tags,
-  Layers3
+  Layers3,
+  Download
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar";
 
@@ -36,7 +37,8 @@ export const navItems: NavItem[] = [
     href: "/suppliers",
     subItems: [
       { title: "Liste des fournisseurs", url: "/suppliers", icon: Truck },
-      { title: "Bon de commande", url: "/suppliers/purchase-orders", icon: FileText }
+      { title: "Bon de commande", url: "/suppliers/purchase-orders", icon: FileText },
+      { title: "Achat de marchandises", url: "/suppliers/purchases", icon: Download }
     ]
   },
   { 
