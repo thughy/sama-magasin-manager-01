@@ -9,6 +9,7 @@ interface PurchaseItem {
   productName: string;
   quantity: number;
   unitPrice: number;
+  sellPrice: number;
 }
 
 interface UsePurchaseFormProps {
@@ -52,7 +53,8 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
         productId: '0',
         productName: initialPurchase.productName,
         quantity: initialPurchase.quantity,
-        unitPrice: initialPurchase.unitPrice
+        unitPrice: initialPurchase.unitPrice,
+        sellPrice: 0 // Adding sell price with default value
       }]);
     }
   }, [initialPurchase]);
@@ -102,7 +104,8 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
       productId: '',
       productName: '',
       quantity: 1,
-      unitPrice: 0
+      unitPrice: 0,
+      sellPrice: 0
     }]);
   };
 
