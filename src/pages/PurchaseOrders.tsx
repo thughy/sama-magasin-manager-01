@@ -1,17 +1,93 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText } from "lucide-react";
-import { suppliersData } from "@/data/suppliersData";
+import { Plus } from "lucide-react";
 import { PurchaseOrderForm } from "@/components/suppliers/PurchaseOrderForm";
+import { PurchaseOrdersList } from "@/components/suppliers/PurchaseOrdersList";
+import { PurchaseOrder } from "@/types/purchaseOrder";
+import { useToast } from "@/hooks/use-toast";
+
+// In a real app, this would come from an API or state management
+const loadOrders = (): PurchaseOrder[] => {
+  const savedOrders = localStorage.getItem('purchaseOrders');
+  return savedOrders ? JSON.parse(savedOrders) : [];
+};
+
+const saveOrders = (orders: PurchaseOrder[]) => {
+  localStorage.setItem('purchaseOrders', JSON.stringify(orders));
+};
 
 const PurchaseOrders = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [orders, setOrders] = useState<PurchaseOrder[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setOrders(loadOrders());
+  }, []);
 
   const handleOpenForm = () => {
+    setSelectedOrder(null);
     setIsFormOpen(true);
+  };
+
+  const handleSaveOrder = (order: PurchaseOrder) => {
+    const updatedOrders = [...orders];
+    const existingIndex = updatedOrders.findIndex(o => o.id === order.id);
+    
+    if (existingIndex >= 0) {
+      updatedOrders[existingIndex] = order;
+      toast({
+        title: "Bon de commande mis à jour",
+        description: `Le bon de commande ${order.reference} a été mis à jour.`,
+      });
+    } else {
+      updatedOrders.push(order);
+      toast({
+        title: "Bon de commande créé",
+        description: `Le bon de commande ${order.reference} a été créé avec succès.`,
+      });
+    }
+    
+    setOrders(updatedOrders);
+    saveOrders(updatedOrders);
+    setIsFormOpen(false);
+  };
+
+  const handleViewOrder = (order: PurchaseOrder) => {
+    setSelectedOrder(order);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    const updatedOrders = orders.filter(order => order.id !== orderId);
+    setOrders(updatedOrders);
+    saveOrders(updatedOrders);
+    
+    toast({
+      title: "Bon de commande supprimé",
+      description: "Le bon de commande a été supprimé avec succès.",
+    });
+  };
+
+  const handleDuplicateOrder = (order: PurchaseOrder) => {
+    const newOrder = {
+      ...order,
+      id: `${Date.now()}`,
+      reference: `${order.reference}-COPIE`,
+      createdAt: new Date().toISOString(),
+      status: 'pending' as const
+    };
+    
+    setSelectedOrder(newOrder);
+    setIsFormOpen(true);
+    
+    toast({
+      title: "Bon de commande dupliqué",
+      description: "Vous pouvez maintenant modifier ce bon de commande.",
+    });
   };
 
   return (
@@ -29,32 +105,20 @@ const PurchaseOrders = () => {
           </Button>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Bons de Commande Récents</CardTitle>
-            <CardDescription>
-              Visualisez et gérez les bons de commande récemment créés
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <FileText className="mx-auto h-12 w-12 text-gray-300" />
-              <h3 className="mt-4 text-lg font-medium">Aucun bon de commande</h3>
-              <p className="mt-1 text-gray-500">
-                Commencez par créer un nouveau bon de commande pour un fournisseur
-              </p>
-              <Button onClick={handleOpenForm} className="mt-4">
-                <Plus className="mr-2 h-4 w-4" /> Créer un Bon de Commande
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <PurchaseOrdersList 
+          orders={orders} 
+          onView={handleViewOrder}
+          onDelete={handleDeleteOrder}
+          onDuplicate={handleDuplicateOrder}
+        />
       </div>
 
       {isFormOpen && (
         <PurchaseOrderForm
           isOpen={isFormOpen}
           onClose={() => setIsFormOpen(false)}
+          initialOrder={selectedOrder}
+          onSave={handleSaveOrder}
         />
       )}
     </MainLayout>
