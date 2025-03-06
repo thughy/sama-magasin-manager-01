@@ -12,8 +12,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Supplier } from "@/data/suppliersData";
 
-export const SuppliersHeader = () => {
+interface SuppliersHeaderProps {
+  onAddSupplier: (supplier: Supplier) => void;
+  lastSupplierId: number;
+}
+
+export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHeaderProps) => {
   const [open, setOpen] = useState(false);
   const [newSupplier, setNewSupplier] = useState({
     name: "",
@@ -48,8 +54,15 @@ export const SuppliersHeader = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ici, vous pourriez ajouter le code pour enregistrer réellement le fournisseur
-    // dans votre base de données ou votre état global
+    // Create new supplier with a unique ID and default balance of 0
+    const supplierToAdd: Supplier = {
+      id: lastSupplierId + 1,
+      ...newSupplier,
+      balance: 0
+    };
+    
+    // Add the supplier to the parent component's state
+    onAddSupplier(supplierToAdd);
     
     toast({
       title: "Fournisseur ajouté",

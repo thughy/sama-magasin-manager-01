@@ -1,27 +1,29 @@
+
 import { useState } from "react";
 import { Supplier } from "@/data/suppliersData";
 import { SuppliersSearch } from "./SuppliersSearch";
 import { SuppliersTableView } from "./SuppliersTableView";
 import { SupplierEditDialog } from "./SupplierEditDialog";
 import { PurchaseOrderForm } from "./PurchaseOrderForm";
+import { useToast } from "@/hooks/use-toast";
 
 interface SuppliersTableProps {
   suppliers: Supplier[];
+  onUpdateSupplier: (supplier: Supplier) => void;
 }
 
-export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTableProps) => {
-  const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
+export const SuppliersTable = ({ suppliers, onUpdateSupplier }: SuppliersTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentSupplier, setCurrentSupplier] = useState<Supplier | null>(null);
   const [purchaseOrderOpen, setPurchaseOrderOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
   const handleRefresh = () => {
-    setSuppliers(initialSuppliers);
     setSearchTerm("");
   };
 
@@ -43,9 +45,12 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (currentSupplier) {
-      setSuppliers(suppliers.map(supplier => 
-        supplier.id === currentSupplier.id ? currentSupplier : supplier
-      ));
+      onUpdateSupplier(currentSupplier);
+      
+      toast({
+        title: "Fournisseur modifié",
+        description: `Les informations de ${currentSupplier.name} ont été mises à jour.`,
+      });
       
       setEditDialogOpen(false);
     }
