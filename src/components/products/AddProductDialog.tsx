@@ -11,14 +11,16 @@ import { Package } from "lucide-react";
 import { ProductForm } from "./forms/ProductForm";
 import { ProductFormValues } from "./forms/schema/productSchema";
 import { ServiceForm, ServiceFormValues } from "./forms/ServiceForm";
+import { Item } from "@/types/product";
 
 interface AddProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (data: any, type: "product" | "service") => void;
+  existingItems: Item[];
 }
 
-export function AddProductDialog({ open, onOpenChange, onAdd }: AddProductDialogProps) {
+export function AddProductDialog({ open, onOpenChange, onAdd, existingItems }: AddProductDialogProps) {
   const [activeTab, setActiveTab] = useState<"product" | "service">("product");
   
   const handleOpenChange = (isOpen: boolean) => {
@@ -59,6 +61,7 @@ export function AddProductDialog({ open, onOpenChange, onAdd }: AddProductDialog
             <ProductForm 
               onSubmit={handleProductSubmit}
               onCancel={handleCancel}
+              existingItems={existingItems}
             />
           </TabsContent>
           
@@ -66,6 +69,7 @@ export function AddProductDialog({ open, onOpenChange, onAdd }: AddProductDialog
             <ServiceForm 
               onSubmit={handleServiceSubmit}
               onCancel={handleCancel}
+              existingItems={existingItems}
             />
           </TabsContent>
         </Tabs>

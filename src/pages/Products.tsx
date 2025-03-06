@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Plus, RefreshCw } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -23,11 +22,7 @@ const Products = () => {
   const [itemToEdit, setItemToEdit] = useState<Item | null>(null);
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
 
-  // For debugging
-  console.log("Items in Products.tsx:", items);
-
   const filteredItems = items.filter(item => {
-    // Filter by search term
     const matchesSearch = 
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.type === "product" && (
@@ -35,12 +30,10 @@ const Products = () => {
         item.id.toLowerCase().includes(searchTerm.toLowerCase())
       ));
     
-    // Filter by category (products only)
     const matchesCategory = selectedCategory === "all"
       ? true
       : (item.type === "product" && (item as Product).category === selectedCategory);
     
-    // Filter by type (product or service)
     const matchesType = selectedType === "all"
       ? true
       : item.type === selectedType;
@@ -48,18 +41,21 @@ const Products = () => {
     return matchesSearch && matchesCategory && matchesType;
   });
 
-  // For debugging
-  console.log("Filtered items in Products.tsx:", filteredItems);
-
-  // Extract unique categories from products
   const categories = [...new Set(
     items
       .filter(item => item.type === "product")
       .map(item => (item as Product).category)
   )];
 
+  const checkNameExists = (name: string, type: "product" | "service", excludeId?: string) => {
+    return items.some(item => 
+      item.type === type && 
+      item.name.toLowerCase() === name.toLowerCase() &&
+      (!excludeId || item.id !== excludeId)
+    );
+  };
+
   const handleAddItem = (data: any, type: "product" | "service") => {
-    // Generate a new ID
     const newId = type === "product" 
       ? `PRD${String(items.length + 1).padStart(3, '0')}` 
       : `SRV${String(items.length + 1).padStart(3, '0')}`;
@@ -69,13 +65,13 @@ const Products = () => {
         id: newId,
         type: "product",
         name: data.name,
-        barcode: data.barcode || "", // Handle empty barcode
+        barcode: data.barcode || "",
         category: data.category,
         buyPrice: data.purchasePrice,
         sellPrice: data.sellPrice,
-        stock: 0, // Initial stock
+        stock: 0,
         minStock: data.minStock,
-        depot: "Principal" // Default depot
+        depot: "Principal"
       };
       setItems([...items, newProduct]);
     } else {
@@ -149,8 +145,6 @@ const Products = () => {
   };
 
   const refreshItems = () => {
-    // Dans une application réelle, ceci pourrait être un appel API
-    // Pour cette démo, nous réinitialisons simplement les données
     setItems(initialItems);
     
     toast({
@@ -207,7 +201,8 @@ const Products = () => {
       <AddProductDialog 
         open={showAddDialog} 
         onOpenChange={setShowAddDialog} 
-        onAdd={handleAddItem} 
+        onAdd={handleAddItem}
+        existingItems={items} 
       />
 
       {itemToEdit && (
@@ -216,6 +211,7 @@ const Products = () => {
           onOpenChange={() => setItemToEdit(null)}
           item={itemToEdit}
           onSave={handleEditItem}
+          existingItems={items}
         />
       )}
 

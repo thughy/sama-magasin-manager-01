@@ -9,20 +9,25 @@ import { productSchema, ProductFormValues } from "./schema/productSchema";
 import { ProductBasicInfo } from "./components/ProductBasicInfo";
 import { ProductPrices } from "./components/ProductPrices";
 import { ProductDetails } from "./components/ProductDetails";
+import { Item } from "@/types/product";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductFormProps {
   onSubmit: (data: ProductFormValues) => void;
   onCancel: () => void;
   initialValues?: ProductFormValues;
   isEditMode?: boolean;
+  existingItems?: Item[];
 }
 
 export function ProductForm({ 
   onSubmit, 
   onCancel, 
   initialValues,
-  isEditMode = false 
+  isEditMode = false,
+  existingItems = []
 }: ProductFormProps) {
+  const { toast } = useToast();
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: initialValues || {
@@ -39,6 +44,22 @@ export function ProductForm({
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleSubmit = (data: ProductFormValues) => {
+    // Check for duplicate name
+    const isDuplicateName = existingItems.some(item => 
+      item.type === "product" && 
+      item.name.toLowerCase() === data.name.toLowerCase() &&
+      (!isEditMode || (isEditMode && initialValues && item.name !== initialValues.name))
+    );
+
+    if (isDuplicateName) {
+      toast({
+        title: "Erreur de validation",
+        description: "Un article avec ce nom existe déjà",
+        variant: "destructive",
+      });
+      return;
+    }
+
     onSubmit(data);
     
     // Only reset the form if not in edit mode

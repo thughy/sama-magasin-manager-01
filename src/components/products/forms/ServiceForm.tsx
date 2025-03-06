@@ -14,6 +14,8 @@ import {
   FormMessage 
 } from "@/components/ui/form";
 import { DialogFooter } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Item } from "@/types/product";
 
 // Form validation schema for Service
 const serviceSchema = z.object({
@@ -28,14 +30,17 @@ interface ServiceFormProps {
   onCancel: () => void;
   initialValues?: ServiceFormValues;
   isEditMode?: boolean;
+  existingItems?: Item[];
 }
 
 export function ServiceForm({ 
   onSubmit, 
   onCancel,
   initialValues,
-  isEditMode = false
+  isEditMode = false,
+  existingItems = []
 }: ServiceFormProps) {
+  const { toast } = useToast();
   const form = useForm<ServiceFormValues>({
     resolver: zodResolver(serviceSchema),
     defaultValues: initialValues || {
@@ -48,6 +53,22 @@ export function ServiceForm({
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleSubmit = (data: ServiceFormValues) => {
+    // Check for duplicate name
+    const isDuplicateName = existingItems.some(item => 
+      item.type === "service" && 
+      item.name.toLowerCase() === data.name.toLowerCase() &&
+      (!isEditMode || (isEditMode && initialValues && item.name !== initialValues.name))
+    );
+
+    if (isDuplicateName) {
+      toast({
+        title: "Erreur de validation",
+        description: "Un service avec ce nom existe déjà",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     onSubmit(data);
     
     // Only reset the form if not in edit mode

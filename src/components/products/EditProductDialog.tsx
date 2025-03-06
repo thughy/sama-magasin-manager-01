@@ -18,13 +18,15 @@ interface EditProductDialogProps {
   onOpenChange: (open: boolean) => void;
   item: Item;
   onSave: (data: any, type: "product" | "service", id: string) => void;
+  existingItems: Item[];
 }
 
 export function EditProductDialog({ 
   open, 
   onOpenChange, 
   item, 
-  onSave 
+  onSave,
+  existingItems
 }: EditProductDialogProps) {
   const [activeTab, setActiveTab] = useState<"product" | "service">(item.type);
   
@@ -90,6 +92,7 @@ export function EditProductDialog({
                 onCancel={handleCancel}
                 initialValues={productInitialValues}
                 isEditMode
+                existingItems={existingItems}
               />
             )}
           </TabsContent>
@@ -101,6 +104,7 @@ export function EditProductDialog({
                 onCancel={handleCancel}
                 initialValues={serviceInitialValues}
                 isEditMode
+                existingItems={existingItems}
               />
             )}
           </TabsContent>
