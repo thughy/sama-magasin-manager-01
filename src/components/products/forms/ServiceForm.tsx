@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,14 +37,32 @@ export function ServiceForm({ onSubmit, onCancel }: ServiceFormProps) {
     },
   });
 
-  // Reference to the name input for focusing (nous le gardons pour l'autocomplétion)
+  // Reference to the name input for focusing
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleSubmit = (data: ServiceFormValues) => {
     onSubmit(data);
-    // Note: We're no longer resetting the form here because the dialog will close
-    // and the component will unmount
+    
+    // Reset form after submission
+    form.reset({
+      name: "",
+      amount: 0,
+    });
+    
+    // Focus on the name input after form reset
+    setTimeout(() => {
+      if (nameInputRef.current) {
+        nameInputRef.current.focus();
+      }
+    }, 100);
   };
+
+  // Focus on name input when component mounts
+  useEffect(() => {
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, []);
 
   return (
     <Form {...form}>
