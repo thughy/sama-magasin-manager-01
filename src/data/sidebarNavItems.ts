@@ -10,13 +10,23 @@ import {
   FileText,
   Warehouse,
   ArrowRight,
-  Boxes
+  Boxes,
+  Tags,
+  Layers3
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar";
 
 export const navItems: NavItem[] = [
   { title: "Tableau de bord", icon: LayoutDashboard, href: "/" },
-  { title: "Produits", icon: Package, href: "/products" },
+  { 
+    title: "Produits", 
+    icon: Package, 
+    href: "/products",
+    subItems: [
+      { title: "Article/Service", url: "/products", icon: Package },
+      { title: "Categorie", url: "/products/categories", icon: Tags }
+    ]
+  },
   { title: "Clients", icon: Users, href: "/clients" },
   { title: "Caisse", icon: CreditCard, href: "/cashier" },
   { title: "Ventes", icon: ShoppingCart, href: "/sales" },
