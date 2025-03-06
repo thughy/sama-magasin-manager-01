@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileEdit, Trash2, Eye, RefreshCw, Search } from "lucide-react";
+import { FileEdit, Trash2, Eye, RefreshCw, Search, FileText } from "lucide-react";
 import { Supplier } from "@/data/suppliersData";
 import { 
   Dialog, 
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { PurchaseOrderForm } from "./PurchaseOrderForm";
 
 interface SuppliersTableProps {
   suppliers: Supplier[];
@@ -24,6 +24,7 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
   const [searchTerm, setSearchTerm] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentSupplier, setCurrentSupplier] = useState<Supplier | null>(null);
+  const [purchaseOrderOpen, setPurchaseOrderOpen] = useState(false);
   const { toast } = useToast();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +71,11 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
     }
   };
 
-  // Filtrer les fournisseurs en fonction du terme de recherche
+  const openPurchaseOrder = (supplier: Supplier) => {
+    setCurrentSupplier(supplier);
+    setPurchaseOrderOpen(true);
+  };
+
   const filteredSuppliers = suppliers.filter(supplier => {
     const term = searchTerm.toLowerCase();
     return (
@@ -135,6 +140,13 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
                     >
                       <FileEdit className="h-4 w-4 text-amber-500" />
                     </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => openPurchaseOrder(supplier)}
+                    >
+                      <FileText className="h-4 w-4 text-blue-500" />
+                    </Button>
                     <Button variant="ghost" size="icon">
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
@@ -152,7 +164,6 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
         </TableBody>
       </Table>
 
-      {/* Dialog pour modifier les informations du fournisseur */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -212,6 +223,14 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
           </form>
         </DialogContent>
       </Dialog>
+
+      {currentSupplier && (
+        <PurchaseOrderForm
+          supplier={currentSupplier}
+          isOpen={purchaseOrderOpen}
+          onClose={() => setPurchaseOrderOpen(false)}
+        />
+      )}
     </div>
   );
 };
