@@ -1,4 +1,3 @@
-
 import { 
   Package, 
   Users, 
@@ -8,20 +7,10 @@ import {
   TrendingUp,
   BarChart
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  BarChart as RechartsBarChart,
-  Bar
-} from "recharts";
 
 const salesData = [
   { name: "Jan", total: 1800 },
