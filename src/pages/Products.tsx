@@ -19,6 +19,9 @@ const Products = () => {
   const [selectedType, setSelectedType] = useState<string>("");
   const [showAddDialog, setShowAddDialog] = useState(false);
 
+  // For debugging
+  console.log("Items in Products.tsx:", items);
+
   const filteredItems = items.filter(item => {
     // Filter by search term
     const matchesSearch = 
@@ -40,6 +43,9 @@ const Products = () => {
     
     return matchesSearch && matchesCategory && matchesType;
   });
+
+  // For debugging
+  console.log("Filtered items in Products.tsx:", filteredItems);
 
   // Extract unique categories from products
   const categories = [...new Set(

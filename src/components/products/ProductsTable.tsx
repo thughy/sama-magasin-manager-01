@@ -1,3 +1,4 @@
+
 import { Barcode, MoreHorizontal, Edit, Trash, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,8 @@ interface ProductsTableProps {
 }
 
 export const ProductsTable = ({ items }: ProductsTableProps) => {
+  console.log("Items in ProductsTable:", items); // For debugging
+  
   return (
     <div className="rounded-md border">
       <Table>
@@ -41,7 +44,7 @@ export const ProductsTable = ({ items }: ProductsTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.length > 0 ? (
+          {items && items.length > 0 ? (
             items.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
