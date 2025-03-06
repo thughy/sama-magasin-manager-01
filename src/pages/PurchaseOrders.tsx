@@ -18,6 +18,16 @@ const saveOrders = (orders: PurchaseOrder[]) => {
   localStorage.setItem('purchaseOrders', JSON.stringify(orders));
 };
 
+// In a real app, this would come from an API or state management
+const loadInventory = (): any[] => {
+  const savedInventory = localStorage.getItem('inventory');
+  return savedInventory ? JSON.parse(savedInventory) : [];
+};
+
+const saveInventory = (inventory: any[]) => {
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+};
+
 const PurchaseOrders = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
@@ -90,6 +100,77 @@ const PurchaseOrders = () => {
     });
   };
 
+  const handleConvertToPurchase = (orderId: string) => {
+    // Find the order to convert
+    const orderToConvert = orders.find(order => order.id === orderId);
+    if (!orderToConvert) return;
+    
+    // Update order status to 'delivered'
+    const updatedOrders = orders.map(order => 
+      order.id === orderId 
+        ? { ...order, status: 'delivered' as const } 
+        : order
+    );
+    
+    setOrders(updatedOrders);
+    saveOrders(updatedOrders);
+    
+    // In a real application, you would update inventory here
+    // For now, we'll simulate adding to inventory in localStorage
+    const currentInventory = loadInventory();
+    
+    // Add items from the purchase order to inventory
+    const updatedInventory = [...currentInventory];
+    
+    orderToConvert.items.forEach(item => {
+      // Extract product ID if available in the description (format: "ID-ProductName")
+      let productId = null;
+      const descriptionParts = item.description.split('-');
+      if (descriptionParts.length > 1 && !isNaN(Number(descriptionParts[0]))) {
+        productId = Number(descriptionParts[0]);
+      }
+      
+      if (productId) {
+        // Check if product already exists in inventory
+        const existingItemIndex = updatedInventory.findIndex(
+          invItem => invItem.id === productId
+        );
+        
+        if (existingItemIndex >= 0) {
+          // Update existing inventory item
+          updatedInventory[existingItemIndex].quantity += item.quantity;
+        } else {
+          // Add new inventory item
+          updatedInventory.push({
+            id: productId,
+            name: item.description.substring(item.description.indexOf('-') + 1),
+            barcode: item.barcode || '',
+            quantity: item.quantity,
+            purchasePrice: item.unitPrice,
+            sellPrice: item.sellPrice || 0,
+          });
+        }
+      } else {
+        // If no product ID found, create a new inventory item
+        updatedInventory.push({
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          name: item.description,
+          barcode: item.barcode || '',
+          quantity: item.quantity,
+          purchasePrice: item.unitPrice,
+          sellPrice: item.sellPrice || 0,
+        });
+      }
+    });
+    
+    saveInventory(updatedInventory);
+    
+    toast({
+      title: "Achat enregistré",
+      description: `Le bon de commande ${orderToConvert.reference} a été transformé en achat et ajouté à votre stock.`,
+    });
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
@@ -110,6 +191,7 @@ const PurchaseOrders = () => {
           onView={handleViewOrder}
           onDelete={handleDeleteOrder}
           onDuplicate={handleDuplicateOrder}
+          onConvertToPurchase={handleConvertToPurchase}
         />
       </div>
 

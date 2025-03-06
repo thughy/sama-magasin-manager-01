@@ -2,7 +2,8 @@
 import React from "react";
 import { Supplier } from "@/data/suppliersData";
 import { OrderItem } from "@/types/purchaseOrder";
-import { Building2, Phone, Mail, MapPin } from "lucide-react";
+import { Building2, Phone, Mail, MapPin, FileCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PrintablePurchaseOrderProps {
   supplier: Supplier;
@@ -11,6 +12,9 @@ interface PrintablePurchaseOrderProps {
   deliveryDate: string;
   orderItems: OrderItem[];
   printRef: React.RefObject<HTMLDivElement>;
+  orderId?: string;
+  onConvertToPurchase?: (orderId: string) => void;
+  showControls?: boolean;
 }
 
 export const PrintablePurchaseOrder = ({ 
@@ -19,7 +23,10 @@ export const PrintablePurchaseOrder = ({
   orderDate, 
   deliveryDate, 
   orderItems,
-  printRef 
+  printRef,
+  orderId,
+  onConvertToPurchase,
+  showControls = false
 }: PrintablePurchaseOrderProps) => {
   const calculateTotal = () => {
     return orderItems.reduce((total, item) => total + (item.quantity * item.unitPrice), 0);
@@ -35,10 +42,25 @@ export const PrintablePurchaseOrder = ({
     logo: localStorage.getItem('companyLogo') || "" // Get logo from localStorage if available
   };
 
+  const handleConvertToPurchase = () => {
+    if (orderId && onConvertToPurchase) {
+      onConvertToPurchase(orderId);
+    }
+  };
+
   return (
-    <div className="hidden">
-      <div ref={printRef} className="purchase-order">
-        <div className="header">
+    <div className={showControls ? "" : "hidden"}>
+      {showControls && orderId && onConvertToPurchase && (
+        <div className="mb-4 flex justify-end">
+          <Button onClick={handleConvertToPurchase} className="bg-green-600 hover:bg-green-700">
+            <FileCheck className="mr-2 h-4 w-4" />
+            Transformer en Achat
+          </Button>
+        </div>
+      )}
+      
+      <div ref={printRef} className="purchase-order border p-8 rounded-lg bg-white">
+        <div className="header flex justify-between items-start">
           <div className="company-info">
             {companyInfo.logo && (
               <div className="mb-2">
