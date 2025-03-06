@@ -69,9 +69,27 @@ export const PurchaseOrderForm = ({
         <head>
           <title>Bon de Commande - ${selectedSupplier?.name}</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-            .purchase-order { width: 210mm; min-height: 297mm; padding: 20mm; margin: 0 auto; }
-            .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+            @page {
+              size: A4;
+              margin: 0;
+            }
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 0; 
+              padding: 0; 
+            }
+            .purchase-order { 
+              width: 210mm; 
+              min-height: 297mm; 
+              padding: 20mm; 
+              margin: 0 auto; 
+              box-sizing: border-box;
+            }
+            .header { 
+              display: flex; 
+              justify-content: space-between; 
+              margin-bottom: 20px; 
+            }
             .company-info { margin-bottom: 30px; }
             .supplier-info { margin-bottom: 30px; }
             h1 { color: #333; }
@@ -81,6 +99,12 @@ export const PurchaseOrderForm = ({
             th { background-color: #f2f2f2; }
             .total-row { font-weight: bold; }
             .footer { margin-top: 50px; text-align: right; }
+            @media print {
+              html, body {
+                width: 210mm;
+                height: 297mm;
+              }
+            }
           </style>
         </head>
         <body>

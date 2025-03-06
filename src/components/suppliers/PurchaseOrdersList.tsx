@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -31,7 +30,7 @@ export const PurchaseOrdersList = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedStatus, setSelectedStatus] = useState("");
-  
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('fr-FR').format(date);
@@ -47,18 +46,14 @@ export const PurchaseOrdersList = ({
     setIsPrintDialogOpen(false);
   };
 
-  // Filter orders based on search term, selected date, and status
   const filteredOrders = orders.filter(order => {
-    // Filter by supplier name
     const matchesSearch = searchTerm === "" || 
       order.supplierName.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Filter by date
     const matchesDate = !selectedDate || 
       isSameDay(new Date(order.orderDate), selectedDate);
     
-    // Filter by status
-    const matchesStatus = selectedStatus === "" || 
+    const matchesStatus = selectedStatus === "" || selectedStatus === "all" || 
       order.status === selectedStatus;
     
     return matchesSearch && matchesDate && matchesStatus;

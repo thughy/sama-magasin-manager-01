@@ -59,7 +59,17 @@ export const PrintablePurchaseOrder = ({
         </div>
       )}
       
-      <div ref={printRef} className="purchase-order border p-8 rounded-lg bg-white">
+      <div 
+        ref={printRef} 
+        className="purchase-order border p-8 rounded-lg bg-white"
+        style={{ 
+          width: '210mm', 
+          minHeight: '297mm', 
+          maxWidth: '100%', 
+          margin: '0 auto',
+          boxSizing: 'border-box' 
+        }}
+      >
         <div className="header flex justify-between items-start">
           <div className="company-info">
             {companyInfo.logo && (
