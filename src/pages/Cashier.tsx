@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, ShoppingCart, Plus, Minus, X, CreditCard, Receipt, Printer } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Package, Plus, Search, Filter, MoreHorizontal, Edit, Trash, Barcode } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
