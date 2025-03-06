@@ -19,10 +19,10 @@ interface PurchasesFiltersProps {
   setSupplierSearchTerm: (term: string) => void;
   productSearchTerm: string;
   setProductSearchTerm: (term: string) => void;
-  selectedDate: Date | undefined;
-  setSelectedDate: (date: Date | undefined) => void;
-  selectedStatus: string;
-  setSelectedStatus: (status: string) => void;
+  selectedDate: string | undefined;
+  setSelectedDate: (date: string | undefined) => void;
+  selectedStatus: "all" | "payée" | "impayée";
+  setSelectedStatus: (status: "all" | "payée" | "impayée") => void;
   onClearFilters: () => void;
 }
 
@@ -40,6 +40,14 @@ export const PurchasesFilters = ({
   const handleClearSupplierSearch = () => setSupplierSearchTerm("");
   const handleClearProductSearch = () => setProductSearchTerm("");
   const handleClearDate = () => setSelectedDate(undefined);
+  
+  // Convert string date to Date object for the Calendar component
+  const dateValue = selectedDate ? new Date(selectedDate) : undefined;
+  
+  // Handle date selection from the Calendar component
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date ? date.toISOString().split('T')[0] : undefined);
+  };
   
   return (
     <div className="flex flex-wrap gap-2 mb-4">
@@ -92,15 +100,16 @@ export const PurchasesFilters = ({
             className="gap-2"
           >
             <Calendar className="h-4 w-4" />
-            {selectedDate ? format(selectedDate, 'dd/MM/yyyy') : "Date"}
+            {selectedDate ? format(new Date(selectedDate), 'dd/MM/yyyy') : "Date"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <CalendarComponent
             mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
+            selected={dateValue}
+            onSelect={handleDateSelect}
             locale={fr}
+            className="pointer-events-auto"
           />
           {selectedDate && (
             <div className="p-2 border-t flex justify-end">
@@ -123,7 +132,7 @@ export const PurchasesFilters = ({
         </SelectContent>
       </Select>
       
-      {(supplierSearchTerm || productSearchTerm || selectedDate || selectedStatus) && (
+      {(supplierSearchTerm || productSearchTerm || selectedDate || selectedStatus !== "all") && (
         <Button variant="outline" size="icon" onClick={onClearFilters}>
           <X className="h-4 w-4" />
         </Button>

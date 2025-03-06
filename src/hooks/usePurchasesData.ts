@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Purchase } from "@/types/purchase";
 import { purchasesData } from "@/data/purchasesData";
 import { useToast } from "./use-toast";
@@ -40,31 +40,31 @@ export const usePurchasesData = () => {
     return true;
   });
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     setAllPurchases([...purchasesData]);
     toast({
       title: "Données actualisées",
       description: "La liste des achats a été actualisée",
     });
-  };
+  }, [toast]);
 
-  const handleAddPurchase = () => {
+  const handleAddPurchase = useCallback(() => {
     setSelectedPurchase(undefined);
     setIsPurchaseFormOpen(true);
-  };
+  }, []);
 
-  const handleEditPurchase = (purchase: Purchase) => {
+  const handleEditPurchase = useCallback((purchase: Purchase) => {
     setSelectedPurchase(purchase);
     setIsPurchaseFormOpen(true);
-  };
+  }, []);
 
-  const handleDeletePurchase = (purchaseId: string) => {
+  const handleDeletePurchase = useCallback((purchaseId: string) => {
     const purchase = allPurchases.find(p => p.id === purchaseId);
     setSelectedPurchase(purchase);
     setIsDeleteDialogOpen(true);
-  };
+  }, [allPurchases]);
 
-  const handleSavePurchase = (purchase: Purchase) => {
+  const handleSavePurchase = useCallback((purchase: Purchase) => {
     if (selectedPurchase) {
       // Update existing purchase
       setAllPurchases(allPurchases.map(p => p.id === purchase.id ? purchase : p));
@@ -82,9 +82,9 @@ export const usePurchasesData = () => {
     }
     setIsPurchaseFormOpen(false);
     setSelectedPurchase(undefined);
-  };
+  }, [allPurchases, selectedPurchase, toast]);
 
-  const confirmDeletePurchase = () => {
+  const confirmDeletePurchase = useCallback(() => {
     if (selectedPurchase) {
       setAllPurchases(allPurchases.filter(p => p.id !== selectedPurchase.id));
       toast({
@@ -94,14 +94,14 @@ export const usePurchasesData = () => {
       setIsDeleteDialogOpen(false);
       setSelectedPurchase(undefined);
     }
-  };
+  }, [allPurchases, selectedPurchase, toast]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSupplierSearchTerm("");
     setProductSearchTerm("");
     setSelectedDate(undefined);
     setSelectedStatus("all");
-  };
+  }, []);
 
   return {
     purchases,
