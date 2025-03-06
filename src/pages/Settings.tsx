@@ -1,4 +1,3 @@
-
 import { MainLayout } from "@/components/layout/MainLayout";
 import { 
   Card, 
@@ -28,12 +27,16 @@ import {
   Bell, 
   ShieldCheck, 
   Save,
-  Trash2 
+  Trash2,
+  Upload,
+  Image
 } from "lucide-react";
 import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("company");
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   
   const companyForm = useForm({
     defaultValues: {
@@ -42,6 +45,7 @@ const Settings = () => {
       phone: "+221 77 123 45 67",
       email: "contact@samamagasin.com",
       taxId: "SN12345678",
+      logo: ""
     }
   });
 
@@ -53,6 +57,19 @@ const Settings = () => {
       confirmPassword: "",
     }
   });
+
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setLogoPreview(result);
+        companyForm.setValue("logo", result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleCompanySubmit = (data: any) => {
     console.log("Company data submitted:", data);
@@ -104,73 +121,108 @@ const Settings = () => {
               </CardHeader>
               <CardContent>
                 <Form {...companyForm}>
-                  <form onSubmit={companyForm.handleSubmit(handleCompanySubmit)} className="space-y-4">
-                    <FormField
-                      control={companyForm.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nom de l'entreprise</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={companyForm.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Adresse</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={companyForm.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Téléphone</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                  <form onSubmit={companyForm.handleSubmit(handleCompanySubmit)} className="space-y-6">
+                    <div className="flex flex-col gap-6 md:flex-row md:items-start">
+                      <div className="flex flex-col items-center gap-4">
+                        <FormLabel className="text-center">Logo de l'entreprise</FormLabel>
+                        <div className="relative flex flex-col items-center">
+                          <Avatar className="h-32 w-32 border border-border">
+                            <AvatarImage src={logoPreview || ""} alt="Logo" />
+                            <AvatarFallback className="bg-muted">
+                              <Image size={32} />
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="mt-4">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="relative"
+                              onClick={() => document.getElementById('logo-upload')?.click()}
+                            >
+                              <Upload size={16} className="mr-2" />
+                              Choisir un logo
+                              <input
+                                id="logo-upload"
+                                type="file"
+                                accept="image/*"
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                onChange={handleLogoChange}
+                              />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
                       
-                      <FormField
-                        control={companyForm.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="email" />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                      <div className="flex-1 space-y-4">
+                        <FormField
+                          control={companyForm.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nom de l'entreprise</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={companyForm.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Adresse</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={companyForm.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Téléphone</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={companyForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <Input {...field} type="email" />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        
+                        <FormField
+                          control={companyForm.control}
+                          name="taxId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Numéro d'identification fiscale</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
-                    
-                    <FormField
-                      control={companyForm.control}
-                      name="taxId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Numéro d'identification fiscale</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
                     
                     <div className="flex justify-end">
                       <Button type="submit" className="bg-sama-600 hover:bg-sama-700">

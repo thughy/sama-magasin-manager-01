@@ -31,7 +31,8 @@ export const PrintablePurchaseOrder = ({
     address: "123 Rue Principale, Dakar",
     phone: "+221 77 123 45 67",
     email: "contact@samamagasin.com",
-    taxId: "SN12345678"
+    taxId: "SN12345678",
+    logo: localStorage.getItem('companyLogo') || "" // Get logo from localStorage if available
   };
 
   return (
@@ -39,6 +40,11 @@ export const PrintablePurchaseOrder = ({
       <div ref={printRef} className="purchase-order">
         <div className="header">
           <div className="company-info">
+            {companyInfo.logo && (
+              <div className="mb-2">
+                <img src={companyInfo.logo} alt="Logo" className="h-16 object-contain" />
+              </div>
+            )}
             <h1 className="text-xl font-bold">{companyInfo.name}</h1>
             <div className="flex items-center gap-2 mt-1">
               <MapPin size={14} />
