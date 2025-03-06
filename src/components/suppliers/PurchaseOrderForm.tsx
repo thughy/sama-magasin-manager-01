@@ -1,8 +1,6 @@
 
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { 
   Dialog, 
   DialogContent, 
@@ -12,19 +10,16 @@ import {
 } from "@/components/ui/dialog";
 import { Supplier } from "@/data/suppliersData";
 import { useToast } from "@/hooks/use-toast";
-import { Printer, Plus, Trash2 } from "lucide-react";
+import { Printer } from "lucide-react";
+import { OrderItem } from "@/types/purchaseOrder";
+import { OrderItemsList } from "./OrderItemsList";
+import { PurchaseOrderInfo } from "./PurchaseOrderInfo";
+import { PrintablePurchaseOrder } from "./PrintablePurchaseOrder";
 
 interface PurchaseOrderFormProps {
   supplier: Supplier;
   isOpen: boolean;
   onClose: () => void;
-}
-
-interface OrderItem {
-  id: number;
-  description: string;
-  quantity: number;
-  unitPrice: number;
 }
 
 export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFormProps) => {
@@ -52,10 +47,6 @@ export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFo
         item.id === id ? { ...item, [field]: value } : item
       )
     );
-  };
-
-  const calculateTotal = () => {
-    return orderItems.reduce((total, item) => total + (item.quantity * item.unitPrice), 0);
   };
 
   const handlePrint = () => {
@@ -110,161 +101,31 @@ export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFo
           <DialogTitle>Bon de Commande - {supplier.name}</DialogTitle>
         </DialogHeader>
         
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="reference">Référence</Label>
-              <Input 
-                id="reference" 
-                value={reference} 
-                onChange={(e) => setReference(e.target.value)} 
-                placeholder="BC-2023-0001" 
-              />
-            </div>
-            <div>
-              <Label htmlFor="orderDate">Date de commande</Label>
-              <Input 
-                id="orderDate" 
-                type="date" 
-                value={orderDate} 
-                onChange={(e) => setOrderDate(e.target.value)} 
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="supplierName">Fournisseur</Label>
-              <Input id="supplierName" value={supplier.name} readOnly />
-            </div>
-            <div>
-              <Label htmlFor="deliveryDate">Date de livraison souhaitée</Label>
-              <Input 
-                id="deliveryDate" 
-                type="date" 
-                value={deliveryDate} 
-                onChange={(e) => setDeliveryDate(e.target.value)} 
-              />
-            </div>
-          </div>
-          
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-medium">Articles</h3>
-              <Button variant="outline" size="sm" onClick={addOrderItem}>
-                <Plus className="h-4 w-4 mr-2" /> Ajouter
-              </Button>
-            </div>
-            
-            <div className="space-y-4">
-              {orderItems.map((item, index) => (
-                <div key={item.id} className="grid grid-cols-12 gap-2 items-end">
-                  <div className="col-span-5">
-                    <Label htmlFor={`item-${item.id}-desc`}>Description</Label>
-                    <Input 
-                      id={`item-${item.id}-desc`} 
-                      value={item.description} 
-                      onChange={(e) => handleItemChange(item.id, "description", e.target.value)}
-                      placeholder="Description de l'article"
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor={`item-${item.id}-qty`}>Quantité</Label>
-                    <Input 
-                      id={`item-${item.id}-qty`} 
-                      type="number" 
-                      min="1"
-                      value={item.quantity} 
-                      onChange={(e) => handleItemChange(item.id, "quantity", parseInt(e.target.value))}
-                    />
-                  </div>
-                  <div className="col-span-3">
-                    <Label htmlFor={`item-${item.id}-price`}>Prix unitaire (FCFA)</Label>
-                    <Input 
-                      id={`item-${item.id}-price`} 
-                      type="number"
-                      min="0" 
-                      value={item.unitPrice} 
-                      onChange={(e) => handleItemChange(item.id, "unitPrice", parseInt(e.target.value))}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => removeOrderItem(item.id)}
-                      disabled={orderItems.length <= 1}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex justify-end mt-4">
-              <div className="w-1/3">
-                <div className="flex justify-between py-2">
-                  <span className="font-medium">Total:</span>
-                  <span className="font-medium">{calculateTotal().toLocaleString()} FCFA</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Hidden div for printing */}
-        <div className="hidden">
-          <div ref={printRef} className="purchase-order">
-            <div className="header">
-              <div className="company-info">
-                <h1>BON DE COMMANDE</h1>
-                <p><strong>Référence:</strong> {reference}</p>
-                <p><strong>Date:</strong> {orderDate}</p>
-                {deliveryDate && <p><strong>Livraison souhaitée:</strong> {deliveryDate}</p>}
-              </div>
-            </div>
-            
-            <div className="supplier-info">
-              <h2>Fournisseur</h2>
-              <p><strong>{supplier.name}</strong></p>
-              <p>Contact: {supplier.contact}</p>
-              <p>Téléphone: {supplier.phone}</p>
-              <p>Email: {supplier.email}</p>
-            </div>
-            
-            <table>
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Quantité</th>
-                  <th>Prix unitaire (FCFA)</th>
-                  <th>Total (FCFA)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orderItems.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.description}</td>
-                    <td>{item.quantity}</td>
-                    <td>{item.unitPrice.toLocaleString()}</td>
-                    <td>{(item.quantity * item.unitPrice).toLocaleString()}</td>
-                  </tr>
-                ))}
-                <tr className="total-row">
-                  <td colSpan={3}>Total</td>
-                  <td>{calculateTotal().toLocaleString()}</td>
-                </tr>
-              </tbody>
-            </table>
-            
-            <div className="footer">
-              <p>Signature autorisée</p>
-              <div style={{ height: '50px' }}></div>
-              <p>_________________________</p>
-            </div>
-          </div>
-        </div>
+        <PurchaseOrderInfo 
+          reference={reference}
+          orderDate={orderDate}
+          deliveryDate={deliveryDate}
+          supplier={supplier}
+          onReferenceChange={setReference}
+          onOrderDateChange={setOrderDate}
+          onDeliveryDateChange={setDeliveryDate}
+        />
+        
+        <OrderItemsList 
+          orderItems={orderItems}
+          onAddItem={addOrderItem}
+          onRemoveItem={removeOrderItem}
+          onItemChange={handleItemChange}
+        />
+        
+        <PrintablePurchaseOrder 
+          supplier={supplier}
+          reference={reference}
+          orderDate={orderDate}
+          deliveryDate={deliveryDate}
+          orderItems={orderItems}
+          printRef={printRef}
+        />
         
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
