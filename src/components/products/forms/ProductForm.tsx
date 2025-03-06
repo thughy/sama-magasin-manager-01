@@ -33,8 +33,21 @@ export function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
 
   const handleSubmit = (data: ProductFormValues) => {
     onSubmit(data);
-    // Note: We're no longer resetting the form here because the dialog will close
-    // and the component will unmount
+    // Reset the form after submission but don't close the dialog
+    form.reset({
+      barcode: "",
+      name: "",
+      sellPrice: 0,
+      purchasePrice: 0,
+      category: "",
+      minStock: 0,
+    });
+    // Focus on the name input after form reset
+    setTimeout(() => {
+      if (nameInputRef.current) {
+        nameInputRef.current.focus();
+      }
+    }, 0);
   };
 
   return (

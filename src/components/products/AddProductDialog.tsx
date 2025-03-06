@@ -27,14 +27,12 @@ export function AddProductDialog({ open, onOpenChange, onAdd }: AddProductDialog
 
   const handleProductSubmit = (data: ProductFormValues) => {
     onAdd(data, "product");
-    // Fermer le dialogue après l'ajout
-    onOpenChange(false);
+    // Don't close the dialog after adding a product
   };
 
   const handleServiceSubmit = (data: ServiceFormValues) => {
     onAdd(data, "service");
-    // Fermer le dialogue après l'ajout
-    onOpenChange(false);
+    // Don't close the dialog after adding a service
   };
 
   const handleCancel = () => {
