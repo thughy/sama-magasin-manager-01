@@ -25,12 +25,14 @@ export const SupplierEditDialog = ({
   if (!supplier) return null;
 
   const handleStatusChange = (value: string) => {
+    // Create a synthetic change event that matches the expected structure
+    // Properly cast to unknown first to avoid TypeScript error
     const event = {
       target: {
         name: "status",
         value: value
       }
-    } as React.ChangeEvent<HTMLInputElement>;
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
     
     onInputChange(event);
   };
@@ -38,12 +40,14 @@ export const SupplierEditDialog = ({
   const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     const numericValue = e.target.value.replace(/[^0-9]/g, '');
     
+    // Create a synthetic change event that matches the expected structure
+    // Properly cast to unknown first to avoid TypeScript error
     const event = {
       target: {
         name: fieldName,
         value: numericValue ? parseInt(numericValue) : 0
       }
-    } as React.ChangeEvent<HTMLInputElement>;
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
     
     onInputChange(event);
   };
