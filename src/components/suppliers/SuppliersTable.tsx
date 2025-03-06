@@ -1,0 +1,52 @@
+
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { FileEdit, Trash2, Eye } from "lucide-react";
+import { Supplier } from "@/data/suppliersData";
+
+interface SuppliersTableProps {
+  suppliers: Supplier[];
+}
+
+export const SuppliersTable = ({ suppliers }: SuppliersTableProps) => {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nom</TableHead>
+          <TableHead>Contact</TableHead>
+          <TableHead>Téléphone</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead className="text-right">Solde (FCFA)</TableHead>
+          <TableHead className="text-center">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {suppliers.map((supplier) => (
+          <TableRow key={supplier.id}>
+            <TableCell className="font-medium">{supplier.name}</TableCell>
+            <TableCell>{supplier.contact}</TableCell>
+            <TableCell>{supplier.phone}</TableCell>
+            <TableCell>{supplier.email}</TableCell>
+            <TableCell className={`text-right font-medium ${supplier.balance < 0 ? 'text-red-500' : supplier.balance > 0 ? 'text-amber-600' : 'text-green-500'}`}>
+              {supplier.balance.toLocaleString()}
+            </TableCell>
+            <TableCell>
+              <div className="flex justify-center space-x-2">
+                <Button variant="ghost" size="icon">
+                  <Eye className="h-4 w-4 text-sama-500" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <FileEdit className="h-4 w-4 text-amber-500" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
