@@ -87,14 +87,15 @@ export const PurchaseFormItems = ({
             <TableHead>Quantité</TableHead>
             <TableHead>Prix d'achat (FCFA)</TableHead>
             <TableHead>Prix de vente (FCFA)</TableHead>
-            <TableHead>Total (FCFA)</TableHead>
+            <TableHead>Total Achat</TableHead>
+            <TableHead>Total Vente</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {items.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
                 Aucun article. Utilisez le champ de recherche ou le bouton "Ajouter" pour ajouter des articles.
               </TableCell>
             </TableRow>
@@ -132,6 +133,9 @@ export const PurchaseFormItems = ({
                 </TableCell>
                 <TableCell className="font-medium">
                   {(item.quantity * item.unitPrice).toLocaleString()}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {(item.quantity * item.sellPrice).toLocaleString()}
                 </TableCell>
                 <TableCell>
                   <Button
