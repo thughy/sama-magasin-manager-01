@@ -16,6 +16,16 @@ export const SuppliersSearch = ({
   onSearchChange, 
   onRefresh 
 }: SuppliersSearchProps) => {
+  const { toast } = useToast();
+  
+  const handleRefresh = () => {
+    onRefresh();
+    toast({
+      title: "Liste actualisée",
+      description: "La liste des fournisseurs a été actualisée avec succès.",
+    });
+  };
+
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       <div className="relative flex-1">
@@ -28,11 +38,13 @@ export const SuppliersSearch = ({
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
       </div>
       <Button 
-        onClick={onRefresh} 
+        onClick={handleRefresh} 
         variant="outline" 
-        className="md:w-auto w-full"
+        size="sm"
+        className="md:w-auto w-full transition-all hover:bg-primary hover:text-white flex items-center gap-2"
       >
-        <RefreshCw className="h-4 w-4 mr-2" /> Actualiser
+        <RefreshCw className="h-4 w-4" /> 
+        <span>Actualiser</span>
       </Button>
     </div>
   );

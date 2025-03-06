@@ -1,7 +1,5 @@
-
 import { useState } from "react";
 import { Supplier } from "@/data/suppliersData";
-import { useToast } from "@/hooks/use-toast";
 import { SuppliersSearch } from "./SuppliersSearch";
 import { SuppliersTableView } from "./SuppliersTableView";
 import { SupplierEditDialog } from "./SupplierEditDialog";
@@ -17,7 +15,6 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentSupplier, setCurrentSupplier] = useState<Supplier | null>(null);
   const [purchaseOrderOpen, setPurchaseOrderOpen] = useState(false);
-  const { toast } = useToast();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -26,10 +23,6 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
   const handleRefresh = () => {
     setSuppliers(initialSuppliers);
     setSearchTerm("");
-    toast({
-      title: "Liste actualisée",
-      description: "La liste des fournisseurs a été actualisée.",
-    });
   };
 
   const openEditDialog = (supplier: Supplier) => {
@@ -53,11 +46,6 @@ export const SuppliersTable = ({ suppliers: initialSuppliers }: SuppliersTablePr
       setSuppliers(suppliers.map(supplier => 
         supplier.id === currentSupplier.id ? currentSupplier : supplier
       ));
-      
-      toast({
-        title: "Fournisseur modifié",
-        description: `Les informations de ${currentSupplier.name} ont été mises à jour.`,
-      });
       
       setEditDialogOpen(false);
     }
