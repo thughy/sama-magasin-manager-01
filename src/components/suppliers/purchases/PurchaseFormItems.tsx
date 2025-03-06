@@ -7,6 +7,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Trash, Plus } from "lucide-react";
 import { ProductSearchBox } from "../ProductSearchBox";
 import { Product } from "@/types/purchaseOrder";
+import { DepotSelector } from "./DepotSelector";
 
 interface PurchaseItem {
   productId: string;
@@ -20,13 +21,17 @@ interface PurchaseFormItemsProps {
   onAddItem: () => void;
   onRemoveItem: (index: number) => void;
   onUpdateItem: (index: number, field: keyof PurchaseItem, value: any) => void;
+  selectedDepot: string;
+  onSelectDepot: (depot: string) => void;
 }
 
 export const PurchaseFormItems = ({
   items,
   onAddItem,
   onRemoveItem,
-  onUpdateItem
+  onUpdateItem,
+  selectedDepot,
+  onSelectDepot
 }: PurchaseFormItemsProps) => {
   const handleSelectProduct = (product: Product, index: number) => {
     onUpdateItem(index, 'productId', product.id.toString());
@@ -66,12 +71,19 @@ export const PurchaseFormItems = ({
         currentItems={[]}
       />
 
+      <div className="mb-4">
+        <DepotSelector 
+          selectedDepot={selectedDepot}
+          onSelectDepot={onSelectDepot}
+        />
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Article</TableHead>
-            <TableHead>Quantité</TableHead>
             <TableHead>Prix unitaire (FCFA)</TableHead>
+            <TableHead>Quantité</TableHead>
             <TableHead>Total (FCFA)</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
@@ -90,19 +102,19 @@ export const PurchaseFormItems = ({
                 <TableCell>
                   <Input
                     type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
-                    className="w-20"
+                    min="0"
+                    value={item.unitPrice}
+                    onChange={(e) => onUpdateItem(index, 'unitPrice', Number(e.target.value))}
+                    className="w-28"
                   />
                 </TableCell>
                 <TableCell>
                   <Input
                     type="number"
-                    min="0"
-                    value={item.unitPrice}
-                    onChange={(e) => onUpdateItem(index, 'unitPrice', Number(e.target.value))}
-                    className="w-28"
+                    min="1"
+                    value={item.quantity}
+                    onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
+                    className="w-20"
                   />
                 </TableCell>
                 <TableCell className="font-medium">

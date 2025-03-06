@@ -9,7 +9,6 @@ import { Purchase } from "@/types/purchase";
 import { SupplierSearchBox } from "../SupplierSearchBox";
 import { ProductSearchBox } from "../ProductSearchBox";
 import { Supplier } from "@/data/suppliersData";
-import { DepotSelector } from "./DepotSelector";
 import { PurchaseFormItems } from "./PurchaseFormItems";
 import { usePurchaseForm } from "@/hooks/usePurchaseForm";
 
@@ -75,15 +74,10 @@ export const PurchaseForm = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
             <SupplierSearchBox 
               selectedSupplier={selectedSupplier} 
               onSelectSupplier={setSelectedSupplier} 
-            />
-            
-            <DepotSelector 
-              selectedDepot={selectedDepot}
-              onSelectDepot={setSelectedDepot}
             />
           </div>
 
@@ -92,6 +86,8 @@ export const PurchaseForm = ({
             onAddItem={addPurchaseItem}
             onRemoveItem={removePurchaseItem}
             onUpdateItem={updatePurchaseItem}
+            selectedDepot={selectedDepot}
+            onSelectDepot={setSelectedDepot}
           />
 
           <div className="grid grid-cols-2 gap-4">
