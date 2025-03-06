@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package } from "lucide-react";
-import { ProductForm, ProductFormValues } from "./forms/ProductForm";
+import { ProductForm } from "./forms/ProductForm";
+import { ProductFormValues } from "./forms/schema/productSchema";
 import { ServiceForm, ServiceFormValues } from "./forms/ServiceForm";
 
 interface AddProductDialogProps {
