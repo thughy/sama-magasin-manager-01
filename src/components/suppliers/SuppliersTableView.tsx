@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { FileEdit, Trash2, Eye, FileText } from "lucide-react";
 import { Supplier } from "@/data/suppliersData";
+import { Badge } from "@/components/ui/badge";
 
 interface SuppliersTableViewProps {
   suppliers: Supplier[];
@@ -24,7 +25,10 @@ export const SuppliersTableView = ({
           <TableHead>Contact</TableHead>
           <TableHead>Téléphone</TableHead>
           <TableHead>Email</TableHead>
+          <TableHead className="text-right">Total Facture (FCFA)</TableHead>
+          <TableHead className="text-right">Total Versé (FCFA)</TableHead>
           <TableHead className="text-right">Solde (FCFA)</TableHead>
+          <TableHead className="text-center">Statut</TableHead>
           <TableHead className="text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -36,8 +40,19 @@ export const SuppliersTableView = ({
               <TableCell>{supplier.contact}</TableCell>
               <TableCell>{supplier.phone}</TableCell>
               <TableCell>{supplier.email}</TableCell>
+              <TableCell className="text-right font-medium">
+                {supplier.totalInvoice.toLocaleString()}
+              </TableCell>
+              <TableCell className="text-right font-medium">
+                {supplier.totalPaid.toLocaleString()}
+              </TableCell>
               <TableCell className={`text-right font-medium ${supplier.balance < 0 ? 'text-red-500' : supplier.balance > 0 ? 'text-amber-600' : 'text-green-500'}`}>
                 {supplier.balance.toLocaleString()}
+              </TableCell>
+              <TableCell className="text-center">
+                <Badge variant={supplier.status === 'payée' ? 'success' : 'destructive'}>
+                  {supplier.status}
+                </Badge>
               </TableCell>
               <TableCell>
                 <div className="flex justify-center space-x-2">
@@ -67,7 +82,7 @@ export const SuppliersTableView = ({
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={6} className="text-center py-6">
+            <TableCell colSpan={9} className="text-center py-6">
               Aucun fournisseur trouvé pour cette recherche
             </TableCell>
           </TableRow>

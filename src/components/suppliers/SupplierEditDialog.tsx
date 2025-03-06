@@ -1,16 +1,11 @@
 
 import React from "react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter 
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Supplier } from "@/data/suppliersData";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SupplierEditDialogProps {
   isOpen: boolean;
@@ -25,66 +20,138 @@ export const SupplierEditDialog = ({
   onOpenChange,
   supplier,
   onInputChange,
-  onSubmit
+  onSubmit,
 }: SupplierEditDialogProps) => {
   if (!supplier) return null;
-  
+
+  const handleStatusChange = (value: string) => {
+    const event = {
+      target: {
+        name: "status",
+        value: value
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    onInputChange(event);
+  };
+
+  const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, '');
+    
+    const event = {
+      target: {
+        name: fieldName,
+        value: numericValue ? parseInt(numericValue) : 0
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    onInputChange(event);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Modifier les informations du fournisseur</DialogTitle>
+          <DialogTitle>Modifier le fournisseur</DialogTitle>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} className="space-y-4">
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="edit-name">Nom du fournisseur</Label>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Nom
+              </Label>
               <Input
-                id="edit-name"
+                id="name"
                 name="name"
                 value={supplier.name}
                 onChange={onInputChange}
-                placeholder="Électronique Express"
-                required
+                className="col-span-3"
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-contact">Personne de contact</Label>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="contact" className="text-right">
+                Contact
+              </Label>
               <Input
-                id="edit-contact"
+                id="contact"
                 name="contact"
                 value={supplier.contact}
                 onChange={onInputChange}
-                placeholder="Amadou Diop"
+                className="col-span-3"
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-phone">Téléphone</Label>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phone" className="text-right">
+                Téléphone
+              </Label>
               <Input
-                id="edit-phone"
+                id="phone"
                 name="phone"
                 value={supplier.phone}
                 onChange={onInputChange}
-                placeholder="+221 77 123 45 67"
+                className="col-span-3"
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-email">Email</Label>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email
+              </Label>
               <Input
-                id="edit-email"
+                id="email"
                 name="email"
-                type="email"
                 value={supplier.email}
                 onChange={onInputChange}
-                placeholder="contact@electronique-express.sn"
+                className="col-span-3"
               />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="totalInvoice" className="text-right">
+                Total Facture
+              </Label>
+              <Input
+                id="totalInvoice"
+                name="totalInvoice"
+                type="text"
+                value={supplier.totalInvoice}
+                onChange={(e) => handleNumericInputChange(e, "totalInvoice")}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="totalPaid" className="text-right">
+                Total Versé
+              </Label>
+              <Input
+                id="totalPaid"
+                name="totalPaid"
+                type="text"
+                value={supplier.totalPaid}
+                onChange={(e) => handleNumericInputChange(e, "totalPaid")}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="status" className="text-right">
+                Statut
+              </Label>
+              <div className="col-span-3">
+                <Select 
+                  value={supplier.status} 
+                  onValueChange={handleStatusChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner le statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="payée">Payée</SelectItem>
+                    <SelectItem value="impayée">Impayée</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Annuler
-            </Button>
-            <Button type="submit">Enregistrer</Button>
+            <Button type="submit">Enregistrer les modifications</Button>
           </DialogFooter>
         </form>
       </DialogContent>

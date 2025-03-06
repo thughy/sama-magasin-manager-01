@@ -6,6 +6,9 @@ export interface Supplier {
   phone: string;
   email: string;
   balance: number;
+  totalInvoice: number;
+  totalPaid: number;
+  status: 'payée' | 'impayée';
 }
 
 // Sample suppliers data
@@ -16,7 +19,10 @@ export const suppliersData: Supplier[] = [
     contact: "Amadou Diop",
     phone: "+221 77 123 45 67",
     email: "contact@electronique-express.sn",
-    balance: 350000
+    balance: 350000,
+    totalInvoice: 750000,
+    totalPaid: 400000,
+    status: 'impayée'
   },
   {
     id: 2,
@@ -24,7 +30,10 @@ export const suppliersData: Supplier[] = [
     contact: "Fatou Ndiaye",
     phone: "+221 76 234 56 78",
     email: "info@globalimport.sn",
-    balance: 125000
+    balance: 125000,
+    totalInvoice: 525000,
+    totalPaid: 400000,
+    status: 'impayée'
   },
   {
     id: 3,
@@ -32,7 +41,10 @@ export const suppliersData: Supplier[] = [
     contact: "Ibrahim Sow",
     phone: "+221 70 345 67 89",
     email: "contact@techsolutions.sn",
-    balance: 0
+    balance: 0,
+    totalInvoice: 680000,
+    totalPaid: 680000,
+    status: 'payée'
   },
   {
     id: 4,
@@ -40,7 +52,10 @@ export const suppliersData: Supplier[] = [
     contact: "Marie Diallo",
     phone: "+221 78 456 78 90",
     email: "ventes@accessoiresplus.sn",
-    balance: 75000
+    balance: 75000,
+    totalInvoice: 475000,
+    totalPaid: 400000,
+    status: 'impayée'
   },
   {
     id: 5,
@@ -48,7 +63,10 @@ export const suppliersData: Supplier[] = [
     contact: "Jean Mendy",
     phone: "+221 77 567 89 01",
     email: "info@dakardigital.sn",
-    balance: -45000
+    balance: -45000,
+    totalInvoice: 300000,
+    totalPaid: 345000,
+    status: 'payée'
   }
 ];
 

@@ -1,18 +1,21 @@
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter 
+import { PlusCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Supplier } from "@/data/suppliersData";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SuppliersHeaderProps {
   onAddSupplier: (supplier: Supplier) => void;
@@ -26,20 +29,34 @@ export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHead
     contact: "",
     phone: "",
     email: "",
+    totalInvoice: 0,
+    totalPaid: 0,
+    status: "impayée" as 'payée' | 'impayée'
   });
-  const nameInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-
-  // Focus sur le champ nom quand le modal s'ouvre
-  useEffect(() => {
-    if (open && nameInputRef.current) {
-      nameInputRef.current.focus();
-    }
-  }, [open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewSupplier((prev) => ({ ...prev, [name]: value }));
+    setNewSupplier((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, '');
+    
+    setNewSupplier((prev) => ({
+      ...prev,
+      [fieldName]: numericValue ? parseInt(numericValue) : 0,
+    }));
+  };
+
+  const handleStatusChange = (value: 'payée' | 'impayée') => {
+    setNewSupplier((prev) => ({
+      ...prev,
+      status: value,
+    }));
   };
 
   const resetForm = () => {
@@ -48,17 +65,30 @@ export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHead
       contact: "",
       phone: "",
       email: "",
+      totalInvoice: 0,
+      totalPaid: 0,
+      status: "impayée"
     });
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      resetForm();
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Create new supplier with a unique ID and default balance of 0
+    // Calculate balance
+    const balance = newSupplier.totalInvoice - newSupplier.totalPaid;
+    
+    // Create new supplier with a unique ID
     const supplierToAdd: Supplier = {
       id: lastSupplierId + 1,
       ...newSupplier,
-      balance: 0
+      balance: balance
     };
     
     // Add the supplier to the parent component's state
@@ -66,100 +96,145 @@ export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHead
     
     toast({
       title: "Fournisseur ajouté",
-      description: `${newSupplier.name} a été ajouté avec succès.`,
+      description: `${newSupplier.name} a été ajouté à la liste des fournisseurs.`,
     });
     
-    // Réinitialiser le formulaire mais garder le modal ouvert pour permettre d'ajouter plusieurs fournisseurs
+    setOpen(false);
     resetForm();
-    
-    // Focus sur le champ nom après réinitialisation
-    if (nameInputRef.current) {
-      nameInputRef.current.focus();
-    }
   };
 
   return (
-    <>
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Fournisseurs</h1>
-          <p className="text-muted-foreground mt-1">
-            Gérez vos fournisseurs et suivez leurs comptes
-          </p>
-        </div>
-        <Button 
-          className="bg-sama-500 hover:bg-sama-600"
-          onClick={() => setOpen(true)}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Nouveau fournisseur
-        </Button>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold">Gestion des Fournisseurs</h1>
+        <p className="text-muted-foreground">
+          Gérez vos fournisseurs et suivez leurs situations financières
+        </p>
       </div>
 
-      <Dialog open={open} onOpenChange={(newOpen) => {
-        setOpen(newOpen);
-        if (!newOpen) {
-          resetForm();
-        }
-      }}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          <Button className="space-x-2">
+            <PlusCircle className="h-4 w-4" />
+            <span>Nouveau Fournisseur</span>
+          </Button>
+        </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Ajouter un nouveau fournisseur</DialogTitle>
+            <DialogTitle>Ajouter un fournisseur</DialogTitle>
+            <DialogDescription>
+              Remplissez le formulaire ci-dessous pour ajouter un nouveau fournisseur
+            </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Nom du fournisseur</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Nom
+                </Label>
                 <Input
                   id="name"
                   name="name"
                   value={newSupplier.name}
                   onChange={handleInputChange}
-                  placeholder="Électronique Express"
+                  className="col-span-3"
                   required
-                  ref={nameInputRef}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="contact">Personne de contact</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="contact" className="text-right">
+                  Contact
+                </Label>
                 <Input
                   id="contact"
                   name="contact"
                   value={newSupplier.contact}
                   onChange={handleInputChange}
-                  placeholder="Amadou Diop"
+                  className="col-span-3"
+                  required
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Téléphone</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="phone" className="text-right">
+                  Téléphone
+                </Label>
                 <Input
                   id="phone"
                   name="phone"
                   value={newSupplier.phone}
                   onChange={handleInputChange}
-                  placeholder="+221 77 123 45 67"
+                  className="col-span-3"
+                  required
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="email" className="text-right">
+                  Email
+                </Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   value={newSupplier.email}
                   onChange={handleInputChange}
-                  placeholder="contact@electronique-express.sn"
+                  className="col-span-3"
+                  required
                 />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="totalInvoice" className="text-right">
+                  Total Facture
+                </Label>
+                <Input
+                  id="totalInvoice"
+                  name="totalInvoice"
+                  type="text"
+                  value={newSupplier.totalInvoice || ""}
+                  onChange={(e) => handleNumericInputChange(e, "totalInvoice")}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="totalPaid" className="text-right">
+                  Total Versé
+                </Label>
+                <Input
+                  id="totalPaid"
+                  name="totalPaid"
+                  type="text"
+                  value={newSupplier.totalPaid || ""}
+                  onChange={(e) => handleNumericInputChange(e, "totalPaid")}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="status" className="text-right">
+                  Statut
+                </Label>
+                <div className="col-span-3">
+                  <Select 
+                    value={newSupplier.status} 
+                    onValueChange={(value) => handleStatusChange(value as 'payée' | 'impayée')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="payée">Payée</SelectItem>
+                      <SelectItem value="impayée">Impayée</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Annuler
-              </Button>
-              <Button type="submit">Ajouter</Button>
+              <Button type="submit">Ajouter le fournisseur</Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };

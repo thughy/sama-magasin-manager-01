@@ -14,6 +14,7 @@ interface SuppliersTableProps {
 
 export const SuppliersTable = ({ suppliers, onUpdateSupplier }: SuppliersTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("tous");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentSupplier, setCurrentSupplier] = useState<Supplier | null>(null);
   const [purchaseOrderOpen, setPurchaseOrderOpen] = useState(false);
@@ -25,6 +26,11 @@ export const SuppliersTable = ({ suppliers, onUpdateSupplier }: SuppliersTablePr
 
   const handleRefresh = () => {
     setSearchTerm("");
+    setStatusFilter("tous");
+  };
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
   };
 
   const openEditDialog = (supplier: Supplier) => {
@@ -63,11 +69,16 @@ export const SuppliersTable = ({ suppliers, onUpdateSupplier }: SuppliersTablePr
 
   const filteredSuppliers = suppliers.filter(supplier => {
     const term = searchTerm.toLowerCase();
-    return (
+    const matchesSearch = 
       supplier.name.toLowerCase().includes(term) ||
       supplier.contact.toLowerCase().includes(term) ||
-      supplier.phone.toLowerCase().includes(term)
-    );
+      supplier.phone.toLowerCase().includes(term);
+    
+    const matchesStatus = 
+      statusFilter === "tous" || 
+      supplier.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
   });
 
   return (
@@ -76,6 +87,8 @@ export const SuppliersTable = ({ suppliers, onUpdateSupplier }: SuppliersTablePr
         searchTerm={searchTerm}
         onSearchChange={handleSearch}
         onRefresh={handleRefresh}
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
       />
 
       <SuppliersTableView 
