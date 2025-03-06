@@ -37,9 +37,25 @@ export function ServiceForm({ onSubmit, onCancel }: ServiceFormProps) {
     },
   });
 
+  // Reference to the name input for focusing
+  const nameInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleSubmit = (data: ServiceFormValues) => {
+    onSubmit(data);
+    // Reset the form after submission
+    form.reset({
+      name: "",
+      amount: 0,
+    });
+    // Focus on the name field after form reset
+    setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 0);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 pt-4">
         <FormField
           control={form.control}
           name="name"
@@ -47,7 +63,7 @@ export function ServiceForm({ onSubmit, onCancel }: ServiceFormProps) {
             <FormItem>
               <FormLabel>Nom du service</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} ref={nameInputRef} />
               </FormControl>
               <FormMessage />
             </FormItem>
