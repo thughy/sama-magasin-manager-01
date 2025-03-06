@@ -5,6 +5,7 @@ import { PurchasesHeader } from "@/components/suppliers/purchases/PurchasesHeade
 import { PurchasesFilters } from "@/components/suppliers/purchases/PurchasesFilters";
 import { PurchasesTable } from "@/components/suppliers/purchases/PurchasesTable";
 import { DeletePurchaseDialog } from "@/components/suppliers/purchases/DeletePurchaseDialog";
+import { PurchaseForm } from "@/components/suppliers/purchases/PurchaseForm";
 import { usePurchasesData } from "@/hooks/usePurchasesData";
 
 const Purchases = () => {
@@ -20,11 +21,14 @@ const Purchases = () => {
     setSelectedStatus,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
+    isPurchaseFormOpen,
+    setIsPurchaseFormOpen,
     selectedPurchase,
     handleRefresh,
     handleAddPurchase,
     handleEditPurchase,
     handleDeletePurchase,
+    handleSavePurchase,
     confirmDeletePurchase,
     clearFilters
   } = usePurchasesData();
@@ -69,6 +73,15 @@ const Purchases = () => {
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={confirmDeletePurchase}
       />
+
+      {isPurchaseFormOpen && (
+        <PurchaseForm
+          isOpen={isPurchaseFormOpen}
+          onClose={() => setIsPurchaseFormOpen(false)}
+          initialPurchase={selectedPurchase}
+          onSave={handleSavePurchase}
+        />
+      )}
     </MainLayout>
   );
 };

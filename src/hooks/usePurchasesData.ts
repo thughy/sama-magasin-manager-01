@@ -1,81 +1,98 @@
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Purchase } from "@/types/purchase";
-import { purchasesData as initialPurchasesData } from "@/data/purchasesData";
-import { useToast } from "@/hooks/use-toast";
-import { isSameDay } from "date-fns";
+import { purchasesData } from "@/data/purchasesData";
+import { useToast } from "./use-toast";
 
 export const usePurchasesData = () => {
-  const [purchases, setPurchases] = useState<Purchase[]>(initialPurchasesData);
+  const [allPurchases, setAllPurchases] = useState<Purchase[]>([...purchasesData]);
   const [supplierSearchTerm, setSupplierSearchTerm] = useState("");
   const [productSearchTerm, setProductSearchTerm] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
+  const [selectedStatus, setSelectedStatus] = useState<"all" | "payée" | "impayée">("all");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+  const [isPurchaseFormOpen, setIsPurchaseFormOpen] = useState(false);
+  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | undefined>(undefined);
   const { toast } = useToast();
 
-  const filteredPurchases = useMemo(() => {
-    return purchases.filter((purchase) => {
-      // Filter by supplier name
-      const matchesSupplier = supplierSearchTerm === "" ||
-        purchase.supplierName.toLowerCase().includes(supplierSearchTerm.toLowerCase());
-      
-      // Filter by product name
-      const matchesProduct = productSearchTerm === "" ||
-        purchase.productName.toLowerCase().includes(productSearchTerm.toLowerCase());
-      
-      // Filter by date
-      const matchesDate = !selectedDate ||
-        (purchase.purchaseDate && isSameDay(new Date(purchase.purchaseDate), selectedDate));
-      
-      // Filter by status
-      const matchesStatus = selectedStatus === "" || selectedStatus === "all" ||
-        purchase.status === selectedStatus;
-      
-      return matchesSupplier && matchesProduct && matchesDate && matchesStatus;
-    });
-  }, [purchases, supplierSearchTerm, productSearchTerm, selectedDate, selectedStatus]);
+  // Filter purchases based on search terms and filters
+  const purchases = allPurchases.filter((purchase) => {
+    // Filter by supplier name
+    if (supplierSearchTerm && !purchase.supplierName.toLowerCase().includes(supplierSearchTerm.toLowerCase())) {
+      return false;
+    }
+    
+    // Filter by product name
+    if (productSearchTerm && !purchase.productName.toLowerCase().includes(productSearchTerm.toLowerCase())) {
+      return false;
+    }
+    
+    // Filter by date
+    if (selectedDate && purchase.purchaseDate !== selectedDate) {
+      return false;
+    }
+    
+    // Filter by status
+    if (selectedStatus !== "all" && purchase.status !== selectedStatus) {
+      return false;
+    }
+    
+    return true;
+  });
 
   const handleRefresh = () => {
-    setPurchases(initialPurchasesData);
+    setAllPurchases([...purchasesData]);
     toast({
-      title: "Actualisé",
-      description: "La liste des achats a été actualisée.",
+      title: "Données actualisées",
+      description: "La liste des achats a été actualisée",
     });
   };
 
   const handleAddPurchase = () => {
-    // To be implemented
-    toast({
-      title: "Pas encore implémenté",
-      description: "La fonctionnalité d'ajout d'achat n'est pas encore disponible.",
-    });
+    setSelectedPurchase(undefined);
+    setIsPurchaseFormOpen(true);
   };
 
   const handleEditPurchase = (purchase: Purchase) => {
     setSelectedPurchase(purchase);
-    setIsEditModalOpen(true);
+    setIsPurchaseFormOpen(true);
   };
 
   const handleDeletePurchase = (purchaseId: string) => {
-    const purchaseToDelete = purchases.find(p => p.id === purchaseId);
-    if (purchaseToDelete) {
-      setSelectedPurchase(purchaseToDelete);
-      setIsDeleteDialogOpen(true);
+    const purchase = allPurchases.find(p => p.id === purchaseId);
+    setSelectedPurchase(purchase);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleSavePurchase = (purchase: Purchase) => {
+    if (selectedPurchase) {
+      // Update existing purchase
+      setAllPurchases(allPurchases.map(p => p.id === purchase.id ? purchase : p));
+      toast({
+        title: "Achat mis à jour",
+        description: `L'achat ${purchase.reference} a été mis à jour avec succès`,
+      });
+    } else {
+      // Add new purchase
+      setAllPurchases([purchase, ...allPurchases]);
+      toast({
+        title: "Achat ajouté",
+        description: `L'achat ${purchase.reference} a été ajouté avec succès`,
+      });
     }
+    setIsPurchaseFormOpen(false);
+    setSelectedPurchase(undefined);
   };
 
   const confirmDeletePurchase = () => {
     if (selectedPurchase) {
-      setPurchases(purchases.filter(p => p.id !== selectedPurchase.id));
+      setAllPurchases(allPurchases.filter(p => p.id !== selectedPurchase.id));
       toast({
         title: "Achat supprimé",
-        description: `L'achat ${selectedPurchase.reference} a été supprimé.`,
+        description: `L'achat ${selectedPurchase.reference} a été supprimé`,
       });
       setIsDeleteDialogOpen(false);
-      setSelectedPurchase(null);
+      setSelectedPurchase(undefined);
     }
   };
 
@@ -83,11 +100,11 @@ export const usePurchasesData = () => {
     setSupplierSearchTerm("");
     setProductSearchTerm("");
     setSelectedDate(undefined);
-    setSelectedStatus("");
+    setSelectedStatus("all");
   };
 
   return {
-    purchases: filteredPurchases,
+    purchases,
     supplierSearchTerm,
     setSupplierSearchTerm,
     productSearchTerm,
@@ -96,16 +113,16 @@ export const usePurchasesData = () => {
     setSelectedDate,
     selectedStatus,
     setSelectedStatus,
-    isEditModalOpen,
-    setIsEditModalOpen,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
+    isPurchaseFormOpen,
+    setIsPurchaseFormOpen,
     selectedPurchase,
-    setSelectedPurchase,
     handleRefresh,
     handleAddPurchase,
     handleEditPurchase,
     handleDeletePurchase,
+    handleSavePurchase,
     confirmDeletePurchase,
     clearFilters
   };
