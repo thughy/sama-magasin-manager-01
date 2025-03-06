@@ -1,19 +1,18 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+
+import React, { useRef } from "react";
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle, 
-  DialogFooter 
+  DialogTitle 
 } from "@/components/ui/dialog";
 import { Supplier } from "@/data/suppliersData";
-import { useToast } from "@/hooks/use-toast";
-import { Printer } from "lucide-react";
-import { OrderItem, Product, PurchaseOrder } from "@/types/purchaseOrder";
+import { PurchaseOrder } from "@/types/purchaseOrder";
 import { OrderItemsList } from "./OrderItemsList";
 import { PurchaseOrderInfo } from "./PurchaseOrderInfo";
 import { PrintablePurchaseOrder } from "./PrintablePurchaseOrder";
+import { PurchaseOrderActions } from "./PurchaseOrderActions";
+import { usePurchaseOrderForm } from "@/hooks/usePurchaseOrderForm";
 
 interface PurchaseOrderFormProps {
   supplier?: Supplier;
@@ -30,90 +29,34 @@ export const PurchaseOrderForm = ({
   initialOrder = null,
   onSave 
 }: PurchaseOrderFormProps) => {
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([{ id: 1, description: "", quantity: 1, unitPrice: 0 }]);
-  const [orderDate, setOrderDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [deliveryDate, setDeliveryDate] = useState<string>("");
-  const [reference, setReference] = useState<string>(`BC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`);
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(supplier || null);
-  const [status, setStatus] = useState<'pending' | 'delivered' | 'cancelled'>('pending');
   const printRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (initialOrder) {
-      setOrderItems(initialOrder.items);
-      setOrderDate(initialOrder.orderDate);
-      setDeliveryDate(initialOrder.deliveryDate);
-      setReference(initialOrder.reference);
-      setStatus(initialOrder.status);
-      
-      if (initialOrder.supplierId) {
-        setSelectedSupplier({
-          id: initialOrder.supplierId,
-          name: initialOrder.supplierName,
-          contact: '',
-          phone: '',
-          email: '',
-          balance: 0,
-          totalInvoice: 0,
-          totalPaid: 0,
-          status: 'payée'
-        });
-      }
-    }
-  }, [initialOrder]);
-
-  const addOrderItem = () => {
-    const newId = orderItems.length > 0 ? Math.max(...orderItems.map(item => item.id)) + 1 : 1;
-    setOrderItems([...orderItems, { id: newId, description: "", quantity: 1, unitPrice: 0 }]);
-  };
-
-  const removeOrderItem = (id: number) => {
-    if (orderItems.length > 1) {
-      setOrderItems(orderItems.filter(item => item.id !== id));
-    }
-  };
-
-  const handleItemChange = (id: number, field: keyof OrderItem, value: string | number) => {
-    setOrderItems(
-      orderItems.map(item => 
-        item.id === id ? { ...item, [field]: value } : item
-      )
-    );
-  };
-
-  const handleSelectProduct = (itemId: number, product: Product) => {
-    setOrderItems(
-      orderItems.map(item => 
-        item.id === itemId ? {
-          ...item,
-          description: `${product.id}-${product.name} (${product.barcode})`,
-          unitPrice: product.purchasePrice,
-          barcode: product.barcode,
-          sellPrice: product.sellPrice
-        } : item
-      )
-    );
-  };
+  
+  const {
+    orderItems,
+    orderDate,
+    deliveryDate,
+    reference,
+    selectedSupplier,
+    setOrderDate,
+    setDeliveryDate,
+    setReference,
+    setSelectedSupplier,
+    addOrderItem,
+    removeOrderItem,
+    handleItemChange,
+    handleSelectProduct,
+    validatePurchaseOrder,
+    createPurchaseOrder,
+    toast,
+  } = usePurchaseOrderForm({
+    supplier,
+    initialOrder,
+    onSave,
+    onClose
+  });
 
   const handlePrint = () => {
-    if (!selectedSupplier) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez sélectionner un fournisseur avant d'imprimer le bon de commande.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (orderItems.some(item => !item.description || !item.quantity || !item.unitPrice)) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs des articles avant d'imprimer.",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!validatePurchaseOrder()) return;
 
     const content = printRef.current;
     if (!content) return;
@@ -124,7 +67,7 @@ export const PurchaseOrderForm = ({
     printWindow.document.write(`
       <html>
         <head>
-          <title>Bon de Commande - ${selectedSupplier.name}</title>
+          <title>Bon de Commande - ${selectedSupplier?.name}</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
             .purchase-order { width: 210mm; min-height: 297mm; padding: 20mm; margin: 0 auto; }
@@ -152,26 +95,14 @@ export const PurchaseOrderForm = ({
     printWindow.document.close();
     
     if (onSave && selectedSupplier) {
-      const total = orderItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-      
-      const purchaseOrder: PurchaseOrder = {
-        id: initialOrder?.id || `${Date.now()}`,
-        reference,
-        orderDate,
-        deliveryDate,
-        supplierId: selectedSupplier.id,
-        supplierName: selectedSupplier.name,
-        status,
-        items: orderItems,
-        total,
-        createdAt: initialOrder?.createdAt || new Date().toISOString()
-      };
-      
-      onSave(purchaseOrder);
+      const purchaseOrder = createPurchaseOrder();
+      if (purchaseOrder) {
+        onSave(purchaseOrder);
+      }
     } else {
       toast({
         title: "Bon de commande créé",
-        description: `Le bon de commande pour ${selectedSupplier.name} a été généré et envoyé à l'impression.`,
+        description: `Le bon de commande pour ${selectedSupplier?.name} a été généré et envoyé à l'impression.`,
       });
       
       onClose();
@@ -215,14 +146,11 @@ export const PurchaseOrderForm = ({
           />
         )}
         
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Annuler
-          </Button>
-          <Button onClick={handlePrint}>
-            <Printer className="h-4 w-4 mr-2" /> {onSave ? "Enregistrer" : "Imprimer"}
-          </Button>
-        </DialogFooter>
+        <PurchaseOrderActions 
+          onPrint={handlePrint}
+          onClose={onClose}
+          isSaveMode={!!onSave}
+        />
       </DialogContent>
     </Dialog>
   );
