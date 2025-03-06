@@ -84,9 +84,9 @@ export const PurchaseFormItems = ({
         <TableHeader>
           <TableRow>
             <TableHead>Article</TableHead>
+            <TableHead>Quantité</TableHead>
             <TableHead>Prix d'achat (FCFA)</TableHead>
             <TableHead>Prix de vente (FCFA)</TableHead>
-            <TableHead>Quantité</TableHead>
             <TableHead>Total (FCFA)</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
@@ -105,6 +105,15 @@ export const PurchaseFormItems = ({
                 <TableCell>
                   <Input
                     type="number"
+                    min="1"
+                    value={item.quantity}
+                    onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
+                    className="w-20"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
                     min="0"
                     value={item.unitPrice}
                     onChange={(e) => onUpdateItem(index, 'unitPrice', Number(e.target.value))}
@@ -119,15 +128,6 @@ export const PurchaseFormItems = ({
                     onChange={(e) => onUpdateItem(index, 'sellPrice', Number(e.target.value))}
                     className="w-28"
                     readOnly
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
-                    className="w-20"
                   />
                 </TableCell>
                 <TableCell className="font-medium">
