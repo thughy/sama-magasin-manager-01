@@ -1,4 +1,3 @@
-
 import { Barcode, MoreHorizontal, Edit, Trash, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Item, Product } from "@/types/product";
+import { Item, Product, Service } from "@/types/product";
 
 interface ProductsTableProps {
   items: Item[];
