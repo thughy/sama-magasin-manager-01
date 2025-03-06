@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,6 +53,8 @@ export function AddDepotDialog({
   onSave,
   hasPrimaryDepot,
 }: AddDepotDialogProps) {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,6 +64,22 @@ export function AddDepotDialog({
       type: hasPrimaryDepot ? "secondaire" : "principal",
     },
   });
+
+  // Reset form when dialog opens
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        name: "",
+        location: "",
+        manager: "",
+        type: hasPrimaryDepot ? "secondaire" : "principal",
+      });
+      // Set focus on name input after a small delay to ensure the dialog is fully rendered
+      setTimeout(() => {
+        nameInputRef.current?.focus();
+      }, 100);
+    }
+  }, [open, form, hasPrimaryDepot]);
 
   const handleSubmit = (data: FormValues) => {
     if (data.type === "principal" && hasPrimaryDepot) {
@@ -93,7 +111,14 @@ export function AddDepotDialog({
                 <FormItem>
                   <FormLabel>Nom du dépôt</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nom du dépôt" {...field} />
+                    <Input
+                      placeholder="Nom du dépôt"
+                      {...field}
+                      ref={(e) => {
+                        field.ref(e);
+                        nameInputRef.current = e;
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
