@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { 
@@ -21,11 +21,28 @@ export const SuppliersHeader = () => {
     phone: "",
     email: "",
   });
+  const nameInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Focus sur le champ nom quand le modal s'ouvre
+  useEffect(() => {
+    if (open && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewSupplier((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetForm = () => {
+    setNewSupplier({
+      name: "",
+      contact: "",
+      phone: "",
+      email: "",
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -39,14 +56,13 @@ export const SuppliersHeader = () => {
       description: `${newSupplier.name} a été ajouté avec succès.`,
     });
     
-    setNewSupplier({
-      name: "",
-      contact: "",
-      phone: "",
-      email: "",
-    });
+    // Réinitialiser le formulaire mais garder le modal ouvert pour permettre d'ajouter plusieurs fournisseurs
+    resetForm();
     
-    setOpen(false);
+    // Focus sur le champ nom après réinitialisation
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
   };
 
   return (
@@ -66,7 +82,12 @@ export const SuppliersHeader = () => {
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(newOpen) => {
+        setOpen(newOpen);
+        if (!newOpen) {
+          resetForm();
+        }
+      }}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Ajouter un nouveau fournisseur</DialogTitle>
@@ -82,6 +103,7 @@ export const SuppliersHeader = () => {
                   onChange={handleInputChange}
                   placeholder="Électronique Express"
                   required
+                  ref={nameInputRef}
                 />
               </div>
               <div className="grid gap-2">
