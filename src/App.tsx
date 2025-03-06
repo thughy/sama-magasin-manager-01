@@ -9,6 +9,7 @@ import Products from "./pages/Products";
 import Clients from "./pages/Clients";
 import Cashier from "./pages/Cashier";
 import Suppliers from "./pages/Suppliers";
+import PurchaseOrders from "./pages/PurchaseOrders";
 import Sales from "./pages/Sales";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/clients" element={<Clients />} />
           <Route path="/cashier" element={<Cashier />} />
           <Route path="/suppliers" element={<Suppliers />} />
+          <Route path="/suppliers/purchase-orders" element={<PurchaseOrders />} />
           <Route path="/sales" element={<Sales />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
