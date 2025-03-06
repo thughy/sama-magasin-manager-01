@@ -13,7 +13,9 @@ import {
   Settings,
   Menu,
   FileText,
-  ChevronDown
+  ChevronDown,
+  Warehouse,
+  ArrowRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -45,6 +47,15 @@ const navItems: NavItem[] = [
     subItems: [
       { title: "Liste des fournisseurs", url: "/suppliers", icon: Truck },
       { title: "Bon de commande", url: "/suppliers/purchase-orders", icon: FileText }
+    ]
+  },
+  { 
+    title: "Dépôts", 
+    icon: Warehouse, 
+    href: "/depots",
+    subItems: [
+      { title: "Liste des dépôts", url: "/depots", icon: Warehouse },
+      { title: "Bon de sortie", url: "/depots/release-orders", icon: ArrowRight }
     ]
   },
   { title: "Paramètres", icon: Settings, href: "/settings" },
