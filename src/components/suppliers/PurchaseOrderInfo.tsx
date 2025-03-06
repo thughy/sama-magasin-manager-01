@@ -3,15 +3,17 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Supplier } from "@/data/suppliersData";
+import { SupplierSearchBox } from "./SupplierSearchBox";
 
 interface PurchaseOrderInfoProps {
   reference: string;
   orderDate: string;
   deliveryDate: string;
-  supplier: Supplier;
+  supplier: Supplier | null;
   onReferenceChange: (value: string) => void;
   onOrderDateChange: (value: string) => void;
   onDeliveryDateChange: (value: string) => void;
+  onSupplierChange: (supplier: Supplier) => void;
 }
 
 export const PurchaseOrderInfo = ({
@@ -21,7 +23,8 @@ export const PurchaseOrderInfo = ({
   supplier,
   onReferenceChange,
   onOrderDateChange,
-  onDeliveryDateChange
+  onDeliveryDateChange,
+  onSupplierChange
 }: PurchaseOrderInfoProps) => {
   return (
     <div className="grid gap-4 py-4">
@@ -47,10 +50,10 @@ export const PurchaseOrderInfo = ({
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="supplierName">Fournisseur</Label>
-          <Input id="supplierName" value={supplier.name} readOnly />
-        </div>
+        <SupplierSearchBox 
+          selectedSupplier={supplier} 
+          onSelectSupplier={onSupplierChange} 
+        />
         <div>
           <Label htmlFor="deliveryDate">Date de livraison souhaitée</Label>
           <Input 

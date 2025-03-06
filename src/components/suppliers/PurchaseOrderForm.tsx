@@ -11,13 +11,13 @@ import {
 import { Supplier } from "@/data/suppliersData";
 import { useToast } from "@/hooks/use-toast";
 import { Printer } from "lucide-react";
-import { OrderItem } from "@/types/purchaseOrder";
+import { OrderItem, Product } from "@/types/purchaseOrder";
 import { OrderItemsList } from "./OrderItemsList";
 import { PurchaseOrderInfo } from "./PurchaseOrderInfo";
 import { PrintablePurchaseOrder } from "./PrintablePurchaseOrder";
 
 interface PurchaseOrderFormProps {
-  supplier: Supplier;
+  supplier?: Supplier;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -27,6 +27,7 @@ export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFo
   const [orderDate, setOrderDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [deliveryDate, setDeliveryDate] = useState<string>("");
   const [reference, setReference] = useState<string>(`BC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`);
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(supplier || null);
   const printRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -49,7 +50,39 @@ export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFo
     );
   };
 
+  const handleSelectProduct = (itemId: number, product: Product) => {
+    setOrderItems(
+      orderItems.map(item => 
+        item.id === itemId ? {
+          ...item,
+          description: `${product.id}-${product.name} (${product.barcode})`,
+          unitPrice: product.purchasePrice,
+          barcode: product.barcode,
+          sellPrice: product.sellPrice
+        } : item
+      )
+    );
+  };
+  
   const handlePrint = () => {
+    if (!selectedSupplier) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un fournisseur avant d'imprimer le bon de commande.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (orderItems.some(item => !item.description || !item.quantity || !item.unitPrice)) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs des articles avant d'imprimer.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const content = printRef.current;
     if (!content) return;
 
@@ -59,7 +92,7 @@ export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFo
     printWindow.document.write(`
       <html>
         <head>
-          <title>Bon de Commande - ${supplier.name}</title>
+          <title>Bon de Commande - ${selectedSupplier.name}</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
             .purchase-order { width: 210mm; min-height: 297mm; padding: 20mm; margin: 0 auto; }
@@ -88,7 +121,7 @@ export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFo
     
     toast({
       title: "Bon de commande créé",
-      description: `Le bon de commande pour ${supplier.name} a été généré et envoyé à l'impression.`,
+      description: `Le bon de commande pour ${selectedSupplier.name} a été généré et envoyé à l'impression.`,
     });
     
     onClose();
@@ -98,17 +131,18 @@ export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Bon de Commande - {supplier.name}</DialogTitle>
+          <DialogTitle>Bon de Commande - {selectedSupplier ? selectedSupplier.name : "Nouveau"}</DialogTitle>
         </DialogHeader>
         
         <PurchaseOrderInfo 
           reference={reference}
           orderDate={orderDate}
           deliveryDate={deliveryDate}
-          supplier={supplier}
+          supplier={selectedSupplier}
           onReferenceChange={setReference}
           onOrderDateChange={setOrderDate}
           onDeliveryDateChange={setDeliveryDate}
+          onSupplierChange={setSelectedSupplier}
         />
         
         <OrderItemsList 
@@ -116,16 +150,19 @@ export const PurchaseOrderForm = ({ supplier, isOpen, onClose }: PurchaseOrderFo
           onAddItem={addOrderItem}
           onRemoveItem={removeOrderItem}
           onItemChange={handleItemChange}
+          onSelectProduct={handleSelectProduct}
         />
         
-        <PrintablePurchaseOrder 
-          supplier={supplier}
-          reference={reference}
-          orderDate={orderDate}
-          deliveryDate={deliveryDate}
-          orderItems={orderItems}
-          printRef={printRef}
-        />
+        {selectedSupplier && (
+          <PrintablePurchaseOrder 
+            supplier={selectedSupplier}
+            reference={reference}
+            orderDate={orderDate}
+            deliveryDate={deliveryDate}
+            orderItems={orderItems}
+            printRef={printRef}
+          />
+        )}
         
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>

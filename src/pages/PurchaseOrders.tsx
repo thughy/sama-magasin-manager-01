@@ -9,7 +9,6 @@ import { PurchaseOrderForm } from "@/components/suppliers/PurchaseOrderForm";
 
 const PurchaseOrders = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState(suppliersData[0]);
 
   const handleOpenForm = () => {
     setIsFormOpen(true);
@@ -54,7 +53,6 @@ const PurchaseOrders = () => {
 
       {isFormOpen && (
         <PurchaseOrderForm
-          supplier={selectedSupplier}
           isOpen={isFormOpen}
           onClose={() => setIsFormOpen(false)}
         />
