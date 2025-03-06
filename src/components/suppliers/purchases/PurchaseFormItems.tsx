@@ -7,7 +7,22 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Trash, Plus } from "lucide-react";
 import { ProductSearchBox } from "../ProductSearchBox";
 import { Product } from "@/types/purchaseOrder";
-import { DepotSelector } from "./DepotSelector";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Liste des dépôts (dans une application réelle, cela viendrait d'une API ou d'un store)
+const depots = [
+  "Principal",
+  "Secondaire",
+  "Entrepôt central",
+  "Magasin 1",
+  "Magasin 2"
+];
 
 interface PurchaseItem {
   productId: string;
@@ -15,6 +30,7 @@ interface PurchaseItem {
   quantity: number;
   unitPrice: number;
   sellPrice: number;
+  depot: string;
 }
 
 interface PurchaseFormItemsProps {
@@ -22,17 +38,13 @@ interface PurchaseFormItemsProps {
   onAddItem: () => void;
   onRemoveItem: (index: number) => void;
   onUpdateItem: (index: number, field: keyof PurchaseItem, value: any) => void;
-  selectedDepot: string;
-  onSelectDepot: (depot: string) => void;
 }
 
 export const PurchaseFormItems = ({
   items,
   onAddItem,
   onRemoveItem,
-  onUpdateItem,
-  selectedDepot,
-  onSelectDepot
+  onUpdateItem
 }: PurchaseFormItemsProps) => {
   const handleSelectProduct = (product: Product, index: number) => {
     onUpdateItem(index, 'productId', product.id.toString());
@@ -73,18 +85,12 @@ export const PurchaseFormItems = ({
         currentItems={[]}
       />
 
-      <div className="mb-4">
-        <DepotSelector 
-          selectedDepot={selectedDepot}
-          onSelectDepot={onSelectDepot}
-        />
-      </div>
-
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Article</TableHead>
             <TableHead>Quantité</TableHead>
+            <TableHead>Dépôt</TableHead>
             <TableHead>Prix d'achat (FCFA)</TableHead>
             <TableHead>Prix de vente (FCFA)</TableHead>
             <TableHead>Total Achat</TableHead>
@@ -95,7 +101,7 @@ export const PurchaseFormItems = ({
         <TableBody>
           {items.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-4 text-muted-foreground">
                 Aucun article. Utilisez le champ de recherche ou le bouton "Ajouter" pour ajouter des articles.
               </TableCell>
             </TableRow>
@@ -111,6 +117,23 @@ export const PurchaseFormItems = ({
                     onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
                     className="w-20"
                   />
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={item.depot || "Principal"}
+                    onValueChange={(value) => onUpdateItem(index, 'depot', value)}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Sélectionner un dépôt" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {depots.map((depot) => (
+                        <SelectItem key={depot} value={depot}>
+                          {depot}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
                 <TableCell>
                   <Input

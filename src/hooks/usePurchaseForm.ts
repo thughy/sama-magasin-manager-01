@@ -10,6 +10,7 @@ interface PurchaseItem {
   quantity: number;
   unitPrice: number;
   sellPrice: number;
+  depot: string;
 }
 
 interface UsePurchaseFormProps {
@@ -36,7 +37,6 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
   });
   
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
-  const [selectedDepot, setSelectedDepot] = useState<string>('Principal');
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([]);
   const [isValid, setIsValid] = useState(false);
 
@@ -54,7 +54,8 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
         productName: initialPurchase.productName,
         quantity: initialPurchase.quantity,
         unitPrice: initialPurchase.unitPrice,
-        sellPrice: 0 // Adding sell price with default value
+        sellPrice: 0,
+        depot: 'Principal' // Default depot for existing items
       }]);
     }
   }, [initialPurchase]);
@@ -93,7 +94,11 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
       formData.purchaseDate?.trim() !== '' &&
       selectedSupplier !== null &&
       purchaseItems.length > 0 &&
-      purchaseItems.every(item => item.quantity > 0 && item.unitPrice > 0);
+      purchaseItems.every(item => 
+        item.quantity > 0 && 
+        item.unitPrice > 0 && 
+        item.depot
+      );
     
     setIsValid(isFormValid);
   }, [formData, selectedSupplier, purchaseItems]);
@@ -105,7 +110,8 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
       productName: '',
       quantity: 1,
       unitPrice: 0,
-      sellPrice: 0
+      sellPrice: 0,
+      depot: 'Principal'
     }]);
   };
 
@@ -162,12 +168,10 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
   return {
     formData,
     selectedSupplier,
-    selectedDepot,
     purchaseItems,
     isValid,
     setFormData,
     setSelectedSupplier,
-    setSelectedDepot,
     addPurchaseItem,
     removePurchaseItem,
     updatePurchaseItem,

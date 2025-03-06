@@ -28,12 +28,10 @@ export const PurchaseForm = ({
   const {
     formData,
     selectedSupplier,
-    selectedDepot,
     purchaseItems,
     isValid,
     setFormData,
     setSelectedSupplier,
-    setSelectedDepot,
     addPurchaseItem,
     removePurchaseItem,
     updatePurchaseItem,
@@ -86,8 +84,6 @@ export const PurchaseForm = ({
             onAddItem={addPurchaseItem}
             onRemoveItem={removePurchaseItem}
             onUpdateItem={updatePurchaseItem}
-            selectedDepot={selectedDepot}
-            onSelectDepot={setSelectedDepot}
           />
 
           <div className="grid grid-cols-2 gap-4">
