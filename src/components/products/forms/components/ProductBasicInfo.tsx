@@ -21,7 +21,7 @@ export function ProductBasicInfo({ control, nameInputRef }: ProductBasicInfoProp
           <FormItem>
             <FormLabel className="flex items-center">
               <Barcode className="mr-2 h-4 w-4" />
-              Code-barres
+              Code-barres (optionnel)
             </FormLabel>
             <FormControl>
               <Input {...field} />
