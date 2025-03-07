@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Purchase } from '@/types/purchase';
 import { Supplier } from '@/data/suppliersData';
+import { suppliersData } from '@/data/suppliersData';
 
 interface UseFormDataManagerProps {
   initialPurchase?: Purchase;
@@ -31,6 +32,14 @@ export const useFormDataManager = ({ initialPurchase }: UseFormDataManagerProps)
       setFormData({
         ...initialPurchase
       });
+      
+      // Find and set the supplier from suppliersData based on the supplierId
+      if (initialPurchase.supplierId) {
+        const supplier = suppliersData.find(s => s.id === initialPurchase.supplierId);
+        if (supplier) {
+          setSelectedSupplier(supplier);
+        }
+      }
     }
   }, [initialPurchase]);
 
