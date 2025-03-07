@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
 import { usePurchaseFormDialog } from "@/hooks/purchase-form/usePurchaseFormDialog";
@@ -48,33 +48,10 @@ export const PurchaseForm = ({
     onSave
   });
 
-  // Ensure clean unmounting
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        e.preventDefault();
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      console.log("PurchaseForm unmounting cleanly");
-    };
-  }, [isOpen, onClose]);
-
   if (!isOpen) return null;
 
-  const handleDialogChange = (open: boolean) => {
-    if (!open) {
-      onClose();
-    }
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <button 
           onClick={onClose}

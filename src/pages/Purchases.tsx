@@ -1,4 +1,3 @@
-
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PurchasesHeader } from "@/components/suppliers/purchases/PurchasesHeader";
@@ -9,7 +8,6 @@ import { PurchaseForm } from "@/components/suppliers/purchases/PurchaseForm";
 import { usePurchasesData } from "@/hooks/usePurchasesData";
 import { useToast } from "@/hooks/use-toast";
 import { Purchase } from "@/types/purchase";
-import { useEffect } from "react";
 
 const Purchases = () => {
   const { toast } = useToast();
@@ -137,14 +135,12 @@ const Purchases = () => {
         onConfirm={confirmDeletePurchase}
       />
 
-      {isPurchaseFormOpen && (
-        <PurchaseForm
-          isOpen={isPurchaseFormOpen}
-          onClose={handlePurchaseFormClose}
-          initialPurchase={selectedPurchase}
-          onSave={handleSavePurchase}
-        />
-      )}
+      <PurchaseForm
+        isOpen={isPurchaseFormOpen}
+        onClose={handlePurchaseFormClose}
+        initialPurchase={selectedPurchase}
+        onSave={handleSavePurchase}
+      />
     </MainLayout>
   );
 };
