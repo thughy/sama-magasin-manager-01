@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -41,7 +40,8 @@ export const PurchaseForm = ({
     removePaymentMethod,
     updatePaymentMethod,
     handleSubmit,
-    printDepotEntry
+    printDepotEntry,
+    PrintConfirmationDialog
   } = usePurchaseForm({ initialPurchase, onSave, onClose });
 
   // Calculate unique depots from purchase items
@@ -220,6 +220,9 @@ export const PurchaseForm = ({
         <div style={{ display: 'none' }}>
           <div ref={printRef}></div>
         </div>
+
+        {/* Print Confirmation Dialog */}
+        <PrintConfirmationDialog />
       </DialogContent>
     </Dialog>
   );

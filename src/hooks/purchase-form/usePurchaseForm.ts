@@ -7,6 +7,7 @@ import { useInventoryUpdater } from './useInventoryUpdater';
 import { usePurchaseFormItems } from './usePurchaseFormItems';
 import { usePaymentMethods } from './usePaymentMethods';
 import { useDepotEntryPrinting } from './useDepotEntryPrinting';
+import { usePrintConfirmation } from './usePrintConfirmation';
 
 interface UsePurchaseFormProps {
   initialPurchase?: Purchase;
@@ -52,6 +53,10 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     updatePaymentMethod 
   } = usePaymentMethods();
   const { printDepotEntry } = useDepotEntryPrinting(formData, purchaseItems);
+  const { showPrintConfirmation, PrintConfirmationDialog } = usePrintConfirmation({
+    formData,
+    purchaseItems
+  });
 
   // Load initial data if editing
   useEffect(() => {
@@ -126,19 +131,8 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     setIsValid(isFormValid);
   }, [formData, selectedSupplier, purchaseItems, paymentMethods]);
 
-  // Form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!isValid) {
-      toast({
-        title: "Formulaire invalide",
-        description: "Veuillez remplir tous les champs obligatoires.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  // The actual save operation after confirmation
+  const completeSaveOperation = () => {
     // For backward compatibility, use the first item's details
     const firstItem = purchaseItems[0];
     
@@ -182,6 +176,31 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     onClose();
   };
 
+  // Form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isValid) {
+      toast({
+        title: "Formulaire invalide",
+        description: "Veuillez remplir tous les champs obligatoires.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if there are items with depots
+    const hasDepotsSelected = purchaseItems.some(item => !!item.depot);
+    
+    if (hasDepotsSelected) {
+      // Show confirmation dialog for printing
+      showPrintConfirmation(completeSaveOperation);
+    } else {
+      // No depots to print, proceed with save
+      completeSaveOperation();
+    }
+  };
+
   return {
     formData,
     selectedSupplier,
@@ -198,6 +217,7 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     updatePaymentMethod,
     calculateTotals,
     handleSubmit,
-    printDepotEntry
+    printDepotEntry,
+    PrintConfirmationDialog
   };
 };
