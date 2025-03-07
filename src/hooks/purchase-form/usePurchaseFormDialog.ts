@@ -10,7 +10,6 @@ import {
   usePrintConfirmation,
   useInitialItems,
   useFormReset,
-  useDialogController,
   useFormSubmitHandler
 } from "@/hooks/purchase-form";
 
@@ -27,9 +26,6 @@ export const usePurchaseFormDialog = ({
   initialPurchase,
   onSave
 }: UsePurchaseFormDialogProps) => {
-  // Use dialog controller
-  const { dialogOpen, handleCancel } = useDialogController({ isOpen, onClose });
-  
   // References
   const printRef = useRef<HTMLDivElement>(null);
   const supplierFocusRef = useRef<HTMLInputElement>(null);
@@ -82,7 +78,7 @@ export const usePurchaseFormDialog = ({
     supplierFocusRef
   });
 
-  // Form submission handler
+  // Form submission handler that closes the form after saving
   const { handleSubmit } = useFormSubmitHandler({
     isValid,
     formData,
@@ -91,7 +87,10 @@ export const usePurchaseFormDialog = ({
     initialPurchase,
     supplierFocusRef,
     resetForm,
-    onSave
+    onSave: (purchase) => {
+      onSave(purchase);
+      onClose();
+    }
   });
 
   // Printing functionality
@@ -105,7 +104,6 @@ export const usePurchaseFormDialog = ({
   const uniqueDepots = [...new Set(purchaseItems.map(item => item.depot))].filter(Boolean);
 
   return {
-    dialogOpen,
     printRef,
     supplierFocusRef,
     formData,
@@ -116,7 +114,6 @@ export const usePurchaseFormDialog = ({
     uniqueDepots,
     printConfirmationProps,
     handleInternalSubmit: handleSubmit,
-    handleCancel,
     setFormData,
     setSelectedSupplier,
     addPurchaseItem,
