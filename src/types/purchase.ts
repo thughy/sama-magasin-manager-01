@@ -5,6 +5,15 @@ export interface PaymentMethod {
   amount: number;
 }
 
+export interface PurchaseItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  sellPrice: number;
+  depot: string;
+}
+
 export interface Purchase {
   id: string;
   reference: string;
@@ -19,4 +28,5 @@ export interface Purchase {
   balance: number;
   status: 'payée' | 'impayée';
   paymentMethods?: PaymentMethod[];
+  items?: PurchaseItem[];
 }

@@ -1,10 +1,10 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar, Plus, Trash2 } from "lucide-react";
+import { Calendar, Plus, Trash2, Printer, PackageCheck } from "lucide-react";
 import { Purchase, PaymentMethod } from "@/types/purchase";
 import { SupplierSearchBox } from "../SupplierSearchBox";
 import { PurchaseFormItems } from "./PurchaseFormItems";
@@ -24,6 +24,8 @@ export const PurchaseForm = ({
   initialPurchase,
   onSave
 }: PurchaseFormProps) => {
+  const printRef = useRef<HTMLDivElement>(null);
+  
   const {
     formData,
     selectedSupplier,
@@ -38,8 +40,12 @@ export const PurchaseForm = ({
     addPaymentMethod,
     removePaymentMethod,
     updatePaymentMethod,
-    handleSubmit
+    handleSubmit,
+    printDepotEntry
   } = usePurchaseForm({ initialPurchase, onSave, onClose });
+
+  // Calculate unique depots from purchase items
+  const uniqueDepots = [...new Set(purchaseItems.map(item => item.depot))].filter(Boolean);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -156,6 +162,36 @@ export const PurchaseForm = ({
               </div>
             )}
           </div>
+          
+          {/* Depot Entry Printing Section */}
+          {uniqueDepots.length > 0 && (
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="text-lg font-medium">Bons d'entrée de dépôt</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {uniqueDepots.map((depot) => (
+                  <Button
+                    key={depot}
+                    type="button"
+                    variant="outline"
+                    onClick={() => printDepotEntry(depot)}
+                    className="flex items-center gap-2"
+                  >
+                    <Printer className="h-4 w-4" />
+                    <span>Imprimer bon pour {depot}</span>
+                  </Button>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => printDepotEntry('all')}
+                  className="flex items-center gap-2"
+                >
+                  <Printer className="h-4 w-4" />
+                  <span>Imprimer tous les bons</span>
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-between items-center pt-4 border-t">
             <div className="space-y-1">
@@ -168,12 +204,22 @@ export const PurchaseForm = ({
               <Button type="button" variant="outline" onClick={onClose}>
                 Annuler
               </Button>
-              <Button type="submit" disabled={!isValid} className="bg-sama-600 hover:bg-sama-700">
+              <Button 
+                type="submit" 
+                disabled={!isValid} 
+                className="bg-sama-600 hover:bg-sama-700 flex items-center gap-2"
+              >
+                <PackageCheck className="h-4 w-4" />
                 {initialPurchase ? "Mettre à jour" : "Enregistrer"}
               </Button>
             </div>
           </div>
         </form>
+        
+        {/* Hidden div for printing */}
+        <div style={{ display: 'none' }}>
+          <div ref={printRef}></div>
+        </div>
       </DialogContent>
     </Dialog>
   );

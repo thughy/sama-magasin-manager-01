@@ -22,9 +22,18 @@ export const usePurchasesData = () => {
       return false;
     }
     
-    // Filter by product name
-    if (productSearchTerm && !purchase.productName.toLowerCase().includes(productSearchTerm.toLowerCase())) {
-      return false;
+    // Filter by product name (check in items array if it exists)
+    if (productSearchTerm) {
+      if (purchase.items && purchase.items.length > 0) {
+        // Check if any item matches the product search term
+        const hasMatchingProduct = purchase.items.some(item => 
+          item.productName.toLowerCase().includes(productSearchTerm.toLowerCase())
+        );
+        if (!hasMatchingProduct) return false;
+      } else if (!purchase.productName.toLowerCase().includes(productSearchTerm.toLowerCase())) {
+        // Fallback to main product name for backward compatibility
+        return false;
+      }
     }
     
     // Filter by date
