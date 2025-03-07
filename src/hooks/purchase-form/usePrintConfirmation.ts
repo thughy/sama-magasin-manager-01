@@ -1,83 +1,66 @@
 
 import { useState } from 'react';
 import { PurchaseItem } from '@/types/purchase';
-import { useDepotEntryPrinting } from './useDepotEntryPrinting';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface UsePrintConfirmationProps {
-  formData: {
-    reference: string;
-    purchaseDate: string;
-    supplierName: string;
-  };
+  formData: any;
   purchaseItems: PurchaseItem[];
 }
 
 export const usePrintConfirmation = ({ formData, purchaseItems }: UsePrintConfirmationProps) => {
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [onSaveCallback, setOnSaveCallback] = useState<(() => void) | null>(null);
-  const { printDepotEntry } = useDepotEntryPrinting(formData, purchaseItems);
+  const [isOpen, setIsOpen] = useState(false);
+  const [onConfirmCallback, setOnConfirmCallback] = useState<(() => boolean | void) | null>(null);
 
-  // Get unique depots from purchase items
-  const uniqueDepots = [...new Set(purchaseItems.map(item => item.depot))].filter(Boolean);
-
-  const showPrintConfirmation = (callback: () => void) => {
-    setOnSaveCallback(() => callback);
-    setIsConfirmOpen(true);
+  // Function to show the confirmation dialog
+  const showPrintConfirmation = (callback: () => boolean | void) => {
+    setOnConfirmCallback(() => callback);
+    setIsOpen(true);
   };
 
-  const handleConfirmYes = () => {
-    // Print all depot entries
-    uniqueDepots.forEach(depot => {
-      if (depot) printDepotEntry(depot);
-    });
-    
-    // Close dialog
-    setIsConfirmOpen(false);
-    
-    // Call the callback to continue with save operation
-    if (onSaveCallback) onSaveCallback();
+  // Function to handle confirmation
+  const handleConfirm = () => {
+    if (onConfirmCallback) {
+      onConfirmCallback();
+    }
+    setIsOpen(false);
   };
 
-  const handleConfirmNo = () => {
-    setIsConfirmOpen(false);
-    
-    // Call the callback without printing
-    if (onSaveCallback) onSaveCallback();
-  };
-
+  // Print Confirmation Dialog component
   const PrintConfirmationDialog = () => {
-    if (uniqueDepots.length === 0) return null;
+    // Get all unique depots that have items
+    const depots = [...new Set(purchaseItems.filter(item => !!item.depot).map(item => item.depot))];
     
     return (
-      <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Imprimer les bons d'entrée</AlertDialogTitle>
-            <AlertDialogDescription>
-              Voulez-vous imprimer les bons d'entrée pour les dépôts suivants :
-              <ul className="mt-2 list-disc pl-5">
-                {uniqueDepots.map(depot => (
-                  <li key={depot}>{depot}</li>
-                ))}
-              </ul>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleConfirmNo}>Non</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmYes}>Oui, imprimer</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Imprimer les bons d'entrée en dépôt</DialogTitle>
+          </DialogHeader>
+
+          <div className="py-4">
+            <p>Voulez-vous imprimer les bons d'entrée pour les dépôts suivants ?</p>
+            <ul className="list-disc pl-6 mt-2">
+              {depots.map((depot, index) => (
+                <li key={index}>{depot}</li>
+              ))}
+            </ul>
+            <p className="mt-4">
+              L'achat sera enregistré et les stocks mis à jour dans les dépôts respectifs.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsOpen(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleConfirm}>
+              Imprimer et enregistrer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     );
   };
 
