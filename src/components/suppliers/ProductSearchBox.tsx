@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +8,6 @@ import { ProductSearchResults } from "./ProductSearchResults";
 import { ProductCreateDialog } from "./ProductCreateDialog";
 import { initialItems } from "@/data/productsData";
 
-// Transform products from our data structure to the expected format
 const getProductsFromItems = () => {
   return initialItems
     .filter(item => item.type === "product")
@@ -34,7 +32,6 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
 
-  // Initialize products from our data
   useEffect(() => {
     const formattedProducts = getProductsFromItems();
     console.log("Initialized products:", formattedProducts);
@@ -48,7 +45,6 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
         product.barcode.includes(searchTerm)
       );
       
-      // Filter out products that are already in the list
       const filteredResults = results.filter(product => !currentItems.includes(Number(product.id)));
       
       setSearchResults(filteredResults);
@@ -59,7 +55,6 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
   }, [searchTerm, currentItems, products]);
 
   const handleSelectProduct = (product: Product) => {
-    // Create a completely new product object with strict type conversions
     const selectedProduct: Product = {
       id: Number(product.id),
       barcode: String(product.barcode || ""),
@@ -68,7 +63,6 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
       sellPrice: Number(product.sellPrice || 0)
     };
     
-    // Deep check that all values are properly defined and of the correct type
     console.log("Sending selected product from SearchBox:", selectedProduct);
     
     if (!selectedProduct.name) {
@@ -76,22 +70,17 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
       return;
     }
     
-    // Pass the properly formatted product to the parent component
     onSelectProduct(selectedProduct);
     
-    // Reset search state
     setSearchTerm("");
     setShowResults(false);
   };
 
   const handleCreateProduct = (newProduct: Product) => {
-    // Add to products data
     setProducts([...products, newProduct]);
     
-    // Select the new product
     onSelectProduct(newProduct);
     
-    // Close dialog and reset search
     setShowCreateDialog(false);
     setSearchTerm("");
   };
@@ -112,6 +101,7 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
               placeholder="Rechercher un article par nom ou code barre..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              autoComplete="off"
             />
             <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
