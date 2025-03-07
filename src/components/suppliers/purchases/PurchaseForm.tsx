@@ -1,5 +1,4 @@
-
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
 import { 
@@ -13,11 +12,8 @@ import {
   useDepotEntryPrinting,
   usePrintConfirmation
 } from "@/hooks/purchase-form";
-import { PurchaseFormHeader } from "./PurchaseFormHeader";
-import { PurchaseFormItems } from "./PurchaseFormItems";
-import { PaymentMethodsSection } from "./PaymentMethodsSection";
-import { DepotEntryPrintingSection } from "./DepotEntryPrintingSection";
-import { PurchaseFormFooter } from "./PurchaseFormFooter";
+import { useFormReset } from "@/hooks/purchase-form/useFormReset";
+import { PurchaseFormContent } from "./purchase-form/PurchaseFormContent";
 import { PrintConfirmationDialog } from "./PrintConfirmationDialog";
 
 interface PurchaseFormProps {
@@ -66,12 +62,21 @@ export const PurchaseForm = ({
   });
 
   // Form calculations and validation
-  const { isValid, calculateTotals } = useFormCalculations({
+  const { isValid } = useFormCalculations({
     formData,
     setFormData,
     selectedSupplier,
     purchaseItems,
     paymentMethods
+  });
+
+  // Form reset functionality
+  const { resetForm } = useFormReset({
+    setFormData,
+    setPurchaseItems,
+    setPaymentMethods,
+    selectedSupplier,
+    supplierFocusRef
   });
 
   // Printing functionality
@@ -90,35 +95,6 @@ export const PurchaseForm = ({
     purchaseItems,
     paymentMethods
   });
-
-  // Function to reset the form after successful submission
-  const resetForm = () => {
-    // Reset form data
-    setFormData({
-      reference: `F-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
-      purchaseDate: new Date().toISOString().split('T')[0],
-      supplierId: selectedSupplier ? selectedSupplier.id : 0,
-      supplierName: selectedSupplier ? selectedSupplier.name : '',
-      productName: '',
-      quantity: 0,
-      unitPrice: 0,
-      totalAmount: 0,
-      totalPaid: 0,
-      balance: 0,
-      status: 'impayée',
-    });
-    
-    // Clear items but keep the supplier
-    setPurchaseItems([]);
-    setPaymentMethods([]);
-    
-    // Focus on supplier input after form reset
-    setTimeout(() => {
-      if (supplierFocusRef.current) {
-        supplierFocusRef.current.focus();
-      }
-    }, 100);
-  };
 
   // Form submission with option to keep form open
   const { handleSubmit } = useFormSubmission({
@@ -152,50 +128,28 @@ export const PurchaseForm = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Form Header and Basic Information */}
-          <PurchaseFormHeader
-            reference={formData.reference}
-            purchaseDate={formData.purchaseDate}
-            selectedSupplier={selectedSupplier}
-            onReferenceChange={(value) => setFormData({...formData, reference: value})}
-            onPurchaseDateChange={(value) => setFormData({...formData, purchaseDate: value})}
-            onSupplierChange={setSelectedSupplier}
-            supplierFocusRef={supplierFocusRef}
-          />
-
-          {/* Purchase Items Section */}
-          <PurchaseFormItems 
-            items={purchaseItems}
-            onAddItem={addPurchaseItem}
-            onRemoveItem={removePurchaseItem}
-            onUpdateItem={updatePurchaseItem}
-            onUpdateItemFields={updatePurchaseItemFields}
-          />
-
-          {/* Payment Methods Section */}
-          <PaymentMethodsSection
-            paymentMethods={paymentMethods}
-            onAddPaymentMethod={addPaymentMethod}
-            onRemovePaymentMethod={removePaymentMethod}
-            onUpdatePaymentMethod={updatePaymentMethod}
-          />
-          
-          {/* Depot Entry Printing Section */}
-          <DepotEntryPrintingSection
-            uniqueDepots={uniqueDepots}
-            onPrintDepotEntry={printDepotEntry}
-          />
-
-          {/* Form Footer with Totals and Actions */}
-          <PurchaseFormFooter
-            formData={formData}
-            isValid={isValid}
-            isEditing={!!initialPurchase}
-            onCancel={onClose}
-            onSubmit={handleSubmit}
-          />
-        </form>
+        <PurchaseFormContent
+          formData={formData}
+          selectedSupplier={selectedSupplier}
+          purchaseItems={purchaseItems}
+          paymentMethods={paymentMethods}
+          uniqueDepots={uniqueDepots}
+          isValid={isValid}
+          initialPurchase={initialPurchase}
+          supplierFocusRef={supplierFocusRef}
+          onSubmit={handleSubmit}
+          onClose={onClose}
+          setFormData={setFormData}
+          setSelectedSupplier={setSelectedSupplier}
+          addPurchaseItem={addPurchaseItem}
+          removePurchaseItem={removePurchaseItem}
+          updatePurchaseItem={updatePurchaseItem}
+          updatePurchaseItemFields={updatePurchaseItemFields}
+          addPaymentMethod={addPaymentMethod}
+          removePaymentMethod={removePaymentMethod}
+          updatePaymentMethod={updatePaymentMethod}
+          printDepotEntry={printDepotEntry}
+        />
         
         {/* Hidden div for printing */}
         <div style={{ display: 'none' }}>

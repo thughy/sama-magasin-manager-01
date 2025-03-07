@@ -10,6 +10,7 @@ import { useInitialItems } from './useInitialItems';
 import { usePurchaseFormItems } from './usePurchaseFormItems';
 import { useInventoryUpdater } from './useInventoryUpdater';
 import { useDepotEntryPrinting } from './useDepotEntryPrinting';
+import { useFormReset } from './useFormReset';
 
 export { 
   usePurchaseForm,
@@ -22,5 +23,6 @@ export {
   useInitialItems,
   usePurchaseFormItems,
   useInventoryUpdater,
-  useDepotEntryPrinting
+  useDepotEntryPrinting,
+  useFormReset
 };
