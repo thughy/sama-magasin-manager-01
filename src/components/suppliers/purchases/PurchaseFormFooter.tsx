@@ -29,7 +29,7 @@ export const PurchaseFormFooter = ({
       
       <div className="flex gap-2">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
+          Fermer
         </Button>
         <Button 
           type="submit" 

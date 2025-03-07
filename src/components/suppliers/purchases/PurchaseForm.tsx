@@ -1,10 +1,11 @@
 
 import React, { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
 import { usePurchaseFormDialog } from "@/hooks/purchase-form/usePurchaseFormDialog";
 import { PurchaseFormContent } from "./purchase-form/PurchaseFormContent";
 import { PrintConfirmationDialog } from "./PrintConfirmationDialog";
+import { X } from "lucide-react";
 
 interface PurchaseFormProps {
   isOpen: boolean;
@@ -55,11 +56,16 @@ export const PurchaseForm = ({
   return (
     <Dialog open={dialogOpen} onOpenChange={(open) => {
       if (!open) {
-        // Prevent automatic closing - we want to control this ourselves
-        console.log("Dialog tried to close automatically, preventing");
+        // Close dialog when the X button is clicked
+        handleCancel();
       }
     }}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" onClick={handleCancel}>
+          <X className="h-4 w-4" />
+          <span className="sr-only">Fermer</span>
+        </DialogClose>
+        
         <PurchaseFormContent
           formData={formData}
           selectedSupplier={selectedSupplier}
