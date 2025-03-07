@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +13,7 @@ const getProductsFromItems = () => {
   return initialItems
     .filter(item => item.type === "product")
     .map(item => ({
-      id: parseInt(item.id.replace('PRD', '')) || item.id,
+      id: parseInt(item.id.replace('PRD', '')) || 0,
       barcode: (item.type === "product") ? item.barcode : "",
       name: item.name,
       purchasePrice: (item.type === "product") ? item.buyPrice : 0,

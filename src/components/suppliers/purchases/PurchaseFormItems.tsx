@@ -47,6 +47,7 @@ export const PurchaseFormItems = ({
   onUpdateItem
 }: PurchaseFormItemsProps) => {
   const handleSelectProduct = (product: Product, index: number) => {
+    // Update all product-related fields
     onUpdateItem(index, 'productId', product.id.toString());
     onUpdateItem(index, 'productName', product.name);
     onUpdateItem(index, 'unitPrice', product.purchasePrice);
@@ -82,7 +83,7 @@ export const PurchaseFormItems = ({
             }, 0);
           }
         }}
-        currentItems={[]}
+        currentItems={items.filter(item => item.productId).map(item => parseInt(item.productId) || 0)}
       />
 
       <Table>
@@ -151,7 +152,6 @@ export const PurchaseFormItems = ({
                     value={item.sellPrice || 0}
                     onChange={(e) => onUpdateItem(index, 'sellPrice', Number(e.target.value))}
                     className="w-28"
-                    readOnly
                   />
                 </TableCell>
                 <TableCell className="font-medium">
