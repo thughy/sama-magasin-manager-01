@@ -14,7 +14,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       quantity: 1,
       unitPrice: 0,
       sellPrice: 0,
-      depot: 'Principal'
+      depot: '' // Initialiser avec une valeur vide pour forcer la sélection
     };
     
     setPurchaseItems(items => [...items, newItem]);

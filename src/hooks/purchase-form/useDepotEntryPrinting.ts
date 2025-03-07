@@ -14,9 +14,30 @@ export const useDepotEntryPrinting = (
   
   // Function to print depot entry receipts
   const printDepotEntry = (depotName: string) => {
+    // Vérifier si tous les articles ont un dépôt sélectionné
+    const itemsWithoutDepot = purchaseItems.filter(item => !item.depot || item.depot.trim() === '');
+    
+    if (itemsWithoutDepot.length > 0) {
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez sélectionner un dépôt pour tous les articles avant d'imprimer.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (depotName === 'all') {
       // Get all unique depots
       const uniqueDepots = [...new Set(purchaseItems.map(item => item.depot))].filter(Boolean);
+      
+      if (uniqueDepots.length === 0) {
+        toast({
+          title: "Aucun dépôt",
+          description: "Aucun dépôt n'a été sélectionné pour les articles.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       // Print for each depot
       uniqueDepots.forEach(depot => {

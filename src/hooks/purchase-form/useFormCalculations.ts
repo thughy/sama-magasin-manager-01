@@ -47,7 +47,8 @@ export const useFormCalculations = ({
       purchaseItems.every(item => 
         item.quantity > 0 && 
         item.unitPrice > 0 && 
-        item.depot
+        item.depot && 
+        item.depot.trim() !== ''
       );
     
     setIsValid(isFormValid);
