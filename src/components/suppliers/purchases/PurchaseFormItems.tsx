@@ -47,11 +47,19 @@ export const PurchaseFormItems = ({
   onUpdateItem
 }: PurchaseFormItemsProps) => {
   const handleSelectProduct = (product: Product, index: number) => {
-    // Update all product-related fields
-    onUpdateItem(index, 'productId', product.id.toString());
+    // Log the received product for debugging
+    console.log("Product selected in PurchaseFormItems:", product, "for index:", index);
+    
+    // Update all product-related fields with explicit type conversion
+    onUpdateItem(index, 'productId', String(product.id));
     onUpdateItem(index, 'productName', product.name);
-    onUpdateItem(index, 'unitPrice', product.purchasePrice);
-    onUpdateItem(index, 'sellPrice', product.sellPrice);
+    onUpdateItem(index, 'unitPrice', Number(product.purchasePrice));
+    onUpdateItem(index, 'sellPrice', Number(product.sellPrice));
+    
+    // Log updated item after changes for debugging
+    setTimeout(() => {
+      console.log("Item after update:", items[index]);
+    }, 10);
   };
 
   return (

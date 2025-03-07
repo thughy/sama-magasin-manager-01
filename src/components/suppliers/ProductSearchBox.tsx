@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,9 +57,20 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
   }, [searchTerm, currentItems, products]);
 
   const handleSelectProduct = (product: Product) => {
-    onSelectProduct(product);
+    // Ensure we're passing the complete product object
+    const selectedProduct = {
+      ...product,
+      id: Number(product.id),
+      purchasePrice: Number(product.purchasePrice),
+      sellPrice: Number(product.sellPrice)
+    };
+    
+    onSelectProduct(selectedProduct);
     setSearchTerm("");
     setShowResults(false);
+    
+    // Log for debugging
+    console.log("Selected product in ProductSearchBox:", selectedProduct);
   };
 
   const handleCreateProduct = (newProduct: Product) => {
