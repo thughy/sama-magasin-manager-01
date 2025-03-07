@@ -78,6 +78,7 @@ export const usePurchaseFormDialog = ({
     setPurchaseItems,
     setPaymentMethods,
     selectedSupplier,
+    setSelectedSupplier,
     supplierFocusRef
   });
 

@@ -7,6 +7,7 @@ interface UseFormResetProps {
   setPurchaseItems: React.Dispatch<React.SetStateAction<any[]>>;
   setPaymentMethods: React.Dispatch<React.SetStateAction<any[]>>;
   selectedSupplier: Supplier | null;
+  setSelectedSupplier: React.Dispatch<React.SetStateAction<Supplier | null>>;
   supplierFocusRef: React.RefObject<HTMLInputElement>;
 }
 
@@ -15,16 +16,17 @@ export const useFormReset = ({
   setPurchaseItems,
   setPaymentMethods,
   selectedSupplier,
+  setSelectedSupplier,
   supplierFocusRef
 }: UseFormResetProps) => {
   // Function to reset the form after successful submission
   const resetForm = () => {
-    // Reset form data but keep the supplier
+    // Reset form data and clear the supplier
     setFormData(prev => ({
       reference: `F-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
       purchaseDate: new Date().toISOString().split('T')[0],
-      supplierId: selectedSupplier ? selectedSupplier.id : prev.supplierId,
-      supplierName: selectedSupplier ? selectedSupplier.name : prev.supplierName,
+      supplierId: 0,
+      supplierName: '',
       productName: '',
       quantity: 0,
       unitPrice: 0,
@@ -34,9 +36,12 @@ export const useFormReset = ({
       status: 'impayée',
     }));
     
-    // Clear items but keep the supplier
+    // Clear items
     setPurchaseItems([]);
     setPaymentMethods([]);
+    
+    // Clear selected supplier
+    setSelectedSupplier(null);
     
     // Focus on supplier input after form reset
     setTimeout(() => {
