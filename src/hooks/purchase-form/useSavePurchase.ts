@@ -3,7 +3,7 @@ import { Purchase, PurchaseItem, PaymentMethod } from '@/types/purchase';
 import { useToast } from '@/hooks/use-toast';
 import { useInventoryUpdater } from './useInventoryUpdater';
 
-interface SaveOperationResult {
+export interface SaveOperationResult {
   success: boolean;
   shouldReset?: boolean;
 }
