@@ -33,7 +33,7 @@ export const DepotSelector = ({ value, onChange, className }: DepotSelectorProps
             onChange(e.target.value);
           }}
           required
-          style={{ width: "140%" }} // Increased width from 120% to 140%
+          style={{ width: "150%" }} // Increased width from 140% to 150%
         >
           {depots.map((depot) => (
             <option 
