@@ -2,7 +2,17 @@
 import React, { useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
-import { usePurchaseForm } from "@/hooks/purchase-form";
+import { 
+  useFormDataManager,
+  usePaymentMethods,
+  usePurchaseFormItems,
+  useFormCalculations,
+  useSavePurchase,
+  useFormSubmission,
+  useInitialItems,
+  useDepotEntryPrinting,
+  usePrintConfirmation
+} from "@/hooks/purchase-form";
 import { PurchaseFormHeader } from "./PurchaseFormHeader";
 import { PurchaseFormItems } from "./PurchaseFormItems";
 import { PaymentMethodsSection } from "./PaymentMethodsSection";
@@ -24,24 +34,67 @@ export const PurchaseForm = ({
 }: PurchaseFormProps) => {
   const printRef = useRef<HTMLDivElement>(null);
   
-  const {
+  // Form data management
+  const { formData, setFormData, selectedSupplier, setSelectedSupplier } = 
+    useFormDataManager({ initialPurchase });
+  
+  // Purchase items and payment methods management
+  const { 
+    purchaseItems, 
+    setPurchaseItems, 
+    addPurchaseItem, 
+    removePurchaseItem, 
+    updatePurchaseItem 
+  } = usePurchaseFormItems();
+  
+  const { 
+    paymentMethods, 
+    setPaymentMethods, 
+    addPaymentMethod, 
+    removePaymentMethod, 
+    updatePaymentMethod 
+  } = usePaymentMethods();
+
+  // Initialize items from initial purchase
+  useInitialItems({
+    initialPurchase,
+    setPurchaseItems,
+    setPaymentMethods
+  });
+
+  // Form calculations and validation
+  const { isValid, calculateTotals } = useFormCalculations({
     formData,
+    setFormData,
     selectedSupplier,
     purchaseItems,
-    paymentMethods,
+    paymentMethods
+  });
+
+  // Printing functionality
+  const { printDepotEntry } = useDepotEntryPrinting(formData, purchaseItems);
+  const { showPrintConfirmation, PrintConfirmationDialog } = usePrintConfirmation({
+    formData,
+    purchaseItems
+  });
+
+  // Save purchase functionality
+  const { completeSaveOperation } = useSavePurchase({
+    initialPurchase,
+    onSave,
+    onClose,
+    formData,
+    purchaseItems,
+    paymentMethods
+  });
+
+  // Form submission
+  const { handleSubmit } = useFormSubmission({
     isValid,
-    setFormData,
-    setSelectedSupplier,
-    addPurchaseItem,
-    removePurchaseItem,
-    updatePurchaseItem,
-    addPaymentMethod,
-    removePaymentMethod,
-    updatePaymentMethod,
-    handleSubmit,
-    printDepotEntry,
-    PrintConfirmationDialog
-  } = usePurchaseForm({ initialPurchase, onSave, onClose });
+    purchaseItems,
+    showPrintConfirmation,
+    completeSaveOperation
+  });
 
   // Calculate unique depots from purchase items
   const uniqueDepots = [...new Set(purchaseItems.map(item => item.depot))].filter(Boolean);
