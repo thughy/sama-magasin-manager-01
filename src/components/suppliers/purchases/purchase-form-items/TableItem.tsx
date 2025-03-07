@@ -24,7 +24,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="1"
           value={item.quantity}
           onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
-          className="w-20"
+          className="w-16" // Reduced width from w-20 to w-16
         />
       </TableCell>
       <TableCell>
@@ -34,6 +34,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
             console.log(`Updating depot for item ${index} to:`, value);
             onUpdateItem(index, 'depot', value);
           }}
+          className="w-full" // Added explicit width class for the depot selector
         />
       </TableCell>
       <TableCell>
