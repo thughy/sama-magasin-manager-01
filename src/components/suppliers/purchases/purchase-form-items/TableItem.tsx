@@ -43,7 +43,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="0"
           value={item.unitPrice}
           onChange={(e) => onUpdateItem(index, 'unitPrice', Number(e.target.value))}
-          className="w-28"
+          className="w-24" // Reduced width from w-28 to w-24
         />
       </TableCell>
       <TableCell>
@@ -52,7 +52,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="0"
           value={item.sellPrice || 0}
           onChange={(e) => onUpdateItem(index, 'sellPrice', Number(e.target.value))}
-          className="w-28"
+          className="w-24" // Reduced width from w-28 to w-24
         />
       </TableCell>
       <TableCell className="font-medium">

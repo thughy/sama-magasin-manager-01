@@ -19,7 +19,7 @@ export function ProductPrices({ control }: ProductPricesProps) {
           <FormItem>
             <FormLabel>Prix d'achat (FCFA)</FormLabel>
             <FormControl>
-              <Input type="number" {...field} />
+              <Input type="number" {...field} className="w-full md:w-4/5" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -33,7 +33,7 @@ export function ProductPrices({ control }: ProductPricesProps) {
           <FormItem>
             <FormLabel>Prix de vente (FCFA)</FormLabel>
             <FormControl>
-              <Input type="number" {...field} />
+              <Input type="number" {...field} className="w-full md:w-4/5" />
             </FormControl>
             <FormMessage />
           </FormItem>
