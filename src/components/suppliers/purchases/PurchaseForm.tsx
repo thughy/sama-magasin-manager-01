@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
@@ -98,14 +97,15 @@ export const PurchaseForm = ({
     shouldResetForm: false
   });
 
-  // Form submission - Garder le formulaire ouvert et focus sur le champ fournisseur
+  // Form submission - Pass setSelectedSupplier to reset supplier after save
   const { handleSubmit } = useFormSubmission({
     isValid,
     purchaseItems,
     showPrintConfirmation,
     completeSaveOperation,
     shouldKeepFormOpen: true,
-    supplierFocusRef
+    supplierFocusRef,
+    setSelectedSupplier
   });
 
   // Calculate unique depots from purchase items

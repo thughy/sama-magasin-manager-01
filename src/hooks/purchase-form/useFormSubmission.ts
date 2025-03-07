@@ -1,4 +1,3 @@
-
 import { useToast } from '@/hooks/use-toast';
 import { PurchaseItem } from '@/types/purchase';
 
@@ -10,6 +9,7 @@ interface UseFormSubmissionProps {
   shouldKeepFormOpen?: boolean;
   resetForm?: () => void;
   supplierFocusRef?: React.RefObject<HTMLInputElement>;
+  setSelectedSupplier?: (supplier: null) => void;
 }
 
 export const useFormSubmission = ({
@@ -19,7 +19,8 @@ export const useFormSubmission = ({
   completeSaveOperation,
   shouldKeepFormOpen = true,
   resetForm,
-  supplierFocusRef
+  supplierFocusRef,
+  setSelectedSupplier
 }: UseFormSubmissionProps) => {
   const { toast } = useToast();
 
@@ -49,16 +50,23 @@ export const useFormSubmission = ({
       return;
     }
     
-    // Save without printing, keep form open, focus on supplier
+    // Save without printing, keep form open
     const result = completeSaveOperation(false);
     
-    // Focus on supplier input if provided
-    if (result.success && supplierFocusRef?.current) {
-      setTimeout(() => {
-        if (supplierFocusRef.current) {
-          supplierFocusRef.current.focus();
-        }
-      }, 100);
+    if (result.success) {
+      // Reset the supplier if save was successful
+      if (setSelectedSupplier) {
+        setSelectedSupplier(null);
+      }
+      
+      // Focus on supplier input if provided
+      if (supplierFocusRef?.current) {
+        setTimeout(() => {
+          if (supplierFocusRef.current) {
+            supplierFocusRef.current.focus();
+          }
+        }, 100);
+      }
     }
   };
 
