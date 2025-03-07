@@ -3,6 +3,11 @@ import { Purchase, PurchaseItem, PaymentMethod } from '@/types/purchase';
 import { useToast } from '@/hooks/use-toast';
 import { useInventoryUpdater } from './useInventoryUpdater';
 
+interface SaveOperationResult {
+  success: boolean;
+  shouldReset?: boolean;
+}
+
 interface UseSavePurchaseProps {
   initialPurchase?: Purchase;
   onSave: (purchase: Purchase) => void;
@@ -26,7 +31,7 @@ export const useSavePurchase = ({
   const { updateInventory } = useInventoryUpdater();
   
   // The actual save operation
-  const completeSaveOperation = (shouldCloseForm = false): boolean => {
+  const completeSaveOperation = (shouldCloseForm = false): SaveOperationResult => {
     // For backward compatibility, use the first item's details
     const firstItem = purchaseItems[0];
     
@@ -36,7 +41,7 @@ export const useSavePurchase = ({
         description: "Aucun article n'a été ajouté à l'achat.",
         variant: "destructive",
       });
-      return false;
+      return { success: false };
     }
     
     const newPurchase: Purchase = {
@@ -65,7 +70,7 @@ export const useSavePurchase = ({
         description: "Impossible de mettre à jour l'inventaire. Veuillez réessayer.",
         variant: "destructive",
       });
-      return false;
+      return { success: false };
     }
     
     // Save purchase
@@ -81,7 +86,7 @@ export const useSavePurchase = ({
       onClose();
     }
     
-    // Return true to indicate success, so we can handle form reset
+    // Return success result with reset flag
     return {
       success: true,
       shouldReset: shouldResetForm

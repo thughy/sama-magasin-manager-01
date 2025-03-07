@@ -1,3 +1,4 @@
+
 import { useToast } from '@/hooks/use-toast';
 import { PurchaseItem } from '@/types/purchase';
 
@@ -5,7 +6,7 @@ interface UseFormSubmissionProps {
   isValid: boolean;
   purchaseItems: PurchaseItem[];
   showPrintConfirmation: (callback: () => any) => void;
-  completeSaveOperation: (shouldCloseForm?: boolean) => any;
+  completeSaveOperation: (shouldCloseForm?: boolean) => { success: boolean; shouldReset?: boolean };
   shouldKeepFormOpen?: boolean;
   resetForm?: () => void;
   supplierFocusRef?: React.RefObject<HTMLInputElement>;
