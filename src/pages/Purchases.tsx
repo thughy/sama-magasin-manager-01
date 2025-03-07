@@ -37,26 +37,30 @@ const Purchases = () => {
     clearFilters
   } = usePurchasesData();
 
-  // Force refresh on unmount issues
+  // Debug and cleanup on mount/unmount
   useEffect(() => {
-    console.log("Purchases page rendered, form open:", isPurchaseFormOpen);
+    console.log("Purchases page mounted");
+    
     return () => {
       console.log("Purchases page unmounting");
     };
+  }, []);
+
+  // Monitor form state changes
+  useEffect(() => {
+    console.log("Purchase form state changed:", isPurchaseFormOpen);
   }, [isPurchaseFormOpen]);
 
   // Handle closing the purchase form
   const handlePurchaseFormClose = () => {
-    console.log("Closing purchase form from parent - START");
+    console.log("Closing purchase form");
     setIsPurchaseFormOpen(false);
-    // Clear selected purchase when form is closed
     setSelectedPurchase(undefined);
-    console.log("Closing purchase form from parent - END");
   };
 
   // Custom save handler
   const handleSavePurchase = (purchase: Purchase) => {
-    console.log("Saving purchase - START");
+    console.log("Saving purchase");
     
     // Get the current list of purchases from local storage or initialize empty
     const purchasesStr = localStorage.getItem('purchases') || '[]';
@@ -89,10 +93,7 @@ const Purchases = () => {
     handleRefresh();
     
     // Close the form after saving
-    console.log("Closing form after save");
-    setIsPurchaseFormOpen(false);
-    setSelectedPurchase(undefined);
-    console.log("Saving purchase - END");
+    handlePurchaseFormClose();
   };
 
   return (

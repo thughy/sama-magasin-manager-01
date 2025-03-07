@@ -48,17 +48,33 @@ export const PurchaseForm = ({
     onSave
   });
 
-  // Cleanup effect when component unmounts
+  // Ensure clean unmounting
   useEffect(() => {
-    return () => {
-      console.log("PurchaseForm unmounting, cleaning up resources");
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        e.preventDefault();
+        onClose();
+      }
     };
-  }, []);
+
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      console.log("PurchaseForm unmounting cleanly");
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <button 
           onClick={onClose}
