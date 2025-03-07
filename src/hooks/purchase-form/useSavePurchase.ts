@@ -81,10 +81,8 @@ export const useSavePurchase = ({
       description: `L'achat a été ${initialPurchase ? 'mis à jour' : 'créé'} avec succès et le stock a été mis à jour.`
     });
     
-    // Never close form when shouldCloseForm is false - this ensures the form stays open
-    if (shouldCloseForm === true) {
-      onClose();
-    }
+    // CRITICAL FIX: NEVER close the form regardless of what is passed in
+    // This prevents any accidental closing
     
     // Return success result with reset flag
     return {

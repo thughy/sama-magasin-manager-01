@@ -106,16 +106,23 @@ export const PurchaseForm = ({
     showPrintConfirmation,
     completeSaveOperation,
     shouldKeepFormOpen: true,
-    resetForm: resetForm,  // Pass the resetForm function explicitly
+    resetForm,  // Pass the resetForm function explicitly
     supplierFocusRef,
     setSelectedSupplier
   });
+
+  // CRITICAL: Prevent dialog from closing when open state changes
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      onClose();
+    }
+  };
 
   // Calculate unique depots from purchase items
   const uniqueDepots = [...new Set(purchaseItems.map(item => item.depot))].filter(Boolean);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <PurchaseFormContent
           formData={formData}

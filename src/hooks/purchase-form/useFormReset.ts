@@ -18,8 +18,8 @@ export const useFormReset = ({
 }: UseFormResetProps) => {
   // Function to reset the form after successful submission
   const resetForm = () => {
-    // Reset form data
-    setFormData({
+    // Reset form data but keep the supplier
+    setFormData(prev => ({
       reference: `F-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
       purchaseDate: new Date().toISOString().split('T')[0],
       supplierId: selectedSupplier ? selectedSupplier.id : 0,
@@ -31,7 +31,7 @@ export const useFormReset = ({
       totalPaid: 0,
       balance: 0,
       status: 'impayée',
-    });
+    }));
     
     // Clear items but keep the supplier
     setPurchaseItems([]);

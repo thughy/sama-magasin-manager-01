@@ -52,7 +52,7 @@ export const useFormSubmission = ({
       return;
     }
     
-    // Always pass false to ensure the form never closes
+    // CRITICAL FIX: We must ALWAYS pass false to ensure the form never closes
     const result = completeSaveOperation(false);
     
     if (result.success) {
