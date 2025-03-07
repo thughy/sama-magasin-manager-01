@@ -82,6 +82,7 @@ export const useSavePurchase = ({
     });
     
     // Only close if explicitly requested AND shouldCloseForm is true
+    // IMPORTANT: We're using strict equality to ensure it's only closed when explicitly true
     if (shouldCloseForm === true) {
       onClose();
     }

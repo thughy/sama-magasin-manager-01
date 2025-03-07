@@ -1,3 +1,4 @@
+
 import { useToast } from '@/hooks/use-toast';
 import { PurchaseItem } from '@/types/purchase';
 
@@ -50,7 +51,7 @@ export const useFormSubmission = ({
       return;
     }
     
-    // Save without printing, keep form open
+    // Always pass false to ensure the form never closes
     const result = completeSaveOperation(false);
     
     if (result.success) {
