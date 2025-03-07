@@ -1,11 +1,11 @@
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Purchase } from "@/types/purchase";
 import { purchasesData } from "@/data/purchasesData";
 import { useToast } from "./use-toast";
 
 export const usePurchasesData = () => {
-  const [allPurchases, setAllPurchases] = useState<Purchase[]>([...purchasesData]);
+  const [allPurchases, setAllPurchases] = useState<Purchase[]>([]);
   const [supplierSearchTerm, setSupplierSearchTerm] = useState("");
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
@@ -14,6 +14,30 @@ export const usePurchasesData = () => {
   const [isPurchaseFormOpen, setIsPurchaseFormOpen] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | undefined>(undefined);
   const { toast } = useToast();
+
+  // Load purchases from localStorage on initial mount
+  useEffect(() => {
+    loadPurchasesFromStorage();
+  }, []);
+
+  // Function to load purchases from localStorage
+  const loadPurchasesFromStorage = () => {
+    try {
+      const storedPurchases = localStorage.getItem('purchases');
+      if (storedPurchases) {
+        const parsedPurchases = JSON.parse(storedPurchases);
+        setAllPurchases(parsedPurchases);
+      } else {
+        // If no purchases in localStorage, use the sample data
+        setAllPurchases([...purchasesData]);
+        // Save sample data to localStorage for future use
+        localStorage.setItem('purchases', JSON.stringify(purchasesData));
+      }
+    } catch (error) {
+      console.error("Error loading purchases from storage:", error);
+      setAllPurchases([...purchasesData]);
+    }
+  };
 
   // Filter purchases based on search terms and filters
   const purchases = allPurchases.filter((purchase) => {
@@ -50,7 +74,7 @@ export const usePurchasesData = () => {
   });
 
   const handleRefresh = useCallback(() => {
-    setAllPurchases([...purchasesData]);
+    loadPurchasesFromStorage();
     toast({
       title: "Données actualisées",
       description: "La liste des achats a été actualisée",
@@ -95,7 +119,12 @@ export const usePurchasesData = () => {
 
   const confirmDeletePurchase = useCallback(() => {
     if (selectedPurchase) {
-      setAllPurchases(allPurchases.filter(p => p.id !== selectedPurchase.id));
+      const updatedPurchases = allPurchases.filter(p => p.id !== selectedPurchase.id);
+      setAllPurchases(updatedPurchases);
+      
+      // Update localStorage
+      localStorage.setItem('purchases', JSON.stringify(updatedPurchases));
+      
       toast({
         title: "Achat supprimé",
         description: `L'achat ${selectedPurchase.reference} a été supprimé`,
@@ -127,7 +156,7 @@ export const usePurchasesData = () => {
     isPurchaseFormOpen,
     setIsPurchaseFormOpen,
     selectedPurchase,
-    setSelectedPurchase, // <- Adding this to the returned object
+    setSelectedPurchase,
     handleRefresh,
     handleAddPurchase,
     handleEditPurchase,

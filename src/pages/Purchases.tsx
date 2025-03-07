@@ -27,7 +27,7 @@ const Purchases = () => {
     isPurchaseFormOpen,
     setIsPurchaseFormOpen,
     selectedPurchase,
-    setSelectedPurchase, // <- This was missing in the hook return but was being used
+    setSelectedPurchase,
     handleRefresh,
     handleAddPurchase,
     handleEditPurchase,
