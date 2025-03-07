@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Supplier } from "@/data/suppliersData";
 
 interface SupplierCreateDialogProps {
@@ -22,7 +21,7 @@ export const SupplierCreateDialog = ({
 }: SupplierCreateDialogProps) => {
   const [newSupplier, setNewSupplier] = useState<Partial<Supplier>>({
     name: "",
-    contact: "",
+    address: "",
     phone: "",
     email: "",
     balance: 0,
@@ -36,26 +35,10 @@ export const SupplierCreateDialog = ({
     setNewSupplier(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
-    const numericValue = e.target.value.replace(/[^0-9]/g, '');
-    
-    setNewSupplier((prev) => ({
-      ...prev,
-      [fieldName]: numericValue ? parseInt(numericValue) : 0,
-    }));
-  };
-
-  const handleStatusChange = (value: 'payée' | 'impayée') => {
-    setNewSupplier((prev) => ({
-      ...prev,
-      status: value,
-    }));
-  };
-
   const resetForm = () => {
     setNewSupplier({
       name: "",
-      contact: "",
+      address: "",
       phone: "",
       email: "",
       balance: 0,
@@ -68,20 +51,18 @@ export const SupplierCreateDialog = ({
   const handleSubmit = () => {
     if (!newSupplier.name) return;
     
-    // Calculate balance
-    const balance = (newSupplier.totalInvoice || 0) - (newSupplier.totalPaid || 0);
-    
-    // Create a new supplier
+    // Create a new supplier with minimal fields and default values for the rest
     const createdSupplier: Supplier = {
       id: lastSupplierId + 1,
       name: newSupplier.name || "",
-      contact: newSupplier.contact || "",
+      contact: "", // We'll set this to empty since it's not needed
+      address: newSupplier.address || "",
       phone: newSupplier.phone || "",
       email: newSupplier.email || "",
-      balance: balance,
-      totalInvoice: newSupplier.totalInvoice || 0,
-      totalPaid: newSupplier.totalPaid || 0,
-      status: newSupplier.status || "impayée"
+      balance: 0,
+      totalInvoice: 0,
+      totalPaid: 0,
+      status: "impayée"
     };
     
     // Call the onCreateSupplier callback
@@ -115,11 +96,11 @@ export const SupplierCreateDialog = ({
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="contact" className="text-right">Contact</Label>
+            <Label htmlFor="address" className="text-right">Adresse</Label>
             <Input
-              id="contact"
-              name="contact"
-              value={newSupplier.contact}
+              id="address"
+              name="address"
+              value={newSupplier.address}
               onChange={handleInputChange}
               className="col-span-3"
             />
@@ -143,45 +124,6 @@ export const SupplierCreateDialog = ({
               onChange={handleInputChange}
               className="col-span-3"
             />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="totalInvoice" className="text-right">Total Facture</Label>
-            <Input
-              id="totalInvoice"
-              name="totalInvoice"
-              type="text"
-              value={newSupplier.totalInvoice || ""}
-              onChange={(e) => handleNumericInputChange(e, "totalInvoice")}
-              className="col-span-3"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="totalPaid" className="text-right">Total Versé</Label>
-            <Input
-              id="totalPaid"
-              name="totalPaid"
-              type="text"
-              value={newSupplier.totalPaid || ""}
-              onChange={(e) => handleNumericInputChange(e, "totalPaid")}
-              className="col-span-3"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="status" className="text-right">Statut</Label>
-            <div className="col-span-3">
-              <Select 
-                value={newSupplier.status} 
-                onValueChange={(value) => handleStatusChange(value as 'payée' | 'impayée')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner le statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="payée">Payée</SelectItem>
-                  <SelectItem value="impayée">Impayée</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </div>
         <DialogFooter>

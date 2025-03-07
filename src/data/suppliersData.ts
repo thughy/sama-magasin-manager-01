@@ -3,6 +3,7 @@ export interface Supplier {
   id: number;
   name: string;
   contact: string;
+  address: string; // Added address field
   phone: string;
   email: string;
   balance: number;
@@ -17,6 +18,7 @@ export const suppliersData: Supplier[] = [
     id: 1,
     name: "Électronique Express",
     contact: "Amadou Diop",
+    address: "123 Rue Principale, Dakar", // Added address
     phone: "+221 77 123 45 67",
     email: "contact@electronique-express.sn",
     balance: 350000,
@@ -28,6 +30,7 @@ export const suppliersData: Supplier[] = [
     id: 2,
     name: "Global Import SARL",
     contact: "Fatou Ndiaye",
+    address: "45 Avenue de la République, Dakar", // Added address
     phone: "+221 76 234 56 78",
     email: "info@globalimport.sn",
     balance: 125000,
@@ -39,6 +42,7 @@ export const suppliersData: Supplier[] = [
     id: 3,
     name: "Tech Solutions",
     contact: "Ibrahim Sow",
+    address: "78 Rue des Entrepreneurs, Thiès", // Added address
     phone: "+221 70 345 67 89",
     email: "contact@techsolutions.sn",
     balance: 0,
@@ -50,6 +54,7 @@ export const suppliersData: Supplier[] = [
     id: 4,
     name: "Accessoires Plus",
     contact: "Marie Diallo",
+    address: "15 Boulevard de l'Indépendance, Saint-Louis", // Added address
     phone: "+221 78 456 78 90",
     email: "ventes@accessoiresplus.sn",
     balance: 75000,
@@ -61,6 +66,7 @@ export const suppliersData: Supplier[] = [
     id: 5,
     name: "Dakar Digital",
     contact: "Jean Mendy",
+    address: "32 Rue Félix Faure, Dakar", // Added address
     phone: "+221 77 567 89 01",
     email: "info@dakardigital.sn",
     balance: -45000,

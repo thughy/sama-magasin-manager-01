@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Supplier } from "@/data/suppliersData";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SuppliersHeaderProps {
   onAddSupplier: (supplier: Supplier) => void;
@@ -26,12 +25,9 @@ export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHead
   const [open, setOpen] = useState(false);
   const [newSupplier, setNewSupplier] = useState({
     name: "",
-    contact: "",
+    address: "",
     phone: "",
     email: "",
-    totalInvoice: 0,
-    totalPaid: 0,
-    status: "impayée" as 'payée' | 'impayée'
   });
   const { toast } = useToast();
 
@@ -43,31 +39,12 @@ export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHead
     }));
   };
 
-  const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
-    const numericValue = e.target.value.replace(/[^0-9]/g, '');
-    
-    setNewSupplier((prev) => ({
-      ...prev,
-      [fieldName]: numericValue ? parseInt(numericValue) : 0,
-    }));
-  };
-
-  const handleStatusChange = (value: 'payée' | 'impayée') => {
-    setNewSupplier((prev) => ({
-      ...prev,
-      status: value,
-    }));
-  };
-
   const resetForm = () => {
     setNewSupplier({
       name: "",
-      contact: "",
+      address: "",
       phone: "",
       email: "",
-      totalInvoice: 0,
-      totalPaid: 0,
-      status: "impayée"
     });
   };
 
@@ -81,14 +58,18 @@ export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHead
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Calculate balance
-    const balance = newSupplier.totalInvoice - newSupplier.totalPaid;
-    
-    // Create new supplier with a unique ID
+    // Create new supplier with a unique ID and default values for financial fields
     const supplierToAdd: Supplier = {
       id: lastSupplierId + 1,
-      ...newSupplier,
-      balance: balance
+      name: newSupplier.name,
+      contact: "", // Empty contact since not needed
+      address: newSupplier.address,
+      phone: newSupplier.phone,
+      email: newSupplier.email,
+      balance: 0,
+      totalInvoice: 0,
+      totalPaid: 0,
+      status: "impayée"
     };
     
     // Add the supplier to the parent component's state
@@ -142,13 +123,13 @@ export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHead
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contact" className="text-right">
-                  Contact
+                <Label htmlFor="address" className="text-right">
+                  Adresse
                 </Label>
                 <Input
-                  id="contact"
-                  name="contact"
-                  value={newSupplier.contact}
+                  id="address"
+                  name="address"
+                  value={newSupplier.address}
                   onChange={handleInputChange}
                   className="col-span-3"
                   required
@@ -180,53 +161,6 @@ export const SuppliersHeader = ({ onAddSupplier, lastSupplierId }: SuppliersHead
                   className="col-span-3"
                   required
                 />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="totalInvoice" className="text-right">
-                  Total Facture
-                </Label>
-                <Input
-                  id="totalInvoice"
-                  name="totalInvoice"
-                  type="text"
-                  value={newSupplier.totalInvoice || ""}
-                  onChange={(e) => handleNumericInputChange(e, "totalInvoice")}
-                  className="col-span-3"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="totalPaid" className="text-right">
-                  Total Versé
-                </Label>
-                <Input
-                  id="totalPaid"
-                  name="totalPaid"
-                  type="text"
-                  value={newSupplier.totalPaid || ""}
-                  onChange={(e) => handleNumericInputChange(e, "totalPaid")}
-                  className="col-span-3"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="status" className="text-right">
-                  Statut
-                </Label>
-                <div className="col-span-3">
-                  <Select 
-                    value={newSupplier.status} 
-                    onValueChange={(value) => handleStatusChange(value as 'payée' | 'impayée')}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le statut" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="payée">Payée</SelectItem>
-                      <SelectItem value="impayée">Impayée</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </div>
             <DialogFooter>

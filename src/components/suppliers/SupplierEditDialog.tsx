@@ -73,13 +73,13 @@ export const SupplierEditDialog = ({
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="contact" className="text-right">
-                Contact
+              <Label htmlFor="address" className="text-right">
+                Adresse
               </Label>
               <Input
-                id="contact"
-                name="contact"
-                value={supplier.contact}
+                id="address"
+                name="address"
+                value={supplier.address}
                 onChange={onInputChange}
                 className="col-span-3"
               />
