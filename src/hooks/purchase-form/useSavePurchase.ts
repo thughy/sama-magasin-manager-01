@@ -81,8 +81,8 @@ export const useSavePurchase = ({
       description: `L'achat a été ${initialPurchase ? 'mis à jour' : 'créé'} avec succès et le stock a été mis à jour.`
     });
     
-    // CRITICAL FIX: NEVER close the form regardless of what is passed in
-    // This prevents any accidental closing
+    console.log("Purchase saved successfully, NOT closing form");
+    // CRITICAL: NEVER call onClose() here under any circumstances
     
     // Return success result with reset flag
     return {

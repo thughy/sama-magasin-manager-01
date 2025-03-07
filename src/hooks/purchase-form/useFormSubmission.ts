@@ -29,6 +29,7 @@ export const useFormSubmission = ({
   // Form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted, checking validity...");
     
     if (!isValid) {
       toast({
@@ -52,14 +53,18 @@ export const useFormSubmission = ({
       return;
     }
     
-    // CRITICAL FIX: We must ALWAYS pass false to ensure the form never closes
+    console.log("Form is valid, saving purchase with shouldCloseForm=false");
+    // CRITICAL: We must ALWAYS pass false to ensure the form never closes
     const result = completeSaveOperation(false);
     
     if (result.success) {
+      console.log("Save successful, resetting form...");
       // Reset the form for a new purchase entry
       if (resetForm) {
+        console.log("Using resetForm function");
         resetForm();
       } else {
+        console.log("No resetForm function provided, doing manual reset");
         // If resetForm is not provided, manually reset the key parts
         if (setSelectedSupplier) {
           setSelectedSupplier(null);
@@ -68,9 +73,11 @@ export const useFormSubmission = ({
       
       // Focus on supplier input if provided - ensure this happens with a slight delay
       if (supplierFocusRef?.current) {
+        console.log("Setting focus to supplier input with delay");
         setTimeout(() => {
           if (supplierFocusRef.current) {
             supplierFocusRef.current.focus();
+            console.log("Focus set on supplier input");
           }
         }, 100);
       }

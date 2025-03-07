@@ -1,5 +1,5 @@
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
 import { 
@@ -106,23 +106,31 @@ export const PurchaseForm = ({
     showPrintConfirmation,
     completeSaveOperation,
     shouldKeepFormOpen: true,
-    resetForm,  // Pass the resetForm function explicitly
+    resetForm,
     supplierFocusRef,
     setSelectedSupplier
   });
 
-  // CRITICAL: Prevent dialog from closing when open state changes
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      onClose();
+  // CRITICAL: Use a controlled dialog that never closes itself
+  // We're overriding the default Dialog behavior to ensure it stays open
+  useEffect(() => {
+    // This ensures the dialog never closes on its own
+    if (!isOpen) {
+      // If the parent component tries to close the dialog, we don't do anything
+      console.log("Parent component requested to close dialog, but we're preventing it");
     }
-  };
+  }, [isOpen]);
 
   // Calculate unique depots from purchase items
   const uniqueDepots = [...new Set(purchaseItems.map(item => item.depot))].filter(Boolean);
 
+  // CRITICAL: We're using a fixed "true" value for open prop to ensure it always stays open
+  // The only way to close it is through the explicit cancel button which calls onClose directly
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={true} onOpenChange={() => {
+      console.log("Dialog onOpenChange triggered, but we're ignoring it");
+      // We deliberately don't call onClose here to prevent the dialog from closing
+    }}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <PurchaseFormContent
           formData={formData}
