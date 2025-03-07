@@ -1,16 +1,15 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "lucide-react";
-import { Purchase } from "@/types/purchase";
+import { Calendar, Plus, Trash2 } from "lucide-react";
+import { Purchase, PaymentMethod } from "@/types/purchase";
 import { SupplierSearchBox } from "../SupplierSearchBox";
-import { ProductSearchBox } from "../ProductSearchBox";
-import { Supplier } from "@/data/suppliersData";
 import { PurchaseFormItems } from "./PurchaseFormItems";
 import { usePurchaseForm } from "@/hooks/usePurchaseForm";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PurchaseFormProps {
   isOpen: boolean;
@@ -29,13 +28,16 @@ export const PurchaseForm = ({
     formData,
     selectedSupplier,
     purchaseItems,
+    paymentMethods,
     isValid,
     setFormData,
     setSelectedSupplier,
     addPurchaseItem,
     removePurchaseItem,
     updatePurchaseItem,
-    calculateTotals,
+    addPaymentMethod,
+    removePaymentMethod,
+    updatePaymentMethod,
     handleSubmit
   } = usePurchaseForm({ initialPurchase, onSave, onClose });
 
@@ -86,15 +88,73 @@ export const PurchaseForm = ({
             onUpdateItem={updatePurchaseItem}
           />
 
-          <div>
-            <Label htmlFor="totalPaid">Montant versé (FCFA)</Label>
-            <Input
-              id="totalPaid"
-              type="number"
-              value={formData.totalPaid}
-              onChange={(e) => setFormData({...formData, totalPaid: Number(e.target.value)})}
-              placeholder="0"
-            />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium">Paiements</h3>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                onClick={addPaymentMethod}
+                className="flex items-center gap-1"
+              >
+                <Plus className="h-4 w-4" /> Ajouter un paiement
+              </Button>
+            </div>
+            
+            {paymentMethods.length === 0 ? (
+              <div className="text-center p-4 border rounded-md bg-gray-50">
+                <p className="text-sm text-gray-500">Aucun paiement ajouté.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {paymentMethods.map((payment) => (
+                  <div key={payment.id} className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end p-3 border rounded-md bg-gray-50">
+                    <div>
+                      <Label htmlFor={`payment-method-${payment.id}`}>Méthode</Label>
+                      <Select
+                        value={payment.method}
+                        onValueChange={(value) => updatePaymentMethod(payment.id, 'method', value)}
+                      >
+                        <SelectTrigger id={`payment-method-${payment.id}`}>
+                          <SelectValue placeholder="Sélectionner" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="cash">Espèces</SelectItem>
+                          <SelectItem value="wave">Wave</SelectItem>
+                          <SelectItem value="orangeMoney">Orange Money</SelectItem>
+                          <SelectItem value="cheque">Chèque</SelectItem>
+                          <SelectItem value="bank">Banque</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`payment-amount-${payment.id}`}>Montant (FCFA)</Label>
+                      <Input
+                        id={`payment-amount-${payment.id}`}
+                        type="number"
+                        value={payment.amount}
+                        onChange={(e) => updatePaymentMethod(payment.id, 'amount', Number(e.target.value))}
+                        placeholder="0"
+                      />
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removePaymentMethod(payment.id)}
+                        className="h-9 w-9 text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-between items-center pt-4 border-t">

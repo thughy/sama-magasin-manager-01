@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Purchase } from '@/types/purchase';
+import { Purchase, PaymentMethod } from '@/types/purchase';
 import { Supplier } from '@/data/suppliersData';
 import { useToast } from '@/hooks/use-toast';
 
@@ -33,12 +33,14 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     totalAmount: 0,
     totalPaid: 0,
     balance: 0,
-    status: 'impayée'
+    status: 'impayée',
+    paymentMethods: []
   });
   
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([]);
   const [isValid, setIsValid] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
   // Load initial data if editing
   useEffect(() => {
@@ -57,6 +59,11 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
         sellPrice: 0,
         depot: 'Principal' // Default depot for existing items
       }]);
+
+      // Set payment methods if they exist
+      if (initialPurchase.paymentMethods && initialPurchase.paymentMethods.length > 0) {
+        setPaymentMethods(initialPurchase.paymentMethods);
+      }
     }
   }, [initialPurchase]);
 
@@ -74,12 +81,13 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
   // Calculate totals and validate form
   const calculateTotals = () => {
     const totalAmount = purchaseItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-    const totalPaid = formData.totalPaid || 0;
+    const totalPaid = paymentMethods.reduce((sum, method) => sum + method.amount, 0);
     const balance = totalAmount - totalPaid;
     
     setFormData(prev => ({
       ...prev,
       totalAmount,
+      totalPaid,
       balance,
       status: balance <= 0 ? 'payée' : 'impayée'
     }));
@@ -101,7 +109,7 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
       );
     
     setIsValid(isFormValid);
-  }, [formData, selectedSupplier, purchaseItems]);
+  }, [formData, selectedSupplier, purchaseItems, paymentMethods]);
 
   // Purchase items management - improved to handle state updates better
   const addPurchaseItem = () => {
@@ -143,6 +151,29 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     });
   };
 
+  // Payment methods management
+  const addPaymentMethod = () => {
+    const newPayment: PaymentMethod = {
+      id: Date.now().toString(),
+      method: 'cash',
+      amount: 0
+    };
+    
+    setPaymentMethods(prev => [...prev, newPayment]);
+  };
+
+  const removePaymentMethod = (id: string) => {
+    setPaymentMethods(prev => prev.filter(method => method.id !== id));
+  };
+
+  const updatePaymentMethod = (id: string, field: keyof PaymentMethod, value: any) => {
+    setPaymentMethods(prev => 
+      prev.map(method => 
+        method.id === id ? { ...method, [field]: value } : method
+      )
+    );
+  };
+
   // Form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,7 +203,8 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
       totalAmount: formData.totalAmount,
       totalPaid: formData.totalPaid,
       balance: formData.balance,
-      status: formData.status
+      status: formData.status,
+      paymentMethods: paymentMethods
     };
     
     onSave(newPurchase);
@@ -187,12 +219,16 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     formData,
     selectedSupplier,
     purchaseItems,
+    paymentMethods,
     isValid,
     setFormData,
     setSelectedSupplier,
     addPurchaseItem,
     removePurchaseItem,
     updatePurchaseItem,
+    addPaymentMethod,
+    removePaymentMethod,
+    updatePaymentMethod,
     calculateTotals,
     handleSubmit
   };

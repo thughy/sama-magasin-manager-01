@@ -1,4 +1,10 @@
 
+export interface PaymentMethod {
+  id: string;
+  method: 'cash' | 'wave' | 'orangeMoney' | 'cheque' | 'bank';
+  amount: number;
+}
+
 export interface Purchase {
   id: string;
   reference: string;
@@ -12,4 +18,5 @@ export interface Purchase {
   totalPaid: number;
   balance: number;
   status: 'payée' | 'impayée';
+  paymentMethods?: PaymentMethod[];
 }
