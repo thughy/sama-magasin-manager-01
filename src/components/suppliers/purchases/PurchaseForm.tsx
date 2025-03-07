@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
 import { usePurchaseFormDialog } from "@/hooks/purchase-form/usePurchaseFormDialog";
@@ -50,6 +50,13 @@ export const PurchaseForm = ({
     onSave
   });
 
+  // Ensure we clean up properly when the component unmounts
+  useEffect(() => {
+    return () => {
+      console.log("PurchaseForm unmounting, cleaning up");
+    };
+  }, []);
+
   // Return null early if dialog is closed
   if (!dialogOpen) return null;
 
@@ -58,7 +65,7 @@ export const PurchaseForm = ({
       open={dialogOpen} 
       onOpenChange={(open) => {
         if (!open) {
-          // Close dialog when the dialog is closed via any method
+          console.log("Dialog onOpenChange triggered with open=false");
           handleCancel();
         }
       }}
@@ -66,7 +73,10 @@ export const PurchaseForm = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogClose 
           className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" 
-          onClick={handleCancel}
+          onClick={() => {
+            console.log("X button clicked");
+            handleCancel();
+          }}
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Fermer</span>

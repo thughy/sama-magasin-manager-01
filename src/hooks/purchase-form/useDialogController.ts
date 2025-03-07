@@ -16,13 +16,12 @@ export const useDialogController = ({ isOpen, onClose }: UseDialogControllerProp
       console.log(`Syncing dialog state: parent=${isOpen}, internal=${dialogOpen}`);
       setDialogOpen(isOpen);
     }
-  }, [isOpen, dialogOpen]);
+  }, [isOpen]);
 
   // Manual cancel handler
   const handleCancel = () => {
     console.log("Cancel button clicked, closing form");
     setDialogOpen(false);
-    // Call the parent onClose immediately rather than with setTimeout
     onClose();
   };
 
