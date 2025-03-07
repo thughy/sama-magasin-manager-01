@@ -11,46 +11,37 @@ interface PurchaseFormItemsProps {
   onAddItem: () => void;
   onRemoveItem: (index: number) => void;
   onUpdateItem: (index: number, field: keyof PurchaseItem, value: any) => void;
+  onUpdateItemFields?: (index: number, fieldsToUpdate: Partial<PurchaseItem>) => void;
 }
 
 export const PurchaseFormItems = ({
   items,
   onAddItem,
   onRemoveItem,
-  onUpdateItem
+  onUpdateItem,
+  onUpdateItemFields
 }: PurchaseFormItemsProps) => {
   // A new direct state update function that doesn't rely on callbacks
   const handleSelectProduct = (product: Product, index: number) => {
     console.log("Product selected in PurchaseFormItems:", product, "for index:", index);
     
-    // Create a complete item update rather than updating fields individually
-    const updatedItem = {
-      ...items[index],
-      productId: String(product.id),
-      productName: String(product.name),
-      unitPrice: Number(product.purchasePrice),
-      sellPrice: Number(product.sellPrice)
-    };
+    if (onUpdateItemFields) {
+      // If the parent component provided the new multi-field update function, use it
+      onUpdateItemFields(index, {
+        productId: String(product.id),
+        productName: String(product.name),
+        unitPrice: Number(product.purchasePrice),
+        sellPrice: Number(product.sellPrice)
+      });
+    } else {
+      // Fallback to individual field updates
+      onUpdateItem(index, 'productId', String(product.id));
+      onUpdateItem(index, 'productName', String(product.name));
+      onUpdateItem(index, 'unitPrice', Number(product.purchasePrice));
+      onUpdateItem(index, 'sellPrice', Number(product.sellPrice));
+    }
     
-    console.log("Will update item to:", updatedItem);
-    
-    // Update each field with a slight delay between them
-    setTimeout(() => {
-      onUpdateItem(index, 'productId', updatedItem.productId);
-      
-      setTimeout(() => {
-        onUpdateItem(index, 'productName', updatedItem.productName);
-        
-        setTimeout(() => {
-          onUpdateItem(index, 'unitPrice', updatedItem.unitPrice);
-          
-          setTimeout(() => {
-            onUpdateItem(index, 'sellPrice', updatedItem.sellPrice);
-            console.log("All fields should be updated now");
-          }, 50);
-        }, 50);
-      }, 50);
-    }, 50);
+    console.log("All fields should be updated now");
   };
 
   return (

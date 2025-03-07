@@ -44,11 +44,32 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
     });
   };
 
+  // New method to update multiple fields at once
+  const updatePurchaseItemFields = (index: number, fieldsToUpdate: Partial<PurchaseItem>) => {
+    console.log(`Updating multiple fields for item ${index}:`, fieldsToUpdate);
+    
+    setPurchaseItems(items => {
+      // Make sure the index is valid
+      if (index >= items.length) {
+        console.warn(`Invalid index: ${index}, items length: ${items.length}`);
+        return items;
+      }
+      
+      // Create a new array with the updated item
+      const newItems = [...items];
+      newItems[index] = { ...newItems[index], ...fieldsToUpdate };
+      
+      console.log(`Item ${index} updated with multiple fields, new value:`, newItems[index]);
+      return newItems;
+    });
+  };
+
   return {
     purchaseItems,
     setPurchaseItems,
     addPurchaseItem,
     removePurchaseItem,
-    updatePurchaseItem
+    updatePurchaseItem,
+    updatePurchaseItemFields
   };
 };

@@ -44,7 +44,8 @@ export const PurchaseForm = ({
     setPurchaseItems, 
     addPurchaseItem, 
     removePurchaseItem, 
-    updatePurchaseItem 
+    updatePurchaseItem,
+    updatePurchaseItemFields 
   } = usePurchaseFormItems();
   
   const { 
@@ -164,6 +165,7 @@ export const PurchaseForm = ({
             onAddItem={addPurchaseItem}
             onRemoveItem={removePurchaseItem}
             onUpdateItem={updatePurchaseItem}
+            onUpdateItemFields={updatePurchaseItemFields}
           />
 
           {/* Payment Methods Section */}
