@@ -10,12 +10,12 @@ interface DepotSelectorProps {
 
 // Liste des dépôts (dans une application réelle, cela viendrait d'une API ou d'un store)
 const depots = [
-  "",
-  "Principal",
-  "Secondaire",
-  "Entrepôt central",
-  "Magasin 1",
-  "Magasin 2"
+  { id: "", name: "Sélectionnez un dépôt" },
+  { id: "Principal", name: "Principal" },
+  { id: "Secondaire", name: "Secondaire" },
+  { id: "Entrepôt central", name: "Entrepôt central" },
+  { id: "Magasin 1", name: "Magasin 1" },
+  { id: "Magasin 2", name: "Magasin 2" }
 ];
 
 export const DepotSelector = ({ value, onChange }: DepotSelectorProps) => {
@@ -30,10 +30,13 @@ export const DepotSelector = ({ value, onChange }: DepotSelectorProps) => {
           onChange={(e) => onChange(e.target.value)}
           required
         >
-          <option value="" disabled>Sélectionnez un dépôt</option>
-          {depots.filter(depot => depot !== "").map((depot, index) => (
-            <option key={index} value={depot}>
-              {depot}
+          {depots.map((depot) => (
+            <option 
+              key={depot.id} 
+              value={depot.id}
+              disabled={depot.id === ""}
+            >
+              {depot.name}
             </option>
           ))}
         </select>

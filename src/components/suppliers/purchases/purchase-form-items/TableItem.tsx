@@ -30,7 +30,10 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
       <TableCell>
         <DepotSelector
           value={item.depot || ""}
-          onChange={(value) => onUpdateItem(index, 'depot', value)}
+          onChange={(value) => {
+            console.log(`Updating depot for item ${index} to:`, value);
+            onUpdateItem(index, 'depot', value);
+          }}
         />
       </TableCell>
       <TableCell>

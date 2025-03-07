@@ -14,7 +14,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       quantity: 1,
       unitPrice: 0,
       sellPrice: 0,
-      depot: '' // Initialiser avec une valeur vide pour forcer la sélection
+      depot: '' // Initialiser avec une valeur vide
     };
     
     setPurchaseItems(items => [...items, newItem]);
@@ -39,7 +39,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       const newItems = [...items];
       newItems[index] = { ...newItems[index], [field]: value };
       
-      console.log(`Item ${index} updated, new value:`, newItems[index]);
+      console.log(`Item ${index} updated, new value for ${field}:`, newItems[index][field]);
       return newItems;
     });
   };
