@@ -33,6 +33,12 @@ const Purchases = () => {
     clearFilters
   } = usePurchasesData();
 
+  // Handle closing the purchase form
+  const handlePurchaseFormClose = () => {
+    console.log("Closing purchase form from parent");
+    setIsPurchaseFormOpen(false);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
@@ -77,7 +83,7 @@ const Purchases = () => {
       {isPurchaseFormOpen && (
         <PurchaseForm
           isOpen={isPurchaseFormOpen}
-          onClose={() => setIsPurchaseFormOpen(false)}
+          onClose={handlePurchaseFormClose}
           initialPurchase={selectedPurchase}
           onSave={handleSavePurchase}
         />
