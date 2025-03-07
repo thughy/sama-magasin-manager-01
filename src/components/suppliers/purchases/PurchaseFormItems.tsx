@@ -46,28 +46,38 @@ export const PurchaseFormItems = ({
   onRemoveItem,
   onUpdateItem
 }: PurchaseFormItemsProps) => {
+  // A new direct state update function that doesn't rely on callbacks
   const handleSelectProduct = (product: Product, index: number) => {
-    // Log the received product for debugging
     console.log("Product selected in PurchaseFormItems:", product, "for index:", index);
     
-    // First update the productId to trigger state changes
-    onUpdateItem(index, 'productId', String(product.id));
+    // Create a complete item update rather than updating fields individually
+    const updatedItem = {
+      ...items[index],
+      productId: String(product.id),
+      productName: String(product.name),
+      unitPrice: Number(product.purchasePrice),
+      sellPrice: Number(product.sellPrice)
+    };
     
-    // Then update the rest of the fields with a slight delay to ensure the state is updated
-    // This is crucial to avoid race conditions in state updates
-    requestAnimationFrame(() => {
-      onUpdateItem(index, 'productName', product.name);
-      onUpdateItem(index, 'unitPrice', Number(product.purchasePrice));
-      onUpdateItem(index, 'sellPrice', Number(product.sellPrice));
+    console.log("Will update item to:", updatedItem);
+    
+    // Update each field with a slight delay between them
+    setTimeout(() => {
+      onUpdateItem(index, 'productId', updatedItem.productId);
       
-      // Log updated item after changes for debugging
-      console.log("Item should be updated now:", {
-        productId: String(product.id),
-        productName: product.name,
-        unitPrice: Number(product.purchasePrice),
-        sellPrice: Number(product.sellPrice)
-      });
-    });
+      setTimeout(() => {
+        onUpdateItem(index, 'productName', updatedItem.productName);
+        
+        setTimeout(() => {
+          onUpdateItem(index, 'unitPrice', updatedItem.unitPrice);
+          
+          setTimeout(() => {
+            onUpdateItem(index, 'sellPrice', updatedItem.sellPrice);
+            console.log("All fields should be updated now");
+          }, 50);
+        }, 50);
+      }, 50);
+    }, 50);
   };
 
   return (
@@ -92,11 +102,16 @@ export const PurchaseFormItems = ({
           if (emptyItemIndex >= 0) {
             handleSelectProduct(product, emptyItemIndex);
           } else {
+            // First add the item, then wait for the state to update before setting the product
             onAddItem();
-            // Add a new item and then update it with the product details
+            
+            // Use a longer timeout to ensure the new item is properly added to the state
             setTimeout(() => {
-              handleSelectProduct(product, items.length);
-            }, 50); // Slightly longer timeout to ensure the new item is added
+              // Make sure we're updating the correct index (which should be the last item)
+              const newIndex = items.length;
+              console.log("Adding to new item at index:", newIndex);
+              handleSelectProduct(product, newIndex);
+            }, 100);
           }
         }}
         currentItems={items.filter(item => item.productId).map(item => parseInt(item.productId) || 0)}
@@ -125,7 +140,7 @@ export const PurchaseFormItems = ({
           ) : (
             items.map((item, index) => (
               <TableRow key={index}>
-                <TableCell>{item.productName || "—"}</TableCell>
+                <TableCell data-testid={`product-name-${index}`}>{item.productName || "—"}</TableCell>
                 <TableCell>
                   <Input
                     type="number"

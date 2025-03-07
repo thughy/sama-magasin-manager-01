@@ -59,17 +59,22 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
   }, [searchTerm, currentItems, products]);
 
   const handleSelectProduct = (product: Product) => {
-    // Ensure we're passing a proper product object with correct types
+    // Create a completely new product object with strict type conversions
     const selectedProduct: Product = {
       id: Number(product.id),
-      barcode: String(product.barcode),
-      name: String(product.name),
-      purchasePrice: Number(product.purchasePrice),
-      sellPrice: Number(product.sellPrice)
+      barcode: String(product.barcode || ""),
+      name: String(product.name || ""),
+      purchasePrice: Number(product.purchasePrice || 0),
+      sellPrice: Number(product.sellPrice || 0)
     };
     
-    // Log complete object before sending it
+    // Deep check that all values are properly defined and of the correct type
     console.log("Sending selected product from SearchBox:", selectedProduct);
+    
+    if (!selectedProduct.name) {
+      console.error("Product name is empty or undefined!");
+      return;
+    }
     
     // Pass the properly formatted product to the parent component
     onSelectProduct(selectedProduct);
