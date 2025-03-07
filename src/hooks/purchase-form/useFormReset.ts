@@ -1,3 +1,4 @@
+
 import { Supplier } from "@/data/suppliersData";
 import { useEffect } from "react";
 
@@ -22,8 +23,8 @@ export const useFormReset = ({
     setFormData(prev => ({
       reference: `F-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
       purchaseDate: new Date().toISOString().split('T')[0],
-      supplierId: selectedSupplier ? selectedSupplier.id : 0,
-      supplierName: selectedSupplier ? selectedSupplier.name : '',
+      supplierId: selectedSupplier ? selectedSupplier.id : prev.supplierId,
+      supplierName: selectedSupplier ? selectedSupplier.name : prev.supplierName,
       productName: '',
       quantity: 0,
       unitPrice: 0,

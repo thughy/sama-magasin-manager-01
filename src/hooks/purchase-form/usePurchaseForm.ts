@@ -77,7 +77,7 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
   const { handleSubmit } = useFormSubmission({
     isValid,
     purchaseItems,
-    showPrintConfirmation: () => showPrintConfirmation(completeSaveOperation),
+    showPrintConfirmation: () => showPrintConfirmation(() => completeSaveOperation()),
     completeSaveOperation
   });
 

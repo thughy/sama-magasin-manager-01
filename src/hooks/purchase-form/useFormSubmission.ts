@@ -71,7 +71,7 @@ export const useFormSubmitHandler = ({
   return { handleSubmit };
 };
 
-// Add this export to maintain backward compatibility
+// Export useFormSubmission for backward compatibility
 export const useFormSubmission = ({
   isValid,
   purchaseItems,
@@ -98,9 +98,6 @@ export const useFormSubmission = ({
     
     // Show print confirmation before completing
     showPrintConfirmation();
-    
-    // This will be called after the user confirms printing choice
-    completeSaveOperation();
   };
   
   return { handleSubmit };
