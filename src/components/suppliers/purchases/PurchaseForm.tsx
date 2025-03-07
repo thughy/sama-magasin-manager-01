@@ -8,7 +8,7 @@ import { Calendar, Plus, Trash2, Printer, PackageCheck } from "lucide-react";
 import { Purchase, PaymentMethod } from "@/types/purchase";
 import { SupplierSearchBox } from "../SupplierSearchBox";
 import { PurchaseFormItems } from "./PurchaseFormItems";
-import { usePurchaseForm } from "@/hooks/usePurchaseForm";
+import { usePurchaseForm } from "@/hooks/purchase-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PurchaseFormProps {
