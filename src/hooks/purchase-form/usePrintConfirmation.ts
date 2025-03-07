@@ -19,12 +19,13 @@ export const usePrintConfirmation = ({ formData, purchaseItems }: UsePrintConfir
 
   // Function to handle confirmation
   const handleConfirm = () => {
-    let result;
     if (onConfirmCallback) {
-      result = onConfirmCallback();
+      const result = onConfirmCallback();
+      setIsOpen(false);
+      return result;
     }
     setIsOpen(false);
-    return result;
+    return true;
   };
 
   // Properties for the PrintConfirmationDialog

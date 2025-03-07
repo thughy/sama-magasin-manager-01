@@ -24,9 +24,18 @@ export const useSavePurchase = ({
   const { updateInventory } = useInventoryUpdater();
   
   // The actual save operation
-  const completeSaveOperation = (shouldCloseForm = true) => {
+  const completeSaveOperation = (shouldCloseForm = true): boolean => {
     // For backward compatibility, use the first item's details
     const firstItem = purchaseItems[0];
+    
+    if (!firstItem) {
+      toast({
+        title: "Erreur de sauvegarde",
+        description: "Aucun article n'a été ajouté à l'achat.",
+        variant: "destructive",
+      });
+      return false;
+    }
     
     const newPurchase: Purchase = {
       id: initialPurchase?.id || `ACH${Date.now().toString().substring(8)}`,
@@ -54,7 +63,7 @@ export const useSavePurchase = ({
         description: "Impossible de mettre à jour l'inventaire. Veuillez réessayer.",
         variant: "destructive",
       });
-      return;
+      return false;
     }
     
     // Save purchase

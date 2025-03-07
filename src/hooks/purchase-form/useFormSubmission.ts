@@ -5,8 +5,8 @@ import { PurchaseItem } from '@/types/purchase';
 interface UseFormSubmissionProps {
   isValid: boolean;
   purchaseItems: PurchaseItem[];
-  showPrintConfirmation: (callback: () => void) => void;
-  completeSaveOperation: (shouldCloseForm?: boolean) => boolean | void;
+  showPrintConfirmation: (callback: () => boolean | void) => void;
+  completeSaveOperation: (shouldCloseForm?: boolean) => boolean;
   shouldKeepFormOpen?: boolean;
 }
 
@@ -38,8 +38,7 @@ export const useFormSubmission = ({
     if (hasDepotsSelected) {
       // Show confirmation dialog for printing
       showPrintConfirmation(() => {
-        const success = completeSaveOperation(!shouldKeepFormOpen);
-        return success;
+        return completeSaveOperation(!shouldKeepFormOpen);
       });
     } else {
       // No depots to print, proceed with save
