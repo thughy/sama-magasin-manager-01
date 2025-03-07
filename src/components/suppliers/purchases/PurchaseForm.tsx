@@ -30,9 +30,10 @@ export const PurchaseForm = ({
   initialPurchase,
   onSave
 }: PurchaseFormProps) => {
-  // Add local state to control dialog open state
-  const [dialogOpen, setDialogOpen] = useState(true);
+  // Internal dialog state - this is what we'll use to control the dialog
+  const [dialogOpen, setDialogOpen] = useState(isOpen);
   const printRef = useRef<HTMLDivElement>(null);
+  
   // Create a reference to the supplier input for focusing after save
   const supplierFocusRef = useRef<HTMLInputElement>(null);
   
@@ -90,67 +91,79 @@ export const PurchaseForm = ({
     purchaseItems
   });
 
-  // Save purchase functionality - Ne pas réinitialiser le formulaire après sauvegarde
-  const { completeSaveOperation } = useSavePurchase({
-    initialPurchase,
-    onSave,
-    onClose: () => {
-      // Override the onClose to prevent accidental closing
-      console.log("onClose called from useSavePurchase but we're preventing it");
-      // We do NOT call the actual onClose here
-    },
-    formData,
-    purchaseItems,
-    paymentMethods,
-    shouldResetForm: false
-  });
-
-  // Form submission - Pass proper reset function and related references
-  const { handleSubmit } = useFormSubmission({
-    isValid,
-    purchaseItems,
-    showPrintConfirmation,
-    completeSaveOperation,
-    shouldKeepFormOpen: true,
-    resetForm,
-    supplierFocusRef,
-    setSelectedSupplier
-  });
-
-  // Custom handler for dialog close events - only close when explicitly requested via the cancel button
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      console.log("Dialog onOpenChange detected a close attempt");
-      // We prevent the automatic closing here by maintaining our local open state
-      // The only way to close is through the explicit cancel button
-      setDialogOpen(true);
+  // Submit handler function
+  const handleInternalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form internally submitted, checking validity...");
+    
+    if (!isValid) {
+      console.log("Form is invalid, not proceeding");
+      return;
     }
+
+    // Create a new purchase object
+    const newPurchase: Purchase = {
+      id: initialPurchase?.id || `ACH${Date.now().toString().substring(8)}`,
+      reference: formData.reference,
+      purchaseDate: formData.purchaseDate,
+      supplierId: formData.supplierId,
+      supplierName: formData.supplierName,
+      productName: purchaseItems[0]?.productName || '',
+      quantity: purchaseItems[0]?.quantity || 0,
+      unitPrice: purchaseItems[0]?.unitPrice || 0,
+      totalAmount: formData.totalAmount,
+      totalPaid: formData.totalPaid,
+      balance: formData.balance,
+      status: formData.status,
+      paymentMethods: paymentMethods,
+      items: purchaseItems
+    };
+    
+    // Save the purchase
+    console.log("Saving purchase:", newPurchase);
+    onSave(newPurchase);
+
+    // Reset the form for next entry
+    console.log("Purchase saved, resetting form for next entry");
+    resetForm();
+    
+    // Focus the supplier input for the next entry
+    setTimeout(() => {
+      if (supplierFocusRef.current) {
+        supplierFocusRef.current.focus();
+        console.log("Focus set on supplier input for next entry");
+      }
+    }, 100);
   };
 
-  // Handler for the explicit cancel button
+  // Manual cancel handler
   const handleCancel = () => {
     console.log("Cancel button clicked, closing form");
     setDialogOpen(false);
-    // Use a small timeout to ensure React has time to process state changes
     setTimeout(() => onClose(), 50);
   };
+
+  // Sync our internal state with parent's isOpen prop
+  useEffect(() => {
+    if (isOpen !== dialogOpen) {
+      console.log(`Syncing dialog state: parent=${isOpen}, internal=${dialogOpen}`);
+      setDialogOpen(isOpen);
+    }
+  }, [isOpen]);
+
+  // Return null early if dialog is closed
+  if (!dialogOpen) return null;
 
   // Calculate unique depots from purchase items
   const uniqueDepots = [...new Set(purchaseItems.map(item => item.depot))].filter(Boolean);
 
-  // Force reopen the dialog if parent tries to close it but we're not ready
-  useEffect(() => {
-    if (isOpen && !dialogOpen) {
-      setDialogOpen(true);
-    }
-  }, [isOpen]);
-
-  // Return null if the dialog is explicitly closed via cancel button
-  if (!dialogOpen) return null;
-
-  // Use our local state to control the dialog
   return (
-    <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={dialogOpen} onOpenChange={(open) => {
+      if (!open) {
+        // Prevent automatic closing - we want to control this ourselves
+        console.log("Dialog tried to close automatically, preventing");
+      }
+    }}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <PurchaseFormContent
           formData={formData}
@@ -161,7 +174,7 @@ export const PurchaseForm = ({
           isValid={isValid}
           initialPurchase={initialPurchase}
           supplierFocusRef={supplierFocusRef}
-          onSubmit={handleSubmit}
+          onSubmit={handleInternalSubmit}
           onClose={handleCancel}
           setFormData={setFormData}
           setSelectedSupplier={setSelectedSupplier}

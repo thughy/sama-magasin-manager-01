@@ -1,4 +1,3 @@
-
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PurchasesHeader } from "@/components/suppliers/purchases/PurchasesHeader";
@@ -7,8 +6,11 @@ import { PurchasesTable } from "@/components/suppliers/purchases/PurchasesTable"
 import { DeletePurchaseDialog } from "@/components/suppliers/purchases/DeletePurchaseDialog";
 import { PurchaseForm } from "@/components/suppliers/purchases/PurchaseForm";
 import { usePurchasesData } from "@/hooks/usePurchasesData";
+import { useToast } from "@/hooks/use-toast";
+import { Purchase } from "@/types/purchase";
 
 const Purchases = () => {
+  const { toast } = useToast();
   const {
     purchases,
     supplierSearchTerm,
@@ -28,7 +30,6 @@ const Purchases = () => {
     handleAddPurchase,
     handleEditPurchase,
     handleDeletePurchase,
-    handleSavePurchase,
     confirmDeletePurchase,
     clearFilters
   } = usePurchasesData();
@@ -37,6 +38,47 @@ const Purchases = () => {
   const handlePurchaseFormClose = () => {
     console.log("Closing purchase form from parent");
     setIsPurchaseFormOpen(false);
+  };
+
+  // Custom save handler that keeps the form open
+  const handleSavePurchase = (purchase: Purchase) => {
+    // Get the current list of purchases from local storage or initialize empty
+    const purchasesStr = localStorage.getItem('purchases') || '[]';
+    let allPurchases = JSON.parse(purchasesStr);
+    
+    if (selectedPurchase) {
+      // Update existing purchase
+      allPurchases = allPurchases.map((p: Purchase) => 
+        p.id === purchase.id ? purchase : p
+      );
+      
+      toast({
+        title: "Achat mis à jour",
+        description: `L'achat ${purchase.reference} a été mis à jour avec succès`,
+      });
+    } else {
+      // Add new purchase
+      allPurchases = [purchase, ...allPurchases];
+      
+      toast({
+        title: "Achat ajouté",
+        description: `L'achat ${purchase.reference} a été ajouté avec succès`,
+      });
+    }
+    
+    // Save to local storage
+    localStorage.setItem('purchases', JSON.stringify(allPurchases));
+    
+    // Trigger refresh without closing the form
+    handleRefresh();
+    
+    // Note: We're NOT closing the form here
+    // This is important: DO NOT set isPurchaseFormOpen to false
+    
+    if (selectedPurchase) {
+      // Only reset selected purchase if we were editing
+      setSelectedPurchase(undefined);
+    }
   };
 
   return (
