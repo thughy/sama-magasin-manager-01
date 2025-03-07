@@ -1,8 +1,8 @@
 
-import React, { useRef } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Printer } from "lucide-react";
+import { Printer, Save } from "lucide-react";
 import { PurchaseOrder } from "@/types/purchaseOrder";
 
 interface PurchaseOrderActionsProps {
@@ -22,7 +22,15 @@ export const PurchaseOrderActions = ({
         Annuler
       </Button>
       <Button onClick={onPrint}>
-        <Printer className="h-4 w-4 mr-2" /> {isSaveMode ? "Enregistrer" : "Imprimer"}
+        {isSaveMode ? (
+          <>
+            <Save className="h-4 w-4 mr-2" /> Enregistrer
+          </>
+        ) : (
+          <>
+            <Printer className="h-4 w-4 mr-2" /> Imprimer
+          </>
+        )}
       </Button>
     </DialogFooter>
   );

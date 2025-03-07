@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
@@ -86,40 +87,25 @@ export const PurchaseForm = ({
     purchaseItems
   });
 
-  // Save purchase functionality
+  // Save purchase functionality - Ne pas réinitialiser le formulaire après sauvegarde
   const { completeSaveOperation } = useSavePurchase({
     initialPurchase,
     onSave,
     onClose,
     formData,
     purchaseItems,
-    paymentMethods
+    paymentMethods,
+    shouldResetForm: false
   });
 
-  // Form submission with option to keep form open
+  // Form submission - Garder le formulaire ouvert et focus sur le champ fournisseur
   const { handleSubmit } = useFormSubmission({
     isValid,
     purchaseItems,
-    showPrintConfirmation: (callback) => {
-      showPrintConfirmation(() => {
-        const success = callback();
-        if (success !== undefined) {
-          if (success) {
-            resetForm();
-          }
-          return success;
-        }
-        return true;
-      });
-    },
-    completeSaveOperation: (shouldCloseForm) => {
-      const success = completeSaveOperation(shouldCloseForm);
-      if (success && !shouldCloseForm) {
-        resetForm();
-      }
-      return success;
-    },
-    shouldKeepFormOpen: true
+    showPrintConfirmation,
+    completeSaveOperation,
+    shouldKeepFormOpen: true,
+    supplierFocusRef
   });
 
   // Calculate unique depots from purchase items

@@ -10,6 +10,7 @@ interface UseSavePurchaseProps {
   formData: Omit<Purchase, 'id'> & { id?: string };
   purchaseItems: PurchaseItem[];
   paymentMethods: PaymentMethod[];
+  shouldResetForm?: boolean;
 }
 
 export const useSavePurchase = ({
@@ -18,13 +19,14 @@ export const useSavePurchase = ({
   onClose,
   formData,
   purchaseItems,
-  paymentMethods
+  paymentMethods,
+  shouldResetForm = false
 }: UseSavePurchaseProps) => {
   const { toast } = useToast();
   const { updateInventory } = useInventoryUpdater();
   
   // The actual save operation
-  const completeSaveOperation = (shouldCloseForm = true): boolean => {
+  const completeSaveOperation = (shouldCloseForm = false): boolean => {
     // For backward compatibility, use the first item's details
     const firstItem = purchaseItems[0];
     
@@ -80,7 +82,10 @@ export const useSavePurchase = ({
     }
     
     // Return true to indicate success, so we can handle form reset
-    return true;
+    return {
+      success: true,
+      shouldReset: shouldResetForm
+    };
   };
 
   return {
