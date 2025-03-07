@@ -5,7 +5,7 @@ import { usePrintConfirmation } from './usePrintConfirmation';
 import { useFormDataManager } from './useFormDataManager';
 import { useFormCalculations } from './useFormCalculations';
 import { useSavePurchase } from './useSavePurchase';
-import { useFormSubmission } from './useFormSubmission';
+import { useFormSubmission, useFormSubmitHandler } from './useFormSubmission';
 import { useInitialItems } from './useInitialItems';
 import { usePurchaseFormItems } from './usePurchaseFormItems';
 import { useInventoryUpdater } from './useInventoryUpdater';
@@ -13,7 +13,6 @@ import { useDepotEntryPrinting } from './useDepotEntryPrinting';
 import { useFormReset } from './useFormReset';
 import { usePurchaseFormDialog } from './usePurchaseFormDialog';
 import { useDialogController } from './useDialogController';
-import { useFormSubmitHandler } from './useFormSubmission';
 
 export { 
   usePurchaseForm,

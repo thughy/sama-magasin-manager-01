@@ -19,6 +19,7 @@ export const useFormSubmitHandler = ({
   purchaseItems,
   paymentMethods,
   initialPurchase,
+  supplierFocusRef,
   resetForm,
   onSave
 }: UseFormSubmitHandlerProps) => {
@@ -67,5 +68,40 @@ export const useFormSubmitHandler = ({
     }, 100);
   };
 
+  return { handleSubmit };
+};
+
+// Add this export to maintain backward compatibility
+export const useFormSubmission = ({
+  isValid,
+  purchaseItems,
+  showPrintConfirmation,
+  completeSaveOperation
+}: {
+  isValid: boolean;
+  purchaseItems: Purchase['items'];
+  showPrintConfirmation: () => void;
+  completeSaveOperation: () => void;
+}) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isValid) {
+      console.log("Form validation failed");
+      return;
+    }
+    
+    if (purchaseItems.length === 0) {
+      console.log("Cannot submit purchase with no items");
+      return;
+    }
+    
+    // Show print confirmation before completing
+    showPrintConfirmation();
+    
+    // This will be called after the user confirms printing choice
+    completeSaveOperation();
+  };
+  
   return { handleSubmit };
 };
