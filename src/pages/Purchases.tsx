@@ -1,4 +1,3 @@
-
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PurchasesHeader } from "@/components/suppliers/purchases/PurchasesHeader";
@@ -40,6 +39,8 @@ const Purchases = () => {
   const handlePurchaseFormClose = () => {
     console.log("Closing purchase form from parent");
     setIsPurchaseFormOpen(false);
+    // Clear selected purchase when form is closed
+    setSelectedPurchase(undefined);
   };
 
   // Custom save handler that keeps the form open
@@ -74,13 +75,9 @@ const Purchases = () => {
     // Trigger refresh without closing the form
     handleRefresh();
     
-    // Note: We're NOT closing the form here
-    // This is important: DO NOT set isPurchaseFormOpen to false
-    
-    if (selectedPurchase) {
-      // Only reset selected purchase if we were editing
-      setSelectedPurchase(undefined);
-    }
+    // Close the form after saving
+    setIsPurchaseFormOpen(false);
+    setSelectedPurchase(undefined);
   };
 
   return (

@@ -22,7 +22,8 @@ export const useDialogController = ({ isOpen, onClose }: UseDialogControllerProp
   const handleCancel = () => {
     console.log("Cancel button clicked, closing form");
     setDialogOpen(false);
-    setTimeout(() => onClose(), 50);
+    // Call the parent onClose immediately rather than with setTimeout
+    onClose();
   };
 
   return {
