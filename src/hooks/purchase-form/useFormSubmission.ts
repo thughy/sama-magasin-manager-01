@@ -1,90 +1,71 @@
 
-import { useToast } from '@/hooks/use-toast';
-import { PurchaseItem } from '@/types/purchase';
-import { useFormReset } from './useFormReset';
+import { Purchase } from "@/types/purchase";
+import { useFormReset } from "./useFormReset";
 
-interface UseFormSubmissionProps {
+interface UseFormSubmitHandlerProps {
   isValid: boolean;
-  purchaseItems: PurchaseItem[];
-  showPrintConfirmation: (callback: () => any) => void;
-  completeSaveOperation: (shouldCloseForm?: boolean) => { success: boolean; shouldReset?: boolean };
-  shouldKeepFormOpen?: boolean;
-  resetForm?: () => void;
-  supplierFocusRef?: React.RefObject<HTMLInputElement>;
-  setSelectedSupplier?: (supplier: null) => void;
+  formData: Omit<Purchase, 'id'> & { id?: string };
+  purchaseItems: Purchase['items'];
+  paymentMethods: Purchase['paymentMethods'];
+  initialPurchase?: Purchase;
+  supplierFocusRef: React.RefObject<HTMLInputElement>;
+  resetForm: () => void;
+  onSave: (purchase: Purchase) => void;
 }
 
-export const useFormSubmission = ({
+export const useFormSubmitHandler = ({
   isValid,
+  formData,
   purchaseItems,
-  showPrintConfirmation,
-  completeSaveOperation,
-  shouldKeepFormOpen = true,
+  paymentMethods,
+  initialPurchase,
   resetForm,
-  supplierFocusRef,
-  setSelectedSupplier
-}: UseFormSubmissionProps) => {
-  const { toast } = useToast();
-
-  // Form submission
+  onSave
+}: UseFormSubmitHandlerProps) => {
+  // Submit handler function
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted, checking validity...");
+    console.log("Form internally submitted, checking validity...");
     
     if (!isValid) {
-      toast({
-        title: "Formulaire invalide",
-        description: "Veuillez remplir tous les champs obligatoires.",
-        variant: "destructive",
-      });
+      console.log("Form is invalid, not proceeding");
       return;
     }
 
-    // Check if there are items with depots
-    const hasDepotsSelected = purchaseItems.some(item => !!item.depot);
-    const allItemsHaveDepots = purchaseItems.every(item => !!item.depot);
+    // Create a new purchase object
+    const newPurchase: Purchase = {
+      id: initialPurchase?.id || `ACH${Date.now().toString().substring(8)}`,
+      reference: formData.reference,
+      purchaseDate: formData.purchaseDate,
+      supplierId: formData.supplierId,
+      supplierName: formData.supplierName,
+      productName: purchaseItems[0]?.productName || '',
+      quantity: purchaseItems[0]?.quantity || 0,
+      unitPrice: purchaseItems[0]?.unitPrice || 0,
+      totalAmount: formData.totalAmount,
+      totalPaid: formData.totalPaid,
+      balance: formData.balance,
+      status: formData.status,
+      paymentMethods: paymentMethods,
+      items: purchaseItems
+    };
     
-    if (!allItemsHaveDepots) {
-      toast({
-        title: "Dépôts manquants",
-        description: "Tous les articles doivent avoir un dépôt sélectionné.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Save the purchase
+    console.log("Saving purchase:", newPurchase);
+    onSave(newPurchase);
+
+    // Reset the form for next entry
+    console.log("Purchase saved, resetting form for next entry");
+    resetForm();
     
-    console.log("Form is valid, saving purchase with shouldCloseForm=false");
-    // CRITICAL: We must ALWAYS pass false to ensure the form never closes
-    const result = completeSaveOperation(false);
-    
-    if (result.success) {
-      console.log("Save successful, resetting form...");
-      // Reset the form for a new purchase entry
-      if (resetForm) {
-        console.log("Using resetForm function");
-        resetForm();
-      } else {
-        console.log("No resetForm function provided, doing manual reset");
-        // If resetForm is not provided, manually reset the key parts
-        if (setSelectedSupplier) {
-          setSelectedSupplier(null);
-        }
+    // Focus the supplier input for the next entry
+    setTimeout(() => {
+      if (supplierFocusRef.current) {
+        supplierFocusRef.current.focus();
+        console.log("Focus set on supplier input for next entry");
       }
-      
-      // Focus on supplier input if provided - ensure this happens with a slight delay
-      if (supplierFocusRef?.current) {
-        console.log("Setting focus to supplier input with delay");
-        setTimeout(() => {
-          if (supplierFocusRef.current) {
-            supplierFocusRef.current.focus();
-            console.log("Focus set on supplier input");
-          }
-        }, 100);
-      }
-    }
+    }, 100);
   };
 
-  return {
-    handleSubmit
-  };
+  return { handleSubmit };
 };
