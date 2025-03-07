@@ -50,16 +50,24 @@ export const PurchaseFormItems = ({
     // Log the received product for debugging
     console.log("Product selected in PurchaseFormItems:", product, "for index:", index);
     
-    // Update all product-related fields with explicit type conversion
+    // First update the productId to trigger state changes
     onUpdateItem(index, 'productId', String(product.id));
-    onUpdateItem(index, 'productName', product.name);
-    onUpdateItem(index, 'unitPrice', Number(product.purchasePrice));
-    onUpdateItem(index, 'sellPrice', Number(product.sellPrice));
     
-    // Log updated item after changes for debugging
-    setTimeout(() => {
-      console.log("Item after update:", items[index]);
-    }, 10);
+    // Then update the rest of the fields with a slight delay to ensure the state is updated
+    // This is crucial to avoid race conditions in state updates
+    requestAnimationFrame(() => {
+      onUpdateItem(index, 'productName', product.name);
+      onUpdateItem(index, 'unitPrice', Number(product.purchasePrice));
+      onUpdateItem(index, 'sellPrice', Number(product.sellPrice));
+      
+      // Log updated item after changes for debugging
+      console.log("Item should be updated now:", {
+        productId: String(product.id),
+        productName: product.name,
+        unitPrice: Number(product.purchasePrice),
+        sellPrice: Number(product.sellPrice)
+      });
+    });
   };
 
   return (
@@ -85,10 +93,10 @@ export const PurchaseFormItems = ({
             handleSelectProduct(product, emptyItemIndex);
           } else {
             onAddItem();
-            // Need to wait for state update
+            // Add a new item and then update it with the product details
             setTimeout(() => {
               handleSelectProduct(product, items.length);
-            }, 0);
+            }, 50); // Slightly longer timeout to ensure the new item is added
           }
         }}
         currentItems={items.filter(item => item.productId).map(item => parseInt(item.productId) || 0)}

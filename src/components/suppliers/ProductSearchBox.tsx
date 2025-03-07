@@ -36,7 +36,9 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
 
   // Initialize products from our data
   useEffect(() => {
-    setProducts(getProductsFromItems());
+    const formattedProducts = getProductsFromItems();
+    console.log("Initialized products:", formattedProducts);
+    setProducts(formattedProducts);
   }, []);
 
   useEffect(() => {
@@ -57,20 +59,24 @@ export const ProductSearchBox = ({ onSelectProduct, currentItems }: ProductSearc
   }, [searchTerm, currentItems, products]);
 
   const handleSelectProduct = (product: Product) => {
-    // Ensure we're passing the complete product object
-    const selectedProduct = {
-      ...product,
+    // Ensure we're passing a proper product object with correct types
+    const selectedProduct: Product = {
       id: Number(product.id),
+      barcode: String(product.barcode),
+      name: String(product.name),
       purchasePrice: Number(product.purchasePrice),
       sellPrice: Number(product.sellPrice)
     };
     
+    // Log complete object before sending it
+    console.log("Sending selected product from SearchBox:", selectedProduct);
+    
+    // Pass the properly formatted product to the parent component
     onSelectProduct(selectedProduct);
+    
+    // Reset search state
     setSearchTerm("");
     setShowResults(false);
-    
-    // Log for debugging
-    console.log("Selected product in ProductSearchBox:", selectedProduct);
   };
 
   const handleCreateProduct = (newProduct: Product) => {
