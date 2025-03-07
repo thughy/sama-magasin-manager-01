@@ -24,7 +24,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="1"
           value={item.quantity}
           onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
-          className="w-16" // Reduced width from w-20 to w-16
+          className="w-16" // Keep existing width
         />
       </TableCell>
       <TableCell>
@@ -34,7 +34,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
             console.log(`Updating depot for item ${index} to:`, value);
             onUpdateItem(index, 'depot', value);
           }}
-          className="w-full" // Added explicit width class for the depot selector
+          className="w-full" // Keep existing width class
         />
       </TableCell>
       <TableCell>
@@ -43,7 +43,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="0"
           value={item.unitPrice}
           onChange={(e) => onUpdateItem(index, 'unitPrice', Number(e.target.value))}
-          className="w-20" // Reduced width from w-24 to w-20
+          className="w-24" // Increased width from w-20 to w-24
         />
       </TableCell>
       <TableCell>
@@ -52,7 +52,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="0"
           value={item.sellPrice || 0}
           onChange={(e) => onUpdateItem(index, 'sellPrice', Number(e.target.value))}
-          className="w-20" // Reduced width from w-24 to w-20
+          className="w-24" // Increased width from w-20 to w-24
         />
       </TableCell>
       <TableCell className="font-medium">
