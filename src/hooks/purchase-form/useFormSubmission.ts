@@ -6,14 +6,16 @@ interface UseFormSubmissionProps {
   isValid: boolean;
   purchaseItems: PurchaseItem[];
   showPrintConfirmation: (callback: () => void) => void;
-  completeSaveOperation: () => void;
+  completeSaveOperation: (shouldCloseForm?: boolean) => boolean | void;
+  shouldKeepFormOpen?: boolean;
 }
 
 export const useFormSubmission = ({
   isValid,
   purchaseItems,
   showPrintConfirmation,
-  completeSaveOperation
+  completeSaveOperation,
+  shouldKeepFormOpen = false
 }: UseFormSubmissionProps) => {
   const { toast } = useToast();
 
@@ -35,10 +37,13 @@ export const useFormSubmission = ({
     
     if (hasDepotsSelected) {
       // Show confirmation dialog for printing
-      showPrintConfirmation(completeSaveOperation);
+      showPrintConfirmation(() => {
+        const success = completeSaveOperation(!shouldKeepFormOpen);
+        return success;
+      });
     } else {
       // No depots to print, proceed with save
-      completeSaveOperation();
+      completeSaveOperation(!shouldKeepFormOpen);
     }
   };
 

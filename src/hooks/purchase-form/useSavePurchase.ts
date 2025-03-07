@@ -24,7 +24,7 @@ export const useSavePurchase = ({
   const { updateInventory } = useInventoryUpdater();
   
   // The actual save operation
-  const completeSaveOperation = () => {
+  const completeSaveOperation = (shouldCloseForm = true) => {
     // For backward compatibility, use the first item's details
     const firstItem = purchaseItems[0];
     
@@ -65,7 +65,13 @@ export const useSavePurchase = ({
       description: `L'achat a été ${initialPurchase ? 'mis à jour' : 'créé'} avec succès et le stock a été mis à jour.`
     });
     
-    onClose();
+    // Only close if explicitly requested
+    if (shouldCloseForm) {
+      onClose();
+    }
+    
+    // Return true to indicate success, so we can handle form reset
+    return true;
   };
 
   return {

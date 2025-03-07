@@ -1,5 +1,4 @@
-
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
 import { 
@@ -33,6 +32,7 @@ export const PurchaseForm = ({
   onSave
 }: PurchaseFormProps) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const supplierFocusRef = useRef<HTMLInputElement>(null);
   
   // Form data management
   const { formData, setFormData, selectedSupplier, setSelectedSupplier } = 
@@ -88,12 +88,56 @@ export const PurchaseForm = ({
     paymentMethods
   });
 
-  // Form submission
+  // Function to reset the form after successful submission
+  const resetForm = () => {
+    // Reset form data
+    setFormData({
+      reference: `F-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+      purchaseDate: new Date().toISOString().split('T')[0],
+      supplierId: selectedSupplier ? selectedSupplier.id : 0,
+      supplierName: selectedSupplier ? selectedSupplier.name : '',
+      productName: '',
+      quantity: 0,
+      unitPrice: 0,
+      totalAmount: 0,
+      totalPaid: 0,
+      balance: 0,
+      status: 'impayée',
+    });
+    
+    // Clear items but keep the supplier
+    setPurchaseItems([]);
+    setPaymentMethods([]);
+    
+    // Focus on supplier input after form reset
+    setTimeout(() => {
+      if (supplierFocusRef.current) {
+        supplierFocusRef.current.focus();
+      }
+    }, 100);
+  };
+
+  // Form submission with option to keep form open
   const { handleSubmit } = useFormSubmission({
     isValid,
     purchaseItems,
-    showPrintConfirmation,
-    completeSaveOperation
+    showPrintConfirmation: (callback) => {
+      showPrintConfirmation(() => {
+        const success = callback();
+        if (success) {
+          resetForm();
+        }
+        return success;
+      });
+    },
+    completeSaveOperation: (shouldCloseForm) => {
+      const success = completeSaveOperation(shouldCloseForm);
+      if (success && !shouldCloseForm) {
+        resetForm();
+      }
+      return success;
+    },
+    shouldKeepFormOpen: true
   });
 
   // Calculate unique depots from purchase items
@@ -111,6 +155,7 @@ export const PurchaseForm = ({
             onReferenceChange={(value) => setFormData({...formData, reference: value})}
             onPurchaseDateChange={(value) => setFormData({...formData, purchaseDate: value})}
             onSupplierChange={setSelectedSupplier}
+            supplierFocusRef={supplierFocusRef}
           />
 
           {/* Purchase Items Section */}

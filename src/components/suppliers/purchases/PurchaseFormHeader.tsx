@@ -14,6 +14,7 @@ interface PurchaseFormHeaderProps {
   onReferenceChange: (value: string) => void;
   onPurchaseDateChange: (value: string) => void;
   onSupplierChange: (supplier: Supplier) => void;
+  supplierFocusRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const PurchaseFormHeader = ({
@@ -22,7 +23,8 @@ export const PurchaseFormHeader = ({
   selectedSupplier,
   onReferenceChange,
   onPurchaseDateChange,
-  onSupplierChange
+  onSupplierChange,
+  supplierFocusRef
 }: PurchaseFormHeaderProps) => {
   return (
     <>
@@ -58,7 +60,8 @@ export const PurchaseFormHeader = ({
       <div>
         <SupplierSearchBox 
           selectedSupplier={selectedSupplier} 
-          onSelectSupplier={onSupplierChange} 
+          onSelectSupplier={onSupplierChange}
+          inputRef={supplierFocusRef}
         />
       </div>
     </>

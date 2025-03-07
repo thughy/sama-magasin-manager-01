@@ -10,9 +10,14 @@ import { SupplierCreateDialog } from "./SupplierCreateDialog";
 interface SupplierSearchBoxProps {
   onSelectSupplier: (supplier: Supplier) => void;
   selectedSupplier: Supplier | null;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
-export const SupplierSearchBox = ({ onSelectSupplier, selectedSupplier }: SupplierSearchBoxProps) => {
+export const SupplierSearchBox = ({ 
+  onSelectSupplier, 
+  selectedSupplier,
+  inputRef 
+}: SupplierSearchBoxProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Supplier[]>([]);
   const [showResults, setShowResults] = useState(false);
@@ -71,6 +76,7 @@ export const SupplierSearchBox = ({ onSelectSupplier, selectedSupplier }: Suppli
                   onSelectSupplier(null as unknown as Supplier);
                 }
               }}
+              ref={inputRef}
             />
             <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
