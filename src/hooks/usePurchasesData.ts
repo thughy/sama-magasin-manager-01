@@ -127,6 +127,7 @@ export const usePurchasesData = () => {
     isPurchaseFormOpen,
     setIsPurchaseFormOpen,
     selectedPurchase,
+    setSelectedPurchase, // <- Adding this to the returned object
     handleRefresh,
     handleAddPurchase,
     handleEditPurchase,
