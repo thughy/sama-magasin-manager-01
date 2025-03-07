@@ -60,7 +60,7 @@ export const useFormSubmission = ({
         setSelectedSupplier(null);
       }
       
-      // Focus on supplier input if provided
+      // Focus on supplier input if provided - ensure this happens with a slight delay
       if (supplierFocusRef?.current) {
         setTimeout(() => {
           if (supplierFocusRef.current) {

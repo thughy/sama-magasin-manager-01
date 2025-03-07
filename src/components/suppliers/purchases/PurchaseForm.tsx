@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
@@ -30,6 +31,7 @@ export const PurchaseForm = ({
   onSave
 }: PurchaseFormProps) => {
   const printRef = useRef<HTMLDivElement>(null);
+  // Create a reference to the supplier input for focusing after save
   const supplierFocusRef = useRef<HTMLInputElement>(null);
   
   // Form data management
