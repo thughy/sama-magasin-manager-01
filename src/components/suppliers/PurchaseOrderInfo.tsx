@@ -36,6 +36,7 @@ export const PurchaseOrderInfo = ({
             value={reference} 
             onChange={(e) => onReferenceChange(e.target.value)} 
             placeholder="BC-2023-0001" 
+            autoComplete="off"
           />
         </div>
         <div>
@@ -45,6 +46,7 @@ export const PurchaseOrderInfo = ({
             type="date" 
             value={orderDate} 
             onChange={(e) => onOrderDateChange(e.target.value)} 
+            autoComplete="off"
           />
         </div>
       </div>
@@ -61,6 +63,7 @@ export const PurchaseOrderInfo = ({
             type="date" 
             value={deliveryDate} 
             onChange={(e) => onDeliveryDateChange(e.target.value)} 
+            autoComplete="off"
           />
         </div>
       </div>

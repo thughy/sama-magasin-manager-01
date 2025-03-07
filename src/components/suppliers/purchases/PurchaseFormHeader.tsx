@@ -40,6 +40,7 @@ export const PurchaseFormHeader = ({
             value={reference}
             onChange={(e) => onReferenceChange(e.target.value)}
             placeholder="F-2024-001"
+            autoComplete="off"
           />
         </div>
         
@@ -51,6 +52,7 @@ export const PurchaseFormHeader = ({
               type="date"
               value={purchaseDate}
               onChange={(e) => onPurchaseDateChange(e.target.value)}
+              autoComplete="off"
             />
             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
