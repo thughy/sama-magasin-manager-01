@@ -81,8 +81,7 @@ export const useSavePurchase = ({
       description: `L'achat a été ${initialPurchase ? 'mis à jour' : 'créé'} avec succès et le stock a été mis à jour.`
     });
     
-    // Only close if explicitly requested AND shouldCloseForm is true
-    // IMPORTANT: We're using strict equality to ensure it's only closed when explicitly true
+    // Never close form when shouldCloseForm is false - this ensures the form stays open
     if (shouldCloseForm === true) {
       onClose();
     }

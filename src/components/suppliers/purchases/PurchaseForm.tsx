@@ -99,13 +99,14 @@ export const PurchaseForm = ({
     shouldResetForm: false
   });
 
-  // Form submission - Pass setSelectedSupplier to reset supplier after save
+  // Form submission - Pass proper reset function and related references
   const { handleSubmit } = useFormSubmission({
     isValid,
     purchaseItems,
     showPrintConfirmation,
     completeSaveOperation,
     shouldKeepFormOpen: true,
+    resetForm: resetForm,  // Pass the resetForm function explicitly
     supplierFocusRef,
     setSelectedSupplier
   });

@@ -1,6 +1,7 @@
 
 import { useToast } from '@/hooks/use-toast';
 import { PurchaseItem } from '@/types/purchase';
+import { useFormReset } from './useFormReset';
 
 interface UseFormSubmissionProps {
   isValid: boolean;
@@ -55,9 +56,14 @@ export const useFormSubmission = ({
     const result = completeSaveOperation(false);
     
     if (result.success) {
-      // Reset the supplier if save was successful
-      if (setSelectedSupplier) {
-        setSelectedSupplier(null);
+      // Reset the form for a new purchase entry
+      if (resetForm) {
+        resetForm();
+      } else {
+        // If resetForm is not provided, manually reset the key parts
+        if (setSelectedSupplier) {
+          setSelectedSupplier(null);
+        }
       }
       
       // Focus on supplier input if provided - ensure this happens with a slight delay
