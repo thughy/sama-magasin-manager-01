@@ -19,27 +19,24 @@ export const usePrintConfirmation = ({ formData, purchaseItems }: UsePrintConfir
 
   // Function to handle confirmation
   const handleConfirm = () => {
+    let result;
     if (onConfirmCallback) {
-      onConfirmCallback();
+      result = onConfirmCallback();
     }
     setIsOpen(false);
+    return result;
   };
 
-  // Print Confirmation Dialog component
-  const PrintConfirmationDialog = () => {
-    // Get all unique depots that have items
-    const depots = [...new Set(purchaseItems.filter(item => !!item.depot).map(item => item.depot))];
-    
-    return {
-      isOpen,
-      depots,
-      handleConfirm,
-      onClose: () => setIsOpen(false)
-    };
+  // Properties for the PrintConfirmationDialog
+  const printConfirmationProps = {
+    isOpen,
+    depots: [...new Set(purchaseItems.filter(item => !!item.depot).map(item => item.depot))],
+    handleConfirm,
+    onClose: () => setIsOpen(false)
   };
 
   return {
     showPrintConfirmation,
-    PrintConfirmationDialog
+    printConfirmationProps
   };
 };

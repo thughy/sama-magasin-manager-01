@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Purchase } from "@/types/purchase";
@@ -17,6 +18,7 @@ import { PurchaseFormItems } from "./PurchaseFormItems";
 import { PaymentMethodsSection } from "./PaymentMethodsSection";
 import { DepotEntryPrintingSection } from "./DepotEntryPrintingSection";
 import { PurchaseFormFooter } from "./PurchaseFormFooter";
+import { PrintConfirmationDialog } from "./PrintConfirmationDialog";
 
 interface PurchaseFormProps {
   isOpen: boolean;
@@ -74,7 +76,7 @@ export const PurchaseForm = ({
 
   // Printing functionality
   const { printDepotEntry } = useDepotEntryPrinting(formData, purchaseItems);
-  const { showPrintConfirmation, PrintConfirmationDialog } = usePrintConfirmation({
+  const { showPrintConfirmation, printConfirmationProps } = usePrintConfirmation({
     formData,
     purchaseItems
   });
@@ -125,10 +127,13 @@ export const PurchaseForm = ({
     showPrintConfirmation: (callback) => {
       showPrintConfirmation(() => {
         const success = callback();
-        if (success) {
-          resetForm();
+        if (success !== undefined) {
+          if (success) {
+            resetForm();
+          }
+          return success;
         }
-        return success;
+        return true;
       });
     },
     completeSaveOperation: (shouldCloseForm) => {
@@ -198,7 +203,7 @@ export const PurchaseForm = ({
         </div>
 
         {/* Print Confirmation Dialog */}
-        <PrintConfirmationDialog />
+        <PrintConfirmationDialog {...printConfirmationProps} />
       </DialogContent>
     </Dialog>
   );

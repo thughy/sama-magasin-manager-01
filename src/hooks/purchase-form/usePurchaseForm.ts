@@ -28,7 +28,8 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     setPurchaseItems, 
     addPurchaseItem, 
     removePurchaseItem, 
-    updatePurchaseItem 
+    updatePurchaseItem,
+    updatePurchaseItemFields
   } = usePurchaseFormItems();
   
   const { 
@@ -57,7 +58,7 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
 
   // Printing functionality
   const { printDepotEntry } = useDepotEntryPrinting(formData, purchaseItems);
-  const { showPrintConfirmation, PrintConfirmationDialog } = usePrintConfirmation({
+  const { showPrintConfirmation, printConfirmationProps } = usePrintConfirmation({
     formData,
     purchaseItems
   });
@@ -91,12 +92,13 @@ export const usePurchaseForm = ({ initialPurchase, onSave, onClose }: UsePurchas
     addPurchaseItem,
     removePurchaseItem,
     updatePurchaseItem,
+    updatePurchaseItemFields,
     addPaymentMethod,
     removePaymentMethod,
     updatePaymentMethod,
     calculateTotals,
     handleSubmit,
     printDepotEntry,
-    PrintConfirmationDialog
+    printConfirmationProps
   };
 };
