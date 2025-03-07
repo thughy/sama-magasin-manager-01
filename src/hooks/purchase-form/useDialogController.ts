@@ -12,15 +12,13 @@ export const useDialogController = ({ isOpen, onClose }: UseDialogControllerProp
 
   // Sync our internal state with parent's isOpen prop
   useEffect(() => {
-    if (isOpen !== dialogOpen) {
-      console.log(`Syncing dialog state: parent=${isOpen}, internal=${dialogOpen}`);
-      setDialogOpen(isOpen);
-    }
+    setDialogOpen(isOpen);
+    console.log(`Dialog state set to: ${isOpen}`);
   }, [isOpen]);
 
   // Manual cancel handler
   const handleCancel = () => {
-    console.log("Cancel button clicked, closing form");
+    console.log("Cancel handler executed in useDialogController");
     setDialogOpen(false);
     onClose();
   };

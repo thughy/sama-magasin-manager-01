@@ -51,21 +51,9 @@ export const useFormSubmitHandler = ({
       items: purchaseItems
     };
     
-    // Save the purchase
-    console.log("Saving purchase:", newPurchase);
+    // Save the purchase and immediately exit the form
+    console.log("Saving purchase and closing form:", newPurchase);
     onSave(newPurchase);
-
-    // Reset the form for next entry
-    console.log("Purchase saved, resetting form for next entry");
-    resetForm();
-    
-    // Focus the supplier input for the next entry
-    setTimeout(() => {
-      if (supplierFocusRef.current) {
-        supplierFocusRef.current.focus();
-        console.log("Focus set on supplier input for next entry");
-      }
-    }, 100);
   };
 
   return { handleSubmit };
