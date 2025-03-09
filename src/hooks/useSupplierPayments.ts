@@ -13,13 +13,15 @@ export const useSupplierPayments = () => {
     setSuppliers,
     selectedSupplier,
     setSelectedSupplier,
-    isLoading
+    isLoading: suppliersLoading
   } = useSupplierData();
 
   // Supplier purchases
   const {
     supplierPurchases,
-    setSupplierPurchases
+    setSupplierPurchases,
+    isLoading: purchasesLoading,
+    error: purchasesError
   } = useSupplierPurchases(selectedSupplier);
 
   // Payment state
@@ -85,6 +87,9 @@ export const useSupplierPayments = () => {
     setSelectedPurchase
   );
 
+  // Calculate overall loading state
+  const isLoading = suppliersLoading || purchasesLoading;
+
   return {
     suppliers,
     selectedSupplier,
@@ -110,6 +115,7 @@ export const useSupplierPayments = () => {
     handleEditPurchase,
     handleSavePurchase,
     handleViewPaymentHistory,
-    isLoading
+    isLoading,
+    purchasesError
   };
 };

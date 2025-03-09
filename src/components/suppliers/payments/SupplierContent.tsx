@@ -20,11 +20,14 @@ export const SupplierContent: React.FC<SupplierContentProps> = ({
   onEditClick,
   onViewHistory
 }) => {
+  // Ensure purchases is always a valid array even if null or undefined is passed
+  const safePurchases = Array.isArray(purchases) ? purchases : [];
+  
   return (
     <div className="space-y-6">
       <SupplierInfo supplier={supplier} />
       <PurchaseList 
-        purchases={purchases || []}
+        purchases={safePurchases}
         onPaymentClick={onPaymentClick}
         onEditClick={onEditClick}
         onViewHistory={onViewHistory}
