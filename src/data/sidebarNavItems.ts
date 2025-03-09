@@ -13,8 +13,7 @@ import {
   Boxes,
   Tags,
   Layers3,
-  Download,
-  Wallet
+  Download
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar";
 
@@ -39,8 +38,7 @@ export const navItems: NavItem[] = [
     subItems: [
       { title: "Liste des fournisseurs", url: "/suppliers", icon: Truck },
       { title: "Bon de commande", url: "/suppliers/purchase-orders", icon: FileText },
-      { title: "Achat de marchandises", url: "/suppliers/purchases", icon: Download },
-      { title: "Paiement fournisseur", url: "/suppliers/payments", icon: Wallet }
+      { title: "Achat de marchandises", url: "/suppliers/purchases", icon: Download }
     ]
   },
   { 
