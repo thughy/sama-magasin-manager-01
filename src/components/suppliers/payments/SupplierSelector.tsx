@@ -43,6 +43,7 @@ export function SupplierSelector({
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between"
+          disabled={isLoading}
         >
           {selectedSupplier ? selectedSupplier.name : "Sélectionner un fournisseur"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
