@@ -1,8 +1,29 @@
 
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SupplierSelector } from "@/components/suppliers/payments/SupplierSelector";
+import { SupplierInfo } from "@/components/suppliers/payments/SupplierInfo";
+import { PurchaseList } from "@/components/suppliers/payments/PurchaseList";
+import { PaymentDialog } from "@/components/suppliers/payments/PaymentDialog";
+import { useSupplierPayments } from "@/hooks/useSupplierPayments";
 
 const SupplierPayments = () => {
+  const {
+    suppliers,
+    selectedSupplier,
+    supplierPurchases,
+    isPaymentDialogOpen,
+    setIsPaymentDialogOpen,
+    selectedPurchase,
+    paymentAmount,
+    setPaymentAmount,
+    paymentMethod,
+    setPaymentMethod,
+    handleSupplierSelect,
+    handlePaymentClick,
+    handlePaymentSubmit
+  } = useSupplierPayments();
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
@@ -15,17 +36,40 @@ const SupplierPayments = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Paiements aux fournisseurs</CardTitle>
+            <CardTitle>Sélection du fournisseur</CardTitle>
             <CardDescription>
-              Consultez et enregistrez les paiements effectués à vos fournisseurs
+              Sélectionnez un fournisseur pour voir ses factures impayées
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-center p-8 text-muted-foreground">
-              Cette fonctionnalité sera bientôt disponible
-            </div>
+            <SupplierSelector 
+              suppliers={suppliers}
+              selectedSupplier={selectedSupplier}
+              onSupplierSelect={handleSupplierSelect}
+            />
           </CardContent>
         </Card>
+
+        {selectedSupplier && (
+          <div className="space-y-6">
+            <SupplierInfo supplier={selectedSupplier} />
+            <PurchaseList 
+              purchases={supplierPurchases}
+              onPaymentClick={handlePaymentClick}
+            />
+          </div>
+        )}
+
+        <PaymentDialog
+          purchase={selectedPurchase}
+          open={isPaymentDialogOpen}
+          onOpenChange={setIsPaymentDialogOpen}
+          paymentAmount={paymentAmount}
+          onPaymentAmountChange={setPaymentAmount}
+          paymentMethod={paymentMethod}
+          onPaymentMethodChange={setPaymentMethod}
+          onSubmit={handlePaymentSubmit}
+        />
       </div>
     </MainLayout>
   );
