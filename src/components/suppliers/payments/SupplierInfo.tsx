@@ -14,8 +14,8 @@ export function SupplierInfo({ supplier }: SupplierInfoProps) {
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
     documentTitle: `Compte Fournisseur - ${supplier?.name || "Fournisseur"}`,
+    content: () => printRef.current,
   });
 
   if (!supplier) {
@@ -26,7 +26,11 @@ export function SupplierInfo({ supplier }: SupplierInfoProps) {
     <Card>
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-xl">Information du fournisseur</CardTitle>
-        <Button variant="outline" size="sm" onClick={handlePrint}>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handlePrint}
+        >
           <Printer className="mr-2 h-4 w-4" />
           Imprimer
         </Button>
