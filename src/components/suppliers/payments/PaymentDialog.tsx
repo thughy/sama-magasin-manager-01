@@ -37,7 +37,7 @@ export function PaymentDialog({
   onPaymentDateChange,
   onSubmit
 }: PaymentDialogProps) {
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true); // Changed to true to make filters visible by default
   const [referenceFilter, setReferenceFilter] = useState("");
   const [totalMinFilter, setTotalMinFilter] = useState("");
   const [totalMaxFilter, setTotalMaxFilter] = useState("");
