@@ -1,20 +1,7 @@
 
-import React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Supplier } from "@/data/suppliersData";
 
 interface SupplierSelectorProps {
@@ -30,57 +17,70 @@ export function SupplierSelector({
   onSupplierSelect,
   isLoading = false
 }: SupplierSelectorProps) {
-  const [open, setOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const [filteredSuppliers, setFilteredSuppliers] = useState<Supplier[]>([]);
   
   // Ensure suppliers is always an array
   const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
   
+  useEffect(() => {
+    if (searchTerm.length >= 1) {
+      const filtered = safeSuppliers.filter(supplier => 
+        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.contact.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredSuppliers(filtered);
+      setShowResults(true);
+    } else {
+      setShowResults(false);
+    }
+  }, [searchTerm, safeSuppliers]);
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-          disabled={isLoading}
-        >
-          {selectedSupplier ? selectedSupplier.name : "Sélectionner un fournisseur"}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        {isLoading ? (
-          <div className="py-6 text-center text-sm">Chargement des fournisseurs...</div>
-        ) : (
-          <Command>
-            <CommandInput placeholder="Rechercher un fournisseur..." />
-            <CommandEmpty>Aucun fournisseur trouvé.</CommandEmpty>
-            <CommandGroup className="max-h-[300px] overflow-auto">
-              {safeSuppliers.map((supplier) => (
-                <CommandItem
-                  key={supplier.id}
-                  value={supplier.name}
-                  onSelect={() => {
+    <div className="relative w-full">
+      <Label htmlFor="supplierSearch">Fournisseur</Label>
+      <Input
+        id="supplierSearch"
+        placeholder="Rechercher un fournisseur..."
+        value={selectedSupplier ? selectedSupplier.name : searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onClick={() => {
+          if (selectedSupplier) {
+            setSearchTerm("");
+            onSupplierSelect(null as unknown as Supplier);
+          }
+        }}
+        disabled={isLoading}
+        className="w-full"
+        autoComplete="off"
+      />
+      
+      {showResults && !selectedSupplier && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+          {filteredSuppliers.length > 0 ? (
+            <ul className="py-1">
+              {filteredSuppliers.map((supplier) => (
+                <li 
+                  key={supplier.id} 
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
                     onSupplierSelect(supplier);
-                    setOpen(false);
+                    setShowResults(false);
                   }}
                 >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedSupplier?.id === supplier.id
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
-                  {supplier.name}
-                </CommandItem>
+                  <div className="font-medium">{supplier.name}</div>
+                  <div className="text-sm text-gray-500">{supplier.contact} • {supplier.phone}</div>
+                </li>
               ))}
-            </CommandGroup>
-          </Command>
-        )}
-      </PopoverContent>
-    </Popover>
+            </ul>
+          ) : (
+            <div className="p-4 text-center text-gray-500">
+              Aucun fournisseur trouvé
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import { useCallback } from "react";
 import { Purchase } from "@/types/purchase";
 import { Supplier } from "@/data/suppliersData";
@@ -14,16 +13,14 @@ export const useSupplierHandlers = (
   setPaymentDate: (date: string) => void
 ) => {
   const handleSupplierSelect = useCallback((supplier: Supplier) => {
-    // First, reset all state related to the previous supplier
+    // First, close all dialogs and reset purchase selection
     setSelectedPurchase(null);
     setIsPaymentDialogOpen(false);
     setIsPaymentHistoryOpen(false);
     setIsPurchaseFormOpen(false);
     
     // Then set the new supplier
-    setTimeout(() => {
-      setSelectedSupplier(supplier);
-    }, 0);
+    setSelectedSupplier(supplier);
   }, [setSelectedSupplier, setSelectedPurchase, setIsPaymentDialogOpen, setIsPaymentHistoryOpen, setIsPurchaseFormOpen]);
 
   const handlePaymentClick = useCallback((purchase: Purchase) => {
