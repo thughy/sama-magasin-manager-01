@@ -42,9 +42,6 @@ export const PurchasesTable = ({ purchases, onEdit, onDelete }: PurchasesTablePr
           <TableHead>Référence</TableHead>
           <TableHead>Date</TableHead>
           <TableHead>Fournisseur</TableHead>
-          <TableHead>Produit</TableHead>
-          <TableHead>Quantité</TableHead>
-          <TableHead>Prix unitaire</TableHead>
           <TableHead>Total</TableHead>
           <TableHead>Versé</TableHead>
           <TableHead>Solde</TableHead>
@@ -58,9 +55,6 @@ export const PurchasesTable = ({ purchases, onEdit, onDelete }: PurchasesTablePr
             <TableCell className="font-medium">{purchase.reference}</TableCell>
             <TableCell>{format(new Date(purchase.purchaseDate), 'dd MMM yyyy', { locale: fr })}</TableCell>
             <TableCell>{purchase.supplierName}</TableCell>
-            <TableCell>{purchase.productName}</TableCell>
-            <TableCell>{purchase.quantity}</TableCell>
-            <TableCell>{formatCurrency(purchase.unitPrice)}</TableCell>
             <TableCell>{formatCurrency(purchase.totalAmount)}</TableCell>
             <TableCell>{formatCurrency(purchase.totalPaid || 0)}</TableCell>
             <TableCell>{formatCurrency(purchase.balance || (purchase.totalAmount - (purchase.totalPaid || 0)))}</TableCell>
