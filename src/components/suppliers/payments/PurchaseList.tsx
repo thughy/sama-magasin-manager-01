@@ -1,18 +1,23 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Wallet } from "lucide-react";
+import { Clock, Edit, Wallet } from "lucide-react";
 import { Purchase } from "@/types/purchase";
 import { Badge } from "@/components/ui/badge";
+import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
 
 interface PurchaseListProps {
   purchases: Purchase[];
   onPaymentClick: (purchase: Purchase) => void;
+  onEditClick?: (purchase: Purchase) => void;
 }
 
-export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListProps) {
+export function PurchaseList({ purchases = [], onPaymentClick, onEditClick }: PurchaseListProps) {
+  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -20,6 +25,11 @@ export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListPro
     } catch (error) {
       return dateString;
     }
+  };
+
+  const handleHistoryClick = (purchase: Purchase) => {
+    setSelectedPurchase(purchase);
+    setIsHistoryDialogOpen(true);
   };
 
   if (!purchases || purchases.length === 0) {
@@ -38,55 +48,86 @@ export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListPro
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Factures du fournisseur</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Référence</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Payé</TableHead>
-              <TableHead>Solde</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {purchases.map((purchase) => (
-              <TableRow key={purchase.id}>
-                <TableCell className="font-medium">{purchase.reference}</TableCell>
-                <TableCell>{formatDate(purchase.purchaseDate)}</TableCell>
-                <TableCell>{purchase.totalAmount.toLocaleString()} F CFA</TableCell>
-                <TableCell>{purchase.totalPaid.toLocaleString()} F CFA</TableCell>
-                <TableCell className={purchase.status === 'impayée' ? 'font-medium text-red-500' : 'font-medium text-green-500'}>
-                  {purchase.balance.toLocaleString()} F CFA
-                </TableCell>
-                <TableCell>
-                  <Badge variant={purchase.status === 'payée' ? 'success' : 'destructive'}>
-                    {purchase.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="ml-auto"
-                    onClick={() => onPaymentClick(purchase)}
-                    disabled={purchase.status === 'payée'}
-                  >
-                    <Wallet className="mr-2 h-4 w-4" />
-                    Payer
-                  </Button>
-                </TableCell>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Factures du fournisseur</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Référence</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Payé</TableHead>
+                <TableHead>Solde</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+            </TableHeader>
+            <TableBody>
+              {purchases.map((purchase) => (
+                <TableRow key={purchase.id}>
+                  <TableCell className="font-medium">{purchase.reference}</TableCell>
+                  <TableCell>{formatDate(purchase.purchaseDate)}</TableCell>
+                  <TableCell>{purchase.totalAmount.toLocaleString()} F CFA</TableCell>
+                  <TableCell>{purchase.totalPaid.toLocaleString()} F CFA</TableCell>
+                  <TableCell className={purchase.status === 'impayée' ? 'font-medium text-red-500' : 'font-medium text-green-500'}>
+                    {purchase.balance.toLocaleString()} F CFA
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={purchase.status === 'payée' ? 'success' : 'destructive'}>
+                      {purchase.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleHistoryClick(purchase)}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        Historique
+                      </Button>
+                      
+                      {onEditClick && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => onEditClick(purchase)}
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Modifier
+                        </Button>
+                      )}
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => onPaymentClick(purchase)}
+                        disabled={purchase.status === 'payée'}
+                      >
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Payer
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      
+      {selectedPurchase && (
+        <PaymentHistoryDialog
+          open={isHistoryDialogOpen}
+          onOpenChange={setIsHistoryDialogOpen}
+          purchase={selectedPurchase}
+        />
+      )}
+    </>
   );
 }

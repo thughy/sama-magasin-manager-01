@@ -14,6 +14,7 @@ export const useSupplierPayments = () => {
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'wave' | 'orangeMoney' | 'cheque' | 'bank'>('cash');
+  const [isPurchaseFormOpen, setIsPurchaseFormOpen] = useState(false);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -97,6 +98,81 @@ export const useSupplierPayments = () => {
     setIsPaymentDialogOpen(true);
   }, []);
 
+  const handleEditPurchase = useCallback((purchase: Purchase) => {
+    setSelectedPurchase(purchase);
+    setIsPurchaseFormOpen(true);
+  }, []);
+
+  const handleSavePurchase = useCallback((updatedPurchase: Purchase) => {
+    const storedPurchases = localStorage.getItem("purchases");
+    if (!storedPurchases) return;
+
+    try {
+      const allPurchases: Purchase[] = JSON.parse(storedPurchases);
+      
+      // Update the purchase in the list
+      const updatedPurchases = allPurchases.map(purchase => {
+        if (purchase.id === updatedPurchase.id) {
+          return updatedPurchase;
+        }
+        return purchase;
+      });
+
+      // Save updated purchases
+      localStorage.setItem("purchases", JSON.stringify(updatedPurchases));
+
+      // Update supplier data if needed
+      if (selectedSupplier) {
+        const updatedSuppliers = suppliers.map(supplier => {
+          if (supplier.id === selectedSupplier.id) {
+            const newBalance = calculateSupplierBalance(supplier.id, updatedPurchases);
+            const totalInvoice = calculateSupplierTotalInvoice(supplier.id, updatedPurchases);
+            const totalPaid = totalInvoice - newBalance;
+            
+            return {
+              ...supplier,
+              balance: newBalance,
+              totalInvoice,
+              totalPaid,
+              status: newBalance <= 0 ? 'payée' as const : 'impayée' as const
+            };
+          }
+          return supplier;
+        });
+
+        setSuppliers(updatedSuppliers);
+        
+        // Update selected supplier
+        const updatedSelectedSupplier = updatedSuppliers.find(s => s.id === selectedSupplier.id) || null;
+        setSelectedSupplier(updatedSelectedSupplier);
+      }
+
+      // Refresh purchases for supplier
+      if (selectedSupplier) {
+        const updatedSupplierPurchases = updatedPurchases.filter(
+          (purchase) => purchase.supplierId === selectedSupplier.id
+        );
+        setSupplierPurchases(updatedSupplierPurchases);
+      }
+
+      // Close form and show success toast
+      setIsPurchaseFormOpen(false);
+      setSelectedPurchase(null);
+      
+      toast({
+        title: "Facture mise à jour",
+        description: `La facture ${updatedPurchase.reference} a été mise à jour avec succès`,
+      });
+    } catch (error) {
+      console.error("Error during purchase update:", error);
+      toast({
+        title: "Erreur de mise à jour",
+        description: "Une erreur s'est produite lors de la mise à jour de la facture",
+        variant: "destructive",
+      });
+    }
+  }, [selectedSupplier, suppliers, toast]);
+
   const handlePaymentSubmit = useCallback(() => {
     if (!selectedPurchase || !selectedSupplier) return;
 
@@ -112,11 +188,24 @@ export const useSupplierPayments = () => {
           const newTotalPaid = purchase.totalPaid + paymentAmount;
           const newBalance = purchase.totalAmount - newTotalPaid;
           
+          // Create a new payment method entry
+          const newPaymentMethod = {
+            id: `payment-${Date.now()}`,
+            method: paymentMethod,
+            amount: paymentAmount,
+            date: new Date().toISOString() // Add the date for payment history
+          };
+          
           return {
             ...purchase,
             totalPaid: newTotalPaid,
             balance: newBalance,
-            status: newBalance <= 0 ? 'payée' as const : 'impayée' as const
+            status: newBalance <= 0 ? 'payée' as const : 'impayée' as const,
+            // Add or update payment methods array
+            paymentMethods: [
+              ...(purchase.paymentMethods || []),
+              newPaymentMethod
+            ]
           };
         }
         return purchase;
@@ -145,7 +234,7 @@ export const useSupplierPayments = () => {
       
       // Refresh purchases for supplier
       const updatedSupplierPurchases = updatedPurchases.filter(
-        (purchase) => purchase.supplierId === selectedSupplier.id && purchase.status === 'impayée'
+        (purchase) => purchase.supplierId === selectedSupplier.id
       );
       setSupplierPurchases(updatedSupplierPurchases);
 
@@ -166,11 +255,16 @@ export const useSupplierPayments = () => {
         variant: "destructive",
       });
     }
-  }, [paymentAmount, selectedPurchase, selectedSupplier, suppliers, toast]);
+  }, [paymentAmount, paymentMethod, selectedPurchase, selectedSupplier, suppliers, toast]);
 
   const calculateSupplierBalance = (supplierId: number, purchases: Purchase[]): number => {
     const supplierPurchases = purchases.filter(p => p.supplierId === supplierId);
     return supplierPurchases.reduce((sum, purchase) => sum + purchase.balance, 0);
+  };
+
+  const calculateSupplierTotalInvoice = (supplierId: number, purchases: Purchase[]): number => {
+    const supplierPurchases = purchases.filter(p => p.supplierId === supplierId);
+    return supplierPurchases.reduce((sum, purchase) => sum + purchase.totalAmount, 0);
   };
 
   return {
@@ -186,9 +280,13 @@ export const useSupplierPayments = () => {
     setPaymentAmount,
     paymentMethod,
     setPaymentMethod,
+    isPurchaseFormOpen,
+    setIsPurchaseFormOpen,
     handleSupplierSelect,
     handlePaymentClick,
     handlePaymentSubmit,
+    handleEditPurchase,
+    handleSavePurchase,
     isLoading
   };
 };

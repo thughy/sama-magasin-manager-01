@@ -9,6 +9,7 @@ import { useSupplierPayments } from "@/hooks/useSupplierPayments";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { PurchaseForm } from "@/components/suppliers/purchases/PurchaseForm";
 
 const SupplierPayments = () => {
   const {
@@ -25,7 +26,11 @@ const SupplierPayments = () => {
     handleSupplierSelect,
     handlePaymentClick,
     handlePaymentSubmit,
-    isLoading
+    isLoading,
+    isPurchaseFormOpen,
+    setIsPurchaseFormOpen,
+    handleEditPurchase,
+    handleSavePurchase
   } = useSupplierPayments();
 
   return (
@@ -80,6 +85,7 @@ const SupplierPayments = () => {
             <PurchaseList 
               purchases={supplierPurchases || []}
               onPaymentClick={handlePaymentClick}
+              onEditClick={handleEditPurchase}
             />
           </div>
         )}
@@ -95,6 +101,16 @@ const SupplierPayments = () => {
             paymentMethod={paymentMethod}
             onPaymentMethodChange={setPaymentMethod}
             onSubmit={handlePaymentSubmit}
+          />
+        )}
+
+        {/* Purchase Edit Form */}
+        {selectedPurchase && (
+          <PurchaseForm
+            isOpen={isPurchaseFormOpen}
+            onClose={() => setIsPurchaseFormOpen(false)}
+            initialPurchase={selectedPurchase}
+            onSave={handleSavePurchase}
           />
         )}
       </div>
