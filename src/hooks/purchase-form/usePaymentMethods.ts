@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { PaymentMethod } from '@/types/purchase';
+import { format } from 'date-fns';
 
 export const usePaymentMethods = (initialMethods: PaymentMethod[] = []) => {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(initialMethods);
@@ -9,7 +10,8 @@ export const usePaymentMethods = (initialMethods: PaymentMethod[] = []) => {
     const newPayment: PaymentMethod = {
       id: Date.now().toString(),
       method: 'cash',
-      amount: 0
+      amount: 0,
+      date: format(new Date(), 'yyyy-MM-dd') // Add the current date as default
     };
     
     setPaymentMethods(prev => [...prev, newPayment]);

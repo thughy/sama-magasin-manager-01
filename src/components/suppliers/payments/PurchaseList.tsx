@@ -12,9 +12,10 @@ interface PurchaseListProps {
   purchases: Purchase[];
   onPaymentClick: (purchase: Purchase) => void;
   onEditClick?: (purchase: Purchase) => void;
+  onViewHistory?: (purchase: Purchase) => void;
 }
 
-export function PurchaseList({ purchases = [], onPaymentClick, onEditClick }: PurchaseListProps) {
+export function PurchaseList({ purchases = [], onPaymentClick, onEditClick, onViewHistory }: PurchaseListProps) {
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
 
@@ -28,8 +29,12 @@ export function PurchaseList({ purchases = [], onPaymentClick, onEditClick }: Pu
   };
 
   const handleHistoryClick = (purchase: Purchase) => {
-    setSelectedPurchase(purchase);
-    setIsHistoryDialogOpen(true);
+    if (onViewHistory) {
+      onViewHistory(purchase);
+    } else {
+      setSelectedPurchase(purchase);
+      setIsHistoryDialogOpen(true);
+    }
   };
 
   if (!purchases || purchases.length === 0) {
@@ -121,7 +126,7 @@ export function PurchaseList({ purchases = [], onPaymentClick, onEditClick }: Pu
         </CardContent>
       </Card>
       
-      {selectedPurchase && (
+      {selectedPurchase && !onViewHistory && (
         <PaymentHistoryDialog
           open={isHistoryDialogOpen}
           onOpenChange={setIsHistoryDialogOpen}
