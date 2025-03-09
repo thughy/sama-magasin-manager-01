@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -141,6 +142,20 @@
 
 /* Print styles */
 @media print {
+  /* A4 paper size setup */
+  @page {
+    size: A4;
+    margin: 1.5cm; /* Standard margin for documents */
+  }
+  
+  body {
+    width: 210mm;
+    background: white !important;
+    font-size: 12pt;
+    margin: 0;
+    padding: 0;
+  }
+  
   .print-hidden,
   .print\:hidden {
     display: none !important;
@@ -150,14 +165,17 @@
     display: block !important;
   }
   
-  body {
-    background: white !important;
-    font-size: 12pt;
+  .print-supplier-invoices {
+    width: 100%;
+    padding: 0;
+    margin: 0;
   }
   
   .print-supplier-invoices table {
     width: 100%;
     border-collapse: collapse;
+    page-break-inside: avoid;
+    margin-bottom: 1cm;
   }
   
   .print-supplier-invoices td,
@@ -169,6 +187,7 @@
   .print-payment-history table {
     width: 100%;
     border-collapse: collapse;
+    page-break-inside: avoid;
   }
   
   .print-payment-history td,
@@ -180,6 +199,17 @@
   .print-supplier table {
     width: 100%;
     border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+  
+  /* Additional A4 specific styles */
+  .page-break {
+    page-break-after: always;
+  }
+  
+  /* Ensure element does not break across pages */
+  .no-break {
+    page-break-inside: avoid;
   }
 }
 

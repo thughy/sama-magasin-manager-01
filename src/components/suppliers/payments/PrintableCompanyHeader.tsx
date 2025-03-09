@@ -4,7 +4,7 @@ import { Building } from "lucide-react";
 
 export const PrintableCompanyHeader: React.FC = () => {
   return (
-    <div className="print-only mb-8">
+    <div className="print-only mb-8 no-break">
       <div className="text-center border-b pb-6">
         <div className="flex items-center justify-center mb-2">
           <Building className="h-8 w-8 mr-2" />

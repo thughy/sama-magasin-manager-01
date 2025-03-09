@@ -11,7 +11,7 @@ export const PrintableSupplierInfo: React.FC<PrintableSupplierInfoProps> = ({ su
   if (!supplier) return null;
   
   return (
-    <div className="my-6 border p-4 rounded-lg">
+    <div className="my-6 border p-4 rounded-lg no-break">
       <div className="flex items-center mb-2">
         <User className="h-5 w-5 mr-2" />
         <h2 className="text-xl font-semibold">Informations du fournisseur</h2>
