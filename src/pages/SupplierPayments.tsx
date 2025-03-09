@@ -89,7 +89,7 @@ const SupplierPayments = () => {
           />
         )}
 
-        {/* All Dialogs */}
+        {/* All Dialogs - only render if selectedPurchase exists */}
         {selectedPurchase && (
           <PaymentDialogs
             selectedPurchase={selectedPurchase}

@@ -23,7 +23,8 @@ export const useSupplierPurchases = (selectedSupplier: Supplier | null) => {
     setError(null);
 
     // Use setTimeout to prevent state updates in the same render cycle
-    setTimeout(() => {
+    // and to avoid race conditions
+    const timeoutId = setTimeout(() => {
       try {
         const storedPurchases = localStorage.getItem("purchases");
         
@@ -44,7 +45,7 @@ export const useSupplierPurchases = (selectedSupplier: Supplier | null) => {
         }
         
         const filteredPurchases = allPurchases.filter(
-          (purchase) => purchase?.supplierId === selectedSupplier.id
+          (purchase) => purchase && purchase.supplierId === selectedSupplier.id
         );
         
         // Important: Always set the supplier purchases, even if the array is empty
@@ -57,7 +58,12 @@ export const useSupplierPurchases = (selectedSupplier: Supplier | null) => {
       } finally {
         setIsLoading(false);
       }
-    }, 0);
+    }, 100); // Slightly longer timeout to ensure DOM is ready
+
+    // Cleanup function to cancel timeout if component unmounts or supplier changes
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [selectedSupplier]);
 
   return {
