@@ -6,7 +6,6 @@ import { SupplierInfo } from "@/components/suppliers/payments/SupplierInfo";
 import { PurchaseList } from "@/components/suppliers/payments/PurchaseList";
 import { PaymentDialog } from "@/components/suppliers/payments/PaymentDialog";
 import { useSupplierPayments } from "@/hooks/useSupplierPayments";
-import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -28,16 +27,6 @@ const SupplierPayments = () => {
     handlePaymentSubmit,
     isLoading
   } = useSupplierPayments();
-
-  // Add logging to debug the component
-  useEffect(() => {
-    console.log("SupplierPayments component mounted");
-    console.log("Suppliers loaded:", suppliers);
-  }, [suppliers]);
-
-  useEffect(() => {
-    console.log("Selected supplier changed:", selectedSupplier);
-  }, [selectedSupplier]);
 
   // Always make sure suppliers is an array
   const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
@@ -67,7 +56,7 @@ const SupplierPayments = () => {
 
   return (
     <MainLayout>
-      <div className="space-y-6 animate-scale-in">
+      <div className="space-y-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Paiement Fournisseur</h1>
           <p className="text-muted-foreground">

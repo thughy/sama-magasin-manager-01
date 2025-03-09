@@ -24,17 +24,15 @@ interface SupplierSelectorProps {
 }
 
 export function SupplierSelector({ 
-  suppliers = [], 
+  suppliers, 
   selectedSupplier, 
   onSupplierSelect 
 }: SupplierSelectorProps) {
   const [open, setOpen] = React.useState(false);
 
-  // Make absolutely sure we have an array to work with
+  // Guarantee we have a safe array to work with
   const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
   
-  console.log("Rendering SupplierSelector with suppliers count:", safeSuppliers.length);
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -52,7 +50,7 @@ export function SupplierSelector({
         <Command>
           <CommandInput placeholder="Rechercher un fournisseur..." />
           <CommandEmpty>Aucun fournisseur trouvé.</CommandEmpty>
-          <CommandGroup className="max-h-60 overflow-auto">
+          <CommandGroup>
             {safeSuppliers.length > 0 ? (
               safeSuppliers.map((supplier) => (
                 <CommandItem
