@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { ItemsHeader } from "./ItemsHeader";
 import { ItemsTable } from "./ItemsTable";
 import { ProductSelector } from "./ProductSelector";
@@ -21,6 +21,11 @@ export const PurchaseFormItems = ({
   onUpdateItem,
   onUpdateItemFields
 }: PurchaseFormItemsProps) => {
+  // Log the items prop on mount and updates
+  useEffect(() => {
+    console.log("PurchaseFormItems component received items:", items);
+  }, [items]);
+
   // A new direct state update function that doesn't rely on callbacks
   const handleSelectProduct = (product: Product, index: number) => {
     console.log("Product selected in PurchaseFormItems:", product, "for index:", index);

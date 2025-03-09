@@ -15,12 +15,16 @@ export const useInitialItems = ({
 }: UseInitialItemsProps) => {
   // Load initial purchase items and payment methods if editing
   useEffect(() => {
+    console.log("useInitialItems - initialPurchase:", initialPurchase);
+    
     if (initialPurchase) {
       // Load purchase items if they exist
       if (initialPurchase.items && initialPurchase.items.length > 0) {
-        setPurchaseItems(initialPurchase.items);
+        console.log("Setting purchase items from initialPurchase.items:", initialPurchase.items);
+        setPurchaseItems([...initialPurchase.items]); // Create a new array to ensure state update
       } else {
         // We'll need to reconstruct purchaseItems from initialPurchase
+        console.log("Reconstructing purchase items from initialPurchase single item");
         setPurchaseItems([{
           productId: '0',
           productName: initialPurchase.productName,
@@ -33,7 +37,7 @@ export const useInitialItems = ({
 
       // Set payment methods if they exist
       if (initialPurchase.paymentMethods && initialPurchase.paymentMethods.length > 0) {
-        setPaymentMethods(initialPurchase.paymentMethods);
+        setPaymentMethods([...initialPurchase.paymentMethods]); // Create a new array to ensure state update
       }
     }
   }, [initialPurchase, setPurchaseItems, setPaymentMethods]);

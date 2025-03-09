@@ -1,9 +1,22 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PurchaseItem } from '@/types/purchase';
 
 export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
-  const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>(initialItems);
+  const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>(initialItems.length > 0 ? [...initialItems] : []);
+
+  // Log when purchaseItems changes
+  useEffect(() => {
+    console.log("usePurchaseFormItems - Current purchase items:", purchaseItems);
+  }, [purchaseItems]);
+
+  // Initialize with at least one empty item if none provided
+  useEffect(() => {
+    if (purchaseItems.length === 0) {
+      console.log("Adding default empty purchase item");
+      addPurchaseItem();
+    }
+  }, []);
 
   const addPurchaseItem = () => {
     console.log("Adding new purchase item");
@@ -14,7 +27,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       quantity: 1,
       unitPrice: 0,
       sellPrice: 0,
-      depot: '' // Initialiser avec une valeur vide
+      depot: '' // Initialize with an empty value
     };
     
     setPurchaseItems(items => [...items, newItem]);
@@ -22,6 +35,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
   };
 
   const removePurchaseItem = (index: number) => {
+    console.log(`Removing purchase item at index ${index}`);
     setPurchaseItems(items => items.filter((_, i) => i !== index));
   };
 
