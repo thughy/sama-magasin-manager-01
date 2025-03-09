@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Printer, AlertCircle } from "lucide-react";
 import { Purchase } from "@/types/purchase";
 import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
 import { useReactToPrint } from "react-to-print";
@@ -13,6 +13,7 @@ import { InvoiceHistoryTitle } from "./InvoiceHistoryTitle";
 import { PurchasesTable } from "./PurchasesTable";
 import { FinancialSummary } from "./FinancialSummary";
 import { PrintableFooter } from "./PrintableFooter";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface PurchaseListProps {
   purchases: Purchase[];
@@ -56,6 +57,7 @@ export function PurchaseList({
     handlePrint();
   };
 
+  // This is the case when a supplier has no purchases
   if (!purchases || purchases.length === 0) {
     return (
       <Card>
@@ -63,9 +65,13 @@ export function PurchaseList({
           <CardTitle>Factures du fournisseur</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center p-8 text-muted-foreground">
-            Aucune facture pour ce fournisseur
-          </div>
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Aucune facture trouvée</AlertTitle>
+            <AlertDescription>
+              Ce fournisseur n'a pas encore de factures enregistrées dans le système.
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
     );

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { Purchase } from "@/types/purchase";
 import { Supplier } from "@/data/suppliersData";
@@ -82,7 +83,9 @@ export const useSupplierPayments = () => {
         (purchase) => purchase.supplierId === selectedSupplier.id
       );
       
+      // Important: Always set the supplier purchases, even if the array is empty
       setSupplierPurchases(filteredPurchases);
+      console.info(`Found ${filteredPurchases.length} purchases for supplier ${selectedSupplier.name}`);
     } catch (error) {
       console.error("Error parsing purchases:", error);
       setSupplierPurchases([]);
@@ -90,6 +93,13 @@ export const useSupplierPayments = () => {
   }, [selectedSupplier]);
 
   const handleSupplierSelect = useCallback((supplier: Supplier) => {
+    // Reset all state related to the previous supplier
+    setSelectedPurchase(null);
+    setIsPaymentDialogOpen(false);
+    setIsPaymentHistoryOpen(false);
+    setIsPurchaseFormOpen(false);
+    
+    // Set the new supplier
     setSelectedSupplier(supplier);
   }, []);
 
