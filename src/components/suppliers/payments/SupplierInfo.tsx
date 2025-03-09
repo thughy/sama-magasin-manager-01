@@ -15,12 +15,7 @@ export function SupplierInfo({ supplier }: SupplierInfoProps) {
 
   const handlePrint = useReactToPrint({
     documentTitle: `Compte Fournisseur - ${supplier?.name || "Fournisseur"}`,
-    // Use the correct property name for react-to-print
-    onBeforeGetContent: () => {
-      return new Promise<void>((resolve) => {
-        resolve();
-      });
-    },
+    content: () => printRef.current,
     onPrintError: (errorLocation, error) => {
       console.error(`Print error at ${errorLocation}:`, error);
     },
@@ -37,12 +32,7 @@ export function SupplierInfo({ supplier }: SupplierInfoProps) {
         <Button 
           variant="outline" 
           size="sm" 
-          // Fix the onClick handler to properly handle the event
-          onClick={() => {
-            if (printRef.current) {
-              handlePrint();
-            }
-          }}
+          onClick={handlePrint}
         >
           <Printer className="mr-2 h-4 w-4" />
           Imprimer
