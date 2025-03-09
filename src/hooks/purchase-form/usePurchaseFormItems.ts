@@ -6,14 +6,24 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
   // Initialize state with a function to avoid reference issues
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>(() => {
     console.log("Initializing usePurchaseFormItems with:", initialItems);
+    
+    // Create a deep copy to avoid reference issues
     return initialItems.length > 0 
-      ? initialItems.map(item => ({ ...item }))  // Create new objects to avoid reference issues
+      ? initialItems.map(item => ({
+          productId: item.productId,
+          productName: item.productName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          sellPrice: item.sellPrice || 0,
+          depot: item.depot || 'Principal'
+        }))
       : [];
   });
 
   // Log when purchaseItems changes
   useEffect(() => {
-    console.log("usePurchaseFormItems - Current purchase items:", purchaseItems);
+    console.log("usePurchaseFormItems - Current purchase items count:", purchaseItems.length);
+    console.log("usePurchaseFormItems - Current purchase items:", JSON.stringify(purchaseItems, null, 2));
   }, [purchaseItems]);
 
   // Initialize with at least one empty item if none provided
@@ -38,14 +48,18 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
     
     setPurchaseItems(prevItems => {
       const newItems = [...prevItems, newItem];
-      console.log("Items after adding:", newItems);
+      console.log("Items after adding:", newItems.length);
       return newItems;
     });
   }, []);
 
   const removePurchaseItem = useCallback((index: number) => {
     console.log(`Removing purchase item at index ${index}`);
-    setPurchaseItems(prevItems => prevItems.filter((_, i) => i !== index));
+    setPurchaseItems(prevItems => {
+      const newItems = prevItems.filter((_, i) => i !== index);
+      console.log(`Items after removing index ${index}:`, newItems.length);
+      return newItems;
+    });
   }, []);
 
   const updatePurchaseItem = useCallback((index: number, field: keyof PurchaseItem, value: any) => {
@@ -62,12 +76,12 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       const newItems = [...prevItems];
       newItems[index] = { ...newItems[index], [field]: value };
       
-      console.log(`Item ${index} updated, new value:`, newItems[index]);
+      console.log(`Item ${index} updated, field: ${field}, new value:`, newItems[index][field]);
       return newItems;
     });
   }, []);
 
-  // New method to update multiple fields at once
+  // Method to update multiple fields at once with improved debugging
   const updatePurchaseItemFields = useCallback((index: number, fieldsToUpdate: Partial<PurchaseItem>) => {
     console.log(`Updating multiple fields for item ${index}:`, fieldsToUpdate);
     

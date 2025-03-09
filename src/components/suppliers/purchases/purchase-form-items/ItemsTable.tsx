@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Table, TableBody } from "@/components/ui/table";
 import { PurchaseItem } from "@/types/purchase";
 import { ItemsTableHeader } from "./TableHeader";
@@ -13,7 +13,11 @@ interface ItemsTableProps {
 }
 
 export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProps) => {
-  console.log("ItemsTable rendering with items:", items.length, items);
+  // Add more detailed logging to trace the items being rendered
+  useEffect(() => {
+    console.log("ItemsTable mounted/updated with items count:", items.length);
+    console.log("ItemsTable items detail:", JSON.stringify(items, null, 2));
+  }, [items]);
   
   return (
     <Table>
@@ -22,9 +26,10 @@ export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProp
         {items.length === 0 ? (
           <TableEmptyState />
         ) : (
+          // Use unique keys based on index to ensure React renders each item correctly
           items.map((item, index) => (
             <TableItem
-              key={`item-${index}-${item.productId || 'empty'}`}
+              key={`item-${index}-${Date.now()}`}
               item={item}
               index={index}
               onRemoveItem={onRemoveItem}

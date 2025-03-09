@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -15,14 +15,17 @@ interface TableItemProps {
 }
 
 export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItemProps) => {
-  console.log(`Rendering TableItem at index ${index} with item:`, item);
+  // Add effect to log when item changes
+  useEffect(() => {
+    console.log(`TableItem at index ${index} rendered with:`, item);
+  }, [item, index]);
   
   // Calculate subtotals
   const purchaseSubtotal = (item.quantity || 0) * (item.unitPrice || 0);
   const sellSubtotal = (item.quantity || 0) * (item.sellPrice || 0);
   
   return (
-    <TableRow key={`purchase-item-${index}`}>
+    <TableRow>
       <TableCell data-testid={`product-name-${index}`}>{item.productName || "—"}</TableCell>
       <TableCell>
         <Input

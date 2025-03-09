@@ -21,17 +21,18 @@ export const PurchaseFormItems = ({
   onUpdateItem,
   onUpdateItemFields
 }: PurchaseFormItemsProps) => {
-  // Log the items prop on mount and updates
+  // Improved logging to track component state
   useEffect(() => {
-    console.log("PurchaseFormItems component received items:", items);
+    console.log("PurchaseFormItems component received items count:", items.length);
+    console.log("PurchaseFormItems items detail:", JSON.stringify(items, null, 2));
   }, [items]);
 
-  // A new direct state update function that doesn't rely on callbacks
+  // A more robust product selection handler
   const handleSelectProduct = (product: Product, index: number) => {
     console.log("Product selected in PurchaseFormItems:", product, "for index:", index);
     
     if (onUpdateItemFields) {
-      // If the parent component provided the new multi-field update function, use it
+      // If the parent component provided the multi-field update function, use it
       onUpdateItemFields(index, {
         productId: String(product.id),
         productName: String(product.name),
@@ -46,7 +47,7 @@ export const PurchaseFormItems = ({
       onUpdateItem(index, 'sellPrice', Number(product.sellPrice));
     }
     
-    console.log("All fields should be updated now");
+    console.log("Product fields updated for index:", index);
   };
 
   return (

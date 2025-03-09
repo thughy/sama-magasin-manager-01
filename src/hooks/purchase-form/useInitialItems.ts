@@ -20,22 +20,22 @@ export const useInitialItems = ({
     if (initialPurchase) {
       // Load purchase items if they exist
       if (initialPurchase.items && initialPurchase.items.length > 0) {
-        console.log("Setting purchase items from initialPurchase.items:", initialPurchase.items);
+        console.log("Setting purchase items from initialPurchase.items, count:", initialPurchase.items.length);
         
-        // Create a fresh array with new object references
+        // Create a fresh array with new object references to avoid reference issues
         const itemsCopy = initialPurchase.items.map(item => ({
-          productId: item.productId,
-          productName: item.productName,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
+          productId: item.productId || '',
+          productName: item.productName || '',
+          quantity: item.quantity || 1,
+          unitPrice: item.unitPrice || 0,
           sellPrice: item.sellPrice || 0,
           depot: item.depot || 'Principal'
         }));
         
-        console.log("Mapped items copy:", itemsCopy);
+        console.log("Mapped items copy for setting state:", itemsCopy.length, itemsCopy);
         setPurchaseItems(itemsCopy);
       } else {
-        // We'll need to reconstruct purchaseItems from initialPurchase
+        // We'll need to reconstruct purchaseItems from initialPurchase single item data
         console.log("Reconstructing purchase items from initialPurchase single item");
         setPurchaseItems([{
           productId: initialPurchase.productName ? '0' : '',
