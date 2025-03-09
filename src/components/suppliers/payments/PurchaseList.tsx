@@ -3,26 +3,34 @@ import React, { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Building, Clock, Edit, FileText, Printer, Wallet } from "lucide-react";
+import { Building, Clock, Edit, FileText, Printer, User, MapPin, Phone, Mail, Wallet } from "lucide-react";
 import { Purchase } from "@/types/purchase";
 import { Badge } from "@/components/ui/badge";
 import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
 import { useReactToPrint } from "react-to-print";
+import { Supplier } from "@/data/suppliersData";
 
 interface PurchaseListProps {
   purchases: Purchase[];
   onPaymentClick: (purchase: Purchase) => void;
   onEditClick?: (purchase: Purchase) => void;
   onViewHistory?: (purchase: Purchase) => void;
+  supplier?: Supplier; // Add the supplier prop
 }
 
-export function PurchaseList({ purchases = [], onPaymentClick, onEditClick, onViewHistory }: PurchaseListProps) {
+export function PurchaseList({ 
+  purchases = [], 
+  onPaymentClick, 
+  onEditClick, 
+  onViewHistory,
+  supplier // Get the supplier data
+}: PurchaseListProps) {
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
-    documentTitle: `Factures_Fournisseur`,
+    documentTitle: `Factures_Fournisseur_${supplier?.name || ''}`,
     bodyClass: "print-supplier-invoices",
     contentRef: printRef,
     onPrintError: (errorLocation, error) => {
@@ -95,7 +103,69 @@ export function PurchaseList({ purchases = [], onPaymentClick, onEditClick, onVi
                 <p className="text-sm">NINEA: 123456789 | RC: SN-DKR-2020-B-12345</p>
               </div>
               
-              <div className="mt-6 mb-4">
+              {/* Add supplier information in the printed version */}
+              {supplier && (
+                <div className="my-6 border p-4 rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <User className="h-5 w-5 mr-2" />
+                    <h2 className="text-xl font-semibold">Informations du fournisseur</h2>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 mt-3">
+                    <div className="flex items-start">
+                      <Building className="h-4 w-4 mr-2 mt-1" />
+                      <div>
+                        <p className="text-sm font-medium">Nom:</p>
+                        <p className="font-semibold">{supplier.name}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <User className="h-4 w-4 mr-2 mt-1" />
+                      <div>
+                        <p className="text-sm font-medium">Contact:</p>
+                        <p className="font-semibold">{supplier.contact}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <MapPin className="h-4 w-4 mr-2 mt-1" />
+                      <div>
+                        <p className="text-sm font-medium">Adresse:</p>
+                        <p className="font-semibold">{supplier.address}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <Phone className="h-4 w-4 mr-2 mt-1" />
+                      <div>
+                        <p className="text-sm font-medium">Téléphone:</p>
+                        <p className="font-semibold">{supplier.phone}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <Mail className="h-4 w-4 mr-2 mt-1" />
+                      <div>
+                        <p className="text-sm font-medium">Email:</p>
+                        <p className="font-semibold">{supplier.email}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <Wallet className="h-4 w-4 mr-2 mt-1" />
+                      <div>
+                        <p className="text-sm font-medium">Solde:</p>
+                        <p className={`font-semibold ${supplier.balance > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                          {supplier.balance.toLocaleString()} F CFA
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="mt-4 mb-4">
                 <div className="flex items-center">
                   <FileText className="h-5 w-5 mr-2" />
                   <h2 className="text-xl font-semibold">Historique des factures fournisseur</h2>

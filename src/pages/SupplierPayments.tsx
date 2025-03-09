@@ -93,6 +93,7 @@ const SupplierPayments = () => {
               onPaymentClick={handlePaymentClick}
               onEditClick={handleEditPurchase}
               onViewHistory={handleViewPaymentHistory}
+              supplier={selectedSupplier} // Pass the supplier data to PurchaseList
             />
           </div>
         )}
