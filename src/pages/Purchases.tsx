@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import { PurchasesFilters } from "@/components/suppliers/purchases/PurchasesFilt
 import { PurchasesTable } from "@/components/suppliers/purchases/PurchasesTable";
 import { DeletePurchaseDialog } from "@/components/suppliers/purchases/DeletePurchaseDialog";
 import { PurchaseForm } from "@/components/suppliers/purchases/PurchaseForm";
+import { PurchasesTotals } from "@/components/suppliers/purchases/PurchasesTotals";
 import { usePurchasesData } from "@/hooks/usePurchasesData";
 import { useToast } from "@/hooks/use-toast";
 import { Purchase } from "@/types/purchase";
@@ -37,7 +37,6 @@ const Purchases = () => {
     clearFilters
   } = usePurchasesData();
 
-  // Debug and cleanup on mount/unmount
   useEffect(() => {
     console.log("Purchases page mounted");
     
@@ -46,28 +45,23 @@ const Purchases = () => {
     };
   }, []);
 
-  // Monitor form state changes
   useEffect(() => {
     console.log("Purchase form state changed:", isPurchaseFormOpen);
   }, [isPurchaseFormOpen]);
 
-  // Handle closing the purchase form
   const handlePurchaseFormClose = () => {
     console.log("Closing purchase form");
     setIsPurchaseFormOpen(false);
     setSelectedPurchase(undefined);
   };
 
-  // Custom save handler
   const handleSavePurchase = (purchase: Purchase) => {
     console.log("Saving purchase");
     
-    // Get the current list of purchases from local storage or initialize empty
     const purchasesStr = localStorage.getItem('purchases') || '[]';
     let allPurchases = JSON.parse(purchasesStr);
     
     if (selectedPurchase) {
-      // Update existing purchase
       allPurchases = allPurchases.map((p: Purchase) => 
         p.id === purchase.id ? purchase : p
       );
@@ -77,7 +71,6 @@ const Purchases = () => {
         description: `L'achat ${purchase.reference} a été mis à jour avec succès`,
       });
     } else {
-      // Add new purchase
       allPurchases = [purchase, ...allPurchases];
       
       toast({
@@ -86,13 +79,10 @@ const Purchases = () => {
       });
     }
     
-    // Save to local storage
     localStorage.setItem('purchases', JSON.stringify(allPurchases));
     
-    // Trigger refresh
     handleRefresh();
     
-    // Close the form after saving
     handlePurchaseFormClose();
   };
 
@@ -100,6 +90,8 @@ const Purchases = () => {
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
         <PurchasesHeader onRefresh={handleRefresh} onAddNew={handleAddPurchase} />
+
+        <PurchasesTotals purchases={purchases} />
 
         <Card>
           <CardHeader>
