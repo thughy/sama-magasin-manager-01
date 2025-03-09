@@ -15,8 +15,11 @@ interface ItemsTableProps {
 export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProps) => {
   // Add more detailed logging to trace the items being rendered
   useEffect(() => {
-    console.log("ItemsTable mounted/updated with items count:", items.length);
-    console.log("ItemsTable items detail:", JSON.stringify(items, null, 2));
+    console.log("ItemsTable rendered with items count:", items.length);
+    if (items.length > 0) {
+      console.log("ItemsTable first few items:",
+        items.slice(0, 3).map((item, idx) => `${idx}: ${item.productName || "empty"}`).join(', '));
+    }
   }, [items]);
   
   return (
@@ -26,7 +29,6 @@ export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProp
         {items.length === 0 ? (
           <TableEmptyState />
         ) : (
-          // Use stable keys based on index only - avoid Date.now() which causes constant re-renders
           items.map((item, index) => (
             <TableItem
               key={`item-${index}`}

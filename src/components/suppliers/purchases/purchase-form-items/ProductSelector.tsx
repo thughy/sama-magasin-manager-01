@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { ProductSearchBox } from "../../ProductSearchBox";
 import { Product } from "@/types/purchaseOrder";
 import { PurchaseItem } from "@/types/purchase";
@@ -14,10 +14,10 @@ export const ProductSelector = ({ items, onSelectProduct, onAddItem }: ProductSe
   // Add effect to log items when they change
   useEffect(() => {
     console.log("ProductSelector received items:", items.length);
-    console.log("ProductSelector items detail:", JSON.stringify(items, null, 2));
   }, [items]);
   
-  const handleSelectProduct = (product: Product) => {
+  // Create a memoized product selection handler
+  const handleSelectProduct = useCallback((product: Product) => {
     console.log("ProductSelector handleSelectProduct called with product:", product);
     
     // Find an empty item slot or create a new one
@@ -28,16 +28,17 @@ export const ProductSelector = ({ items, onSelectProduct, onAddItem }: ProductSe
       onSelectProduct(product, emptyItemIndex);
     } else {
       console.log(`No empty item found, adding new item for product ${product.name}`);
+      // Add the item first, then wait for the state to update
       onAddItem();
       
-      // Use setTimeout with a longer delay to ensure the new item is added before we try to update it
+      // Use setTimeout to ensure the new item is added before updating it
       setTimeout(() => {
         const newIndex = items.length;
-        console.log(`Setting product on new item at index ${newIndex}, current items length: ${items.length}`);
+        console.log(`Setting product on new item at index ${newIndex}`);
         onSelectProduct(product, newIndex);
-      }, 100);
+      }, 200); // Increased timeout for better reliability
     }
-  };
+  }, [items, onAddItem, onSelectProduct]);
 
   return (
     <ProductSearchBox

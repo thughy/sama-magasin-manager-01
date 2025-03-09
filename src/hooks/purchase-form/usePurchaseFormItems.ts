@@ -16,7 +16,10 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
   // Log when purchaseItems changes
   useEffect(() => {
     console.log("usePurchaseFormItems - Current purchase items count:", purchaseItems.length);
-    console.log("usePurchaseFormItems - Items:", purchaseItems.map(item => `${item.productId}: ${item.productName}`));
+    if (purchaseItems.length > 0) {
+      console.log("usePurchaseFormItems - First few items:", 
+        purchaseItems.slice(0, 3).map(item => `${item.productId}: ${item.productName}`));
+    }
   }, [purchaseItems]);
 
   // Initialize with at least one empty item if none provided
@@ -90,6 +93,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       newItems[index] = { ...newItems[index], ...fieldsToUpdate };
       
       console.log(`Item ${index} updated with multiple fields, new product: ${newItems[index].productName}`);
+      console.log("All items after update:", newItems.map(item => item.productName));
       return newItems;
     });
   }, []);

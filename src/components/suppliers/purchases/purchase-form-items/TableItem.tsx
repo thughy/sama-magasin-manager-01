@@ -17,7 +17,7 @@ interface TableItemProps {
 export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItemProps) => {
   // Add effect to log when item changes
   useEffect(() => {
-    console.log(`TableItem at index ${index} rendered with product: ${item.productName || "empty"}`);
+    console.log(`TableItem at index ${index} rendered with:`, item);
   }, [item, index]);
   
   // Calculate subtotals
@@ -25,7 +25,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
   const sellSubtotal = (item.quantity || 0) * (item.sellPrice || 0);
   
   return (
-    <TableRow>
+    <TableRow data-testid={`item-row-${index}`}>
       <TableCell data-testid={`product-name-${index}`}>{item.productName || "—"}</TableCell>
       <TableCell>
         <Input
@@ -39,10 +39,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
       <TableCell>
         <DepotSelector
           value={item.depot || "Principal"}
-          onChange={(value) => {
-            console.log(`Updating depot for item ${index} to:`, value);
-            onUpdateItem(index, 'depot', value);
-          }}
+          onChange={(value) => onUpdateItem(index, 'depot', value)}
           className="w-full"
         />
       </TableCell>
