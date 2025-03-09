@@ -6,6 +6,8 @@ import { usePurchaseFormDialog } from "@/hooks/purchase-form/usePurchaseFormDial
 import { PurchaseFormContent } from "./purchase-form/PurchaseFormContent";
 import { PrintConfirmationDialog } from "./PrintConfirmationDialog";
 import { X } from "lucide-react";
+import { PrintablePurchase } from "./PrintablePurchase";
+import { usePurchasePrinting } from "@/hooks/purchase-form/usePurchasePrinting";
 
 interface PurchaseFormProps {
   isOpen: boolean;
@@ -21,7 +23,7 @@ export const PurchaseForm = ({
   onSave
 }: PurchaseFormProps) => {
   const {
-    printRef,
+    printRef: depotPrintRef,
     supplierFocusRef,
     formData,
     selectedSupplier,
@@ -46,6 +48,13 @@ export const PurchaseForm = ({
     onClose,
     initialPurchase,
     onSave
+  });
+
+  // Add purchase printing functionality
+  const { printRef: purchasePrintRef, handlePrint: handlePrintPurchase } = usePurchasePrinting({
+    formData,
+    purchaseItems,
+    paymentMethods
   });
 
   if (!isOpen) return null;
@@ -83,10 +92,18 @@ export const PurchaseForm = ({
           removePaymentMethod={removePaymentMethod}
           updatePaymentMethod={updatePaymentMethod}
           printDepotEntry={printDepotEntry}
+          onPrintPurchase={handlePrintPurchase}
         />
         
+        {/* Hidden print components */}
         <div style={{ display: 'none' }}>
-          <div ref={printRef}></div>
+          <div ref={depotPrintRef}></div>
+          <PrintablePurchase 
+            ref={purchasePrintRef}
+            purchase={formData}
+            items={purchaseItems}
+            paymentMethods={paymentMethods}
+          />
         </div>
 
         <PrintConfirmationDialog {...printConfirmationProps} />

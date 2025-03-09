@@ -7,6 +7,9 @@ import { PurchaseFormItems } from "../purchase-form-items";
 import { PaymentMethodsSection } from "../PaymentMethodsSection";
 import { DepotEntryPrintingSection } from "../DepotEntryPrintingSection";
 import { PurchaseFormFooter } from "../PurchaseFormFooter";
+import { PurchaseFormSummary } from "../PurchaseFormSummary";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
 
 interface PurchaseFormContentProps {
   formData: any;
@@ -29,6 +32,7 @@ interface PurchaseFormContentProps {
   removePaymentMethod: (id: string) => void;
   updatePaymentMethod: (id: string, field: keyof PaymentMethod, value: any) => void;
   printDepotEntry: (depot: string) => void;
+  onPrintPurchase?: () => void;
 }
 
 export const PurchaseFormContent: React.FC<PurchaseFormContentProps> = ({
@@ -51,7 +55,8 @@ export const PurchaseFormContent: React.FC<PurchaseFormContentProps> = ({
   addPaymentMethod,
   removePaymentMethod,
   updatePaymentMethod,
-  printDepotEntry
+  printDepotEntry,
+  onPrintPurchase
 }) => {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
@@ -65,6 +70,22 @@ export const PurchaseFormContent: React.FC<PurchaseFormContentProps> = ({
         onSupplierChange={setSelectedSupplier}
         supplierFocusRef={supplierFocusRef}
       />
+
+      {/* Purchase Summary Information */}
+      <div className="flex justify-between items-center">
+        <PurchaseFormSummary formData={formData} />
+        {onPrintPurchase && (
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onPrintPurchase}
+            className="flex items-center gap-2"
+          >
+            <Printer className="h-4 w-4" />
+            Imprimer la facture
+          </Button>
+        )}
+      </div>
 
       {/* Purchase Items Section */}
       <PurchaseFormItems 

@@ -19,12 +19,16 @@ export const PurchaseFormFooter = ({
   onCancel,
   onSubmit
 }: PurchaseFormFooterProps) => {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' }).format(amount);
+  };
+
   return (
     <div className="flex justify-between items-center pt-4 border-t">
       <div className="space-y-1">
-        <div className="text-sm">Total: <span className="font-bold">{formData.totalAmount.toLocaleString()} FCFA</span></div>
-        <div className="text-sm">Payé: <span className="font-bold">{formData.totalPaid.toLocaleString()} FCFA</span></div>
-        <div className="text-sm">Solde: <span className="font-bold">{formData.balance.toLocaleString()} FCFA</span></div>
+        <div className="text-sm">Total facture: <span className="font-bold">{formatCurrency(formData.totalAmount)}</span></div>
+        <div className="text-sm">Total versé: <span className="font-bold">{formatCurrency(formData.totalPaid)}</span></div>
+        <div className="text-sm">Solde restant: <span className="font-bold">{formatCurrency(formData.balance)}</span></div>
       </div>
       
       <div className="flex gap-2">

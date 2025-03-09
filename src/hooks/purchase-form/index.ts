@@ -12,6 +12,7 @@ import { useInventoryUpdater } from './useInventoryUpdater';
 import { useDepotEntryPrinting } from './useDepotEntryPrinting';
 import { useFormReset } from './useFormReset';
 import { usePurchaseFormDialog } from './usePurchaseFormDialog';
+import { usePurchasePrinting } from './usePurchasePrinting';
 
 export { 
   usePurchaseForm,
@@ -27,5 +28,6 @@ export {
   useDepotEntryPrinting,
   useFormReset,
   usePurchaseFormDialog,
-  useFormSubmitHandler
+  useFormSubmitHandler,
+  usePurchasePrinting
 };
