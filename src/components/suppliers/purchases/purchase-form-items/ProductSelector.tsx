@@ -21,23 +21,21 @@ export const ProductSelector = ({ items, onSelectProduct, onAddItem }: ProductSe
     console.log("ProductSelector handleSelectProduct called with product:", product);
     
     // Find an empty item slot or create a new one
-    const emptyItemIndex = items.findIndex(item => !item.productName || item.productName === '');
+    const emptyItemIndex = items.findIndex(item => !item.productId || item.productId === '');
     
     if (emptyItemIndex >= 0) {
       console.log(`Using existing empty item at index ${emptyItemIndex} for product ${product.name}`);
       onSelectProduct(product, emptyItemIndex);
     } else {
-      // Add a new item first and then update it in the next render cycle
       console.log(`No empty item found, adding new item for product ${product.name}`);
       onAddItem();
       
-      // Use setTimeout to ensure the new item is added before we try to update it
+      // Use setTimeout with a longer delay to ensure the new item is added before we try to update it
       setTimeout(() => {
-        // The new item should be at the end of the array
         const newIndex = items.length;
         console.log(`Setting product on new item at index ${newIndex}, current items length: ${items.length}`);
         onSelectProduct(product, newIndex);
-      }, 0);
+      }, 100);
     }
   };
 

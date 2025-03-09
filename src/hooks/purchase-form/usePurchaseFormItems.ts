@@ -3,27 +3,20 @@ import { useState, useEffect, useCallback } from 'react';
 import { PurchaseItem } from '@/types/purchase';
 
 export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
-  // Initialize state with a function to avoid reference issues
+  // Initialize with a proper deep copy of initial items
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>(() => {
-    console.log("Initializing usePurchaseFormItems with:", initialItems);
+    console.log("Initializing usePurchaseFormItems with:", initialItems.length, "items");
     
     // Create a deep copy to avoid reference issues
     return initialItems.length > 0 
-      ? initialItems.map(item => ({
-          productId: item.productId,
-          productName: item.productName,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          sellPrice: item.sellPrice || 0,
-          depot: item.depot || 'Principal'
-        }))
+      ? JSON.parse(JSON.stringify(initialItems))
       : [];
   });
 
   // Log when purchaseItems changes
   useEffect(() => {
     console.log("usePurchaseFormItems - Current purchase items count:", purchaseItems.length);
-    console.log("usePurchaseFormItems - Current purchase items:", JSON.stringify(purchaseItems, null, 2));
+    console.log("usePurchaseFormItems - Items:", purchaseItems.map(item => `${item.productId}: ${item.productName}`));
   }, [purchaseItems]);
 
   // Initialize with at least one empty item if none provided
@@ -43,7 +36,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       quantity: 1,
       unitPrice: 0,
       sellPrice: 0,
-      depot: 'Principal' // Initialize with a default value
+      depot: 'Principal'
     };
     
     setPurchaseItems(prevItems => {
@@ -76,7 +69,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       const newItems = [...prevItems];
       newItems[index] = { ...newItems[index], [field]: value };
       
-      console.log(`Item ${index} updated, field: ${field}, new value:`, newItems[index][field]);
+      console.log(`Item ${index} updated, new value: ${field}=${newItems[index][field]}`);
       return newItems;
     });
   }, []);
@@ -96,7 +89,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       const newItems = [...prevItems];
       newItems[index] = { ...newItems[index], ...fieldsToUpdate };
       
-      console.log(`Item ${index} updated with multiple fields, new value:`, newItems[index]);
+      console.log(`Item ${index} updated with multiple fields, new product: ${newItems[index].productName}`);
       return newItems;
     });
   }, []);

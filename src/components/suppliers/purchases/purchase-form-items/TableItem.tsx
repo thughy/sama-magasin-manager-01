@@ -17,7 +17,7 @@ interface TableItemProps {
 export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItemProps) => {
   // Add effect to log when item changes
   useEffect(() => {
-    console.log(`TableItem at index ${index} rendered with:`, item);
+    console.log(`TableItem at index ${index} rendered with product: ${item.productName || "empty"}`);
   }, [item, index]);
   
   // Calculate subtotals

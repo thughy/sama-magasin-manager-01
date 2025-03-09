@@ -15,24 +15,19 @@ export const useInitialItems = ({
 }: UseInitialItemsProps) => {
   // Load initial purchase items and payment methods if editing
   useEffect(() => {
-    console.log("useInitialItems - initialPurchase:", initialPurchase);
+    console.log("useInitialItems - initialPurchase:", initialPurchase?.id);
     
     if (initialPurchase) {
       // Load purchase items if they exist
       if (initialPurchase.items && initialPurchase.items.length > 0) {
         console.log("Setting purchase items from initialPurchase.items, count:", initialPurchase.items.length);
         
-        // Create a fresh array with new object references to avoid reference issues
-        const itemsCopy = initialPurchase.items.map(item => ({
-          productId: item.productId || '',
-          productName: item.productName || '',
-          quantity: item.quantity || 1,
-          unitPrice: item.unitPrice || 0,
-          sellPrice: item.sellPrice || 0,
-          depot: item.depot || 'Principal'
-        }));
+        // Create a completely fresh copy using JSON to avoid reference issues
+        const itemsCopy = JSON.parse(JSON.stringify(initialPurchase.items));
         
-        console.log("Mapped items copy for setting state:", itemsCopy.length, itemsCopy);
+        console.log("Items to set:", itemsCopy.map((item: PurchaseItem) => 
+          `${item.productId}: ${item.productName}`).join(', '));
+          
         setPurchaseItems(itemsCopy);
       } else {
         // We'll need to reconstruct purchaseItems from initialPurchase single item data
@@ -43,19 +38,14 @@ export const useInitialItems = ({
           quantity: initialPurchase.quantity || 1,
           unitPrice: initialPurchase.unitPrice || 0,
           sellPrice: 0,
-          depot: 'Principal' // Default depot for existing items
+          depot: 'Principal'
         }]);
       }
 
       // Set payment methods if they exist
       if (initialPurchase.paymentMethods && initialPurchase.paymentMethods.length > 0) {
         // Create a fresh array with new object references
-        const methodsCopy = initialPurchase.paymentMethods.map(method => ({
-          id: method.id,
-          method: method.method,
-          amount: method.amount
-        }));
-        
+        const methodsCopy = JSON.parse(JSON.stringify(initialPurchase.paymentMethods));
         setPaymentMethods(methodsCopy);
       }
     }

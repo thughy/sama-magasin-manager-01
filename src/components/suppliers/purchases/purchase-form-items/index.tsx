@@ -24,12 +24,12 @@ export const PurchaseFormItems = ({
   // Improved logging to track component state
   useEffect(() => {
     console.log("PurchaseFormItems component received items count:", items.length);
-    console.log("PurchaseFormItems items detail:", JSON.stringify(items, null, 2));
+    console.log("PurchaseFormItems items:", items.map(item => `${item.productId}: ${item.productName}`).join(', '));
   }, [items]);
 
   // A more robust product selection handler
   const handleSelectProduct = (product: Product, index: number) => {
-    console.log("Product selected in PurchaseFormItems:", product, "for index:", index);
+    console.log("Product selected in PurchaseFormItems:", product.name, "for index:", index);
     
     if (onUpdateItemFields) {
       // If the parent component provided the multi-field update function, use it

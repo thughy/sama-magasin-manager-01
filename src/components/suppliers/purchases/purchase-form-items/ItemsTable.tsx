@@ -26,10 +26,10 @@ export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProp
         {items.length === 0 ? (
           <TableEmptyState />
         ) : (
-          // Use unique keys based on index to ensure React renders each item correctly
+          // Use stable keys based on index only - avoid Date.now() which causes constant re-renders
           items.map((item, index) => (
             <TableItem
-              key={`item-${index}-${Date.now()}`}
+              key={`item-${index}`}
               item={item}
               index={index}
               onRemoveItem={onRemoveItem}
