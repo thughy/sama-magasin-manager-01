@@ -16,10 +16,7 @@ export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProp
   // Add more detailed logging to trace the items being rendered
   useEffect(() => {
     console.log("ItemsTable rendered with items count:", items.length);
-    if (items.length > 0) {
-      console.log("ItemsTable first few items:",
-        items.slice(0, 3).map((item, idx) => `${idx}: ${item.productName || "empty"}`).join(', '));
-    }
+    console.log("ItemsTable items:", JSON.stringify(items));
   }, [items]);
   
   return (
@@ -31,7 +28,7 @@ export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProp
         ) : (
           items.map((item, index) => (
             <TableItem
-              key={`item-${index}`}
+              key={`item-${index}-${item.productId || 'empty'}`}
               item={item}
               index={index}
               onRemoveItem={onRemoveItem}

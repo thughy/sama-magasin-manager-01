@@ -16,10 +16,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
   // Log when purchaseItems changes
   useEffect(() => {
     console.log("usePurchaseFormItems - Current purchase items count:", purchaseItems.length);
-    if (purchaseItems.length > 0) {
-      console.log("usePurchaseFormItems - First few items:", 
-        purchaseItems.slice(0, 3).map(item => `${item.productId}: ${item.productName}`));
-    }
+    console.log("usePurchaseFormItems - All items:", JSON.stringify(purchaseItems));
   }, [purchaseItems]);
 
   // Initialize with at least one empty item if none provided
@@ -44,7 +41,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
     
     setPurchaseItems(prevItems => {
       const newItems = [...prevItems, newItem];
-      console.log("Items after adding:", newItems.length);
+      console.log("Items after adding:", JSON.stringify(newItems));
       return newItems;
     });
   }, []);
@@ -53,7 +50,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
     console.log(`Removing purchase item at index ${index}`);
     setPurchaseItems(prevItems => {
       const newItems = prevItems.filter((_, i) => i !== index);
-      console.log(`Items after removing index ${index}:`, newItems.length);
+      console.log(`Items after removing index ${index}:`, JSON.stringify(newItems));
       return newItems;
     });
   }, []);
@@ -73,6 +70,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       newItems[index] = { ...newItems[index], [field]: value };
       
       console.log(`Item ${index} updated, new value: ${field}=${newItems[index][field]}`);
+      console.log("All items after update:", JSON.stringify(newItems));
       return newItems;
     });
   }, []);
@@ -92,8 +90,8 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       const newItems = [...prevItems];
       newItems[index] = { ...newItems[index], ...fieldsToUpdate };
       
-      console.log(`Item ${index} updated with multiple fields, new product: ${newItems[index].productName}`);
-      console.log("All items after update:", newItems.map(item => item.productName));
+      console.log(`Item ${index} updated with multiple fields: ${JSON.stringify(newItems[index])}`);
+      console.log("All items after update:", JSON.stringify(newItems));
       return newItems;
     });
   }, []);

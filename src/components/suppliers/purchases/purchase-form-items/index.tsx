@@ -24,7 +24,7 @@ export const PurchaseFormItems = ({
   // Improved logging to track component state
   useEffect(() => {
     console.log("PurchaseFormItems rendered with items count:", items.length);
-    console.log("PurchaseFormItems items details:", JSON.stringify(items, null, 2));
+    console.log("PurchaseFormItems items:", JSON.stringify(items));
   }, [items]);
 
   // A more robust product selection handler that uses onUpdateItemFields when available
@@ -51,7 +51,7 @@ export const PurchaseFormItems = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="purchase-form-items">
       <ItemsHeader onAddItem={onAddItem} />
       
       <ProductSelector 

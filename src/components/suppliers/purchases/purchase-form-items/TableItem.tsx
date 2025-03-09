@@ -17,7 +17,7 @@ interface TableItemProps {
 export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItemProps) => {
   // Add effect to log when item changes
   useEffect(() => {
-    console.log(`TableItem at index ${index} rendered with:`, item);
+    console.log(`TableItem at index ${index} rendered with:`, JSON.stringify(item));
   }, [item, index]);
   
   // Calculate subtotals
@@ -26,7 +26,9 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
   
   return (
     <TableRow data-testid={`item-row-${index}`}>
-      <TableCell data-testid={`product-name-${index}`}>{item.productName || "—"}</TableCell>
+      <TableCell data-testid={`product-name-${index}`}>
+        {item.productName || "—"}
+      </TableCell>
       <TableCell>
         <Input
           type="number"
@@ -34,6 +36,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           value={item.quantity || 1}
           onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
           className="w-16"
+          data-testid={`quantity-input-${index}`}
         />
       </TableCell>
       <TableCell>
@@ -41,6 +44,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           value={item.depot || "Principal"}
           onChange={(value) => onUpdateItem(index, 'depot', value)}
           className="w-full"
+          data-testid={`depot-selector-${index}`}
         />
       </TableCell>
       <TableCell>
@@ -50,6 +54,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           value={item.unitPrice || 0}
           onChange={(e) => onUpdateItem(index, 'unitPrice', Number(e.target.value))}
           className="w-24"
+          data-testid={`unit-price-input-${index}`}
         />
       </TableCell>
       <TableCell>
@@ -59,6 +64,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           value={item.sellPrice || 0}
           onChange={(e) => onUpdateItem(index, 'sellPrice', Number(e.target.value))}
           className="w-24"
+          data-testid={`sell-price-input-${index}`}
         />
       </TableCell>
       <TableCell className="font-medium">
@@ -73,6 +79,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           variant="ghost"
           size="icon"
           onClick={() => onRemoveItem(index)}
+          data-testid={`remove-item-${index}`}
         >
           <Trash className="h-4 w-4" />
         </Button>

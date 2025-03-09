@@ -13,31 +13,24 @@ interface ProductSelectorProps {
 export const ProductSelector = ({ items, onSelectProduct, onAddItem }: ProductSelectorProps) => {
   // Add effect to log items when they change
   useEffect(() => {
-    console.log("ProductSelector received items:", items.length);
+    console.log("ProductSelector received items:", JSON.stringify(items));
   }, [items]);
   
   // Create a memoized product selection handler
   const handleSelectProduct = useCallback((product: Product) => {
     console.log("ProductSelector handleSelectProduct called with product:", product);
     
-    // Find an empty item slot or create a new one
-    const emptyItemIndex = items.findIndex(item => !item.productId || item.productId === '');
+    // First add a new item, then in the next render cycle update it
+    onAddItem();
     
-    if (emptyItemIndex >= 0) {
-      console.log(`Using existing empty item at index ${emptyItemIndex} for product ${product.name}`);
-      onSelectProduct(product, emptyItemIndex);
-    } else {
-      console.log(`No empty item found, adding new item for product ${product.name}`);
-      // Add the item first, then wait for the state to update
-      onAddItem();
-      
-      // Use setTimeout to ensure the new item is added before updating it
-      setTimeout(() => {
-        const newIndex = items.length;
-        console.log(`Setting product on new item at index ${newIndex}`);
-        onSelectProduct(product, newIndex);
-      }, 200); // Increased timeout for better reliability
-    }
+    // Use setTimeout to ensure the new item is added before setting the product
+    setTimeout(() => {
+      // Get the latest empty item
+      const newIndex = items.length;
+      console.log(`Setting product on new item at index ${newIndex}`);
+      onSelectProduct(product, newIndex);
+    }, 100);
+    
   }, [items, onAddItem, onSelectProduct]);
 
   return (
