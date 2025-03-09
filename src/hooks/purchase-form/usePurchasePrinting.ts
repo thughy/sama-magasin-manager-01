@@ -17,11 +17,12 @@ export const usePurchasePrinting = ({
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
     documentTitle: `Achat_${formData.reference}`,
     onAfterPrint: () => {
       console.log("Print completed successfully");
-    }
+    },
+    // The contentRef option is now used instead of content
+    contentRef: printRef
   });
 
   return {
