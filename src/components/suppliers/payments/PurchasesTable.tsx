@@ -23,6 +23,7 @@ export const PurchasesTable: React.FC<PurchasesTableProps> = ({
     from: Date | undefined;
     to: Date | undefined;
   }>({ from: undefined, to: undefined });
+  const [referenceFilter, setReferenceFilter] = useState<string>("");
   
   const formatDate = (dateString: string) => {
     try {
@@ -71,7 +72,7 @@ export const PurchasesTable: React.FC<PurchasesTableProps> = ({
     return true;
   };
   
-  // Filtrer les factures en fonction du statut et de la date sélectionnés
+  // Filtrer les factures en fonction du statut, de la date et de la référence
   const filteredPurchases = purchases.filter(purchase => {
     // Filtrer par statut
     const statusMatch = statusFilter === "all" || purchase.status === statusFilter;
@@ -79,7 +80,11 @@ export const PurchasesTable: React.FC<PurchasesTableProps> = ({
     // Filtrer par date
     const dateMatch = isDateInFilter(purchase.purchaseDate);
     
-    return statusMatch && dateMatch;
+    // Filtrer par référence
+    const referenceMatch = referenceFilter === "" || 
+      purchase.reference.toLowerCase().includes(referenceFilter.toLowerCase());
+    
+    return statusMatch && dateMatch && referenceMatch;
   });
   
   // Réinitialiser tous les filtres
@@ -87,6 +92,7 @@ export const PurchasesTable: React.FC<PurchasesTableProps> = ({
     setStatusFilter("all");
     setDateFilter(undefined);
     setDateRangeFilter({ from: undefined, to: undefined });
+    setReferenceFilter("");
   };
   
   // Réinitialiser uniquement les filtres de date
@@ -96,7 +102,11 @@ export const PurchasesTable: React.FC<PurchasesTableProps> = ({
   };
   
   // Vérifier si des filtres sont actifs
-  const hasActiveFilters = statusFilter !== "all" || dateFilter || dateRangeFilter.from || dateRangeFilter.to;
+  const hasActiveFilters = statusFilter !== "all" || 
+    !!dateFilter || 
+    !!dateRangeFilter.from || 
+    !!dateRangeFilter.to || 
+    referenceFilter !== "";
   
   return (
     <div>
@@ -107,6 +117,8 @@ export const PurchasesTable: React.FC<PurchasesTableProps> = ({
         setDateFilter={setDateFilter}
         dateRangeFilter={dateRangeFilter}
         setDateRangeFilter={setDateRangeFilter}
+        referenceFilter={referenceFilter}
+        setReferenceFilter={setReferenceFilter}
         resetFilters={resetFilters}
         resetDateFilters={resetDateFilters}
         hasActiveFilters={hasActiveFilters}

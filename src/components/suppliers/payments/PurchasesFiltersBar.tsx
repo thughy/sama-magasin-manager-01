@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { PurchasesStatusFilter } from "./PurchasesStatusFilter";
 import { PurchasesDateFilters } from "./PurchasesDateFilters";
+import { PurchasesReferenceFilter } from "./PurchasesReferenceFilter";
 
 interface PurchasesFiltersBarProps {
   statusFilter: "all" | "payée" | "impayée";
@@ -15,6 +16,8 @@ interface PurchasesFiltersBarProps {
     to: Date | undefined;
   };
   setDateRangeFilter: (range: { from: Date | undefined; to: Date | undefined }) => void;
+  referenceFilter: string;
+  setReferenceFilter: (reference: string) => void;
   resetFilters: () => void;
   resetDateFilters: () => void;
   hasActiveFilters: boolean;
@@ -27,6 +30,8 @@ export const PurchasesFiltersBar: React.FC<PurchasesFiltersBarProps> = ({
   setDateFilter,
   dateRangeFilter,
   setDateRangeFilter,
+  referenceFilter,
+  setReferenceFilter,
   resetFilters,
   resetDateFilters,
   hasActiveFilters,
@@ -44,6 +49,11 @@ export const PurchasesFiltersBar: React.FC<PurchasesFiltersBarProps> = ({
         dateRangeFilter={dateRangeFilter}
         setDateRangeFilter={setDateRangeFilter}
         resetDateFilters={resetDateFilters}
+      />
+      
+      <PurchasesReferenceFilter
+        referenceFilter={referenceFilter}
+        setReferenceFilter={setReferenceFilter}
       />
       
       {/* Bouton pour réinitialiser tous les filtres */}
