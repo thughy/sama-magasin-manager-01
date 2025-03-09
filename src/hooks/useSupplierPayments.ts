@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Purchase } from "@/types/purchase";
 import { Supplier } from "@/data/suppliersData";
 import { suppliersData } from "@/data/suppliersData";
+import { purchasesData } from "@/data/purchasesData";
 import { useToast } from "./use-toast";
 
 export const useSupplierPayments = () => {
@@ -18,7 +19,13 @@ export const useSupplierPayments = () => {
   // Load suppliers on mount
   useEffect(() => {
     console.log("Loading suppliers data:", suppliersData);
+    // Make sure we always have suppliers data to work with
     setSuppliers(suppliersData || []);
+
+    // Initialize localStorage with sample purchase data if needed
+    if (!localStorage.getItem("purchases")) {
+      localStorage.setItem("purchases", JSON.stringify(purchasesData));
+    }
   }, []);
 
   // Load purchases for selected supplier
@@ -89,13 +96,12 @@ export const useSupplierPayments = () => {
       const updatedSuppliers = suppliers.map(supplier => {
         if (supplier.id === selectedSupplier.id) {
           const newBalance = calculateSupplierBalance(supplier.id, updatedPurchases);
-          const newStatus = newBalance <= 0 ? 'payée' as const : 'impayée' as const;
           
           return {
             ...supplier,
             balance: newBalance,
             totalPaid: supplier.totalPaid + paymentAmount,
-            status: newStatus
+            status: newBalance <= 0 ? 'payée' as const : 'impayée' as const
           };
         }
         return supplier;

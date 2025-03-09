@@ -24,11 +24,14 @@ interface SupplierSelectorProps {
 }
 
 export function SupplierSelector({ 
-  suppliers = [], // Provide default empty array to prevent undefined errors
+  suppliers = [], 
   selectedSupplier, 
   onSupplierSelect 
 }: SupplierSelectorProps) {
   const [open, setOpen] = React.useState(false);
+
+  // Add safety check to ensure suppliers is always an array
+  const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -48,7 +51,7 @@ export function SupplierSelector({
           <CommandInput placeholder="Rechercher un fournisseur..." />
           <CommandEmpty>Aucun fournisseur trouvé.</CommandEmpty>
           <CommandGroup>
-            {suppliers.map((supplier) => (
+            {safeSuppliers.map((supplier) => (
               <CommandItem
                 key={supplier.id}
                 value={supplier.name}

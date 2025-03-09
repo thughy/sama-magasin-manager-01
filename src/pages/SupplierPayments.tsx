@@ -35,6 +35,9 @@ const SupplierPayments = () => {
     console.log("Selected supplier changed:", selectedSupplier);
   }, [selectedSupplier]);
 
+  // Make sure suppliers is always an array
+  const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
@@ -54,7 +57,7 @@ const SupplierPayments = () => {
           </CardHeader>
           <CardContent>
             <SupplierSelector 
-              suppliers={suppliers || []}
+              suppliers={safeSuppliers}
               selectedSupplier={selectedSupplier}
               onSupplierSelect={handleSupplierSelect}
             />
