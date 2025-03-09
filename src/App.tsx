@@ -12,6 +12,7 @@ import Cashier from "./pages/Cashier";
 import Suppliers from "./pages/Suppliers";
 import PurchaseOrders from "./pages/PurchaseOrders";
 import Purchases from "./pages/Purchases";
+import SupplierPayments from "./pages/SupplierPayments";
 import Sales from "./pages/Sales";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/suppliers/purchase-orders" element={<PurchaseOrders />} />
           <Route path="/suppliers/purchases" element={<Purchases />} />
+          <Route path="/suppliers/payments" element={<SupplierPayments />} />
           <Route path="/sales" element={<Sales />} />
           <Route path="/depots" element={<Depots />} />
           <Route path="/depots/release-orders" element={<DepotReleaseOrders />} />
