@@ -7,6 +7,7 @@ import { PurchaseList } from "@/components/suppliers/payments/PurchaseList";
 import { PaymentDialog } from "@/components/suppliers/payments/PaymentDialog";
 import { useSupplierPayments } from "@/hooks/useSupplierPayments";
 import { useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SupplierPayments = () => {
   const {
@@ -22,7 +23,8 @@ const SupplierPayments = () => {
     setPaymentMethod,
     handleSupplierSelect,
     handlePaymentClick,
-    handlePaymentSubmit
+    handlePaymentSubmit,
+    isLoading
   } = useSupplierPayments();
 
   // Add logging to debug the component
@@ -56,11 +58,17 @@ const SupplierPayments = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SupplierSelector 
-              suppliers={safeSuppliers}
-              selectedSupplier={selectedSupplier}
-              onSupplierSelect={handleSupplierSelect}
-            />
+            {isLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-10 w-full" />
+              </div>
+            ) : (
+              <SupplierSelector 
+                suppliers={safeSuppliers}
+                selectedSupplier={selectedSupplier}
+                onSupplierSelect={handleSupplierSelect}
+              />
+            )}
           </CardContent>
         </Card>
 

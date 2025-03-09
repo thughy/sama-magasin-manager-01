@@ -32,6 +32,8 @@ export function SupplierSelector({
 
   // Add safety check to ensure suppliers is always an array
   const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
+  
+  console.log("Rendering SupplierSelector with suppliers:", safeSuppliers);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -51,7 +53,7 @@ export function SupplierSelector({
           <CommandInput placeholder="Rechercher un fournisseur..." />
           <CommandEmpty>Aucun fournisseur trouvé.</CommandEmpty>
           <CommandGroup>
-            {safeSuppliers.map((supplier) => (
+            {safeSuppliers.length > 0 ? safeSuppliers.map((supplier) => (
               <CommandItem
                 key={supplier.id}
                 value={supplier.name}
@@ -70,7 +72,9 @@ export function SupplierSelector({
                 />
                 {supplier.name}
               </CommandItem>
-            ))}
+            )) : (
+              <CommandItem disabled>Chargement des fournisseurs...</CommandItem>
+            )}
           </CommandGroup>
         </Command>
       </PopoverContent>

@@ -15,16 +15,29 @@ export const useSupplierPayments = () => {
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'wave' | 'orangeMoney' | 'cheque' | 'bank'>('cash');
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load suppliers on mount
   useEffect(() => {
-    console.log("Loading suppliers data:", suppliersData);
-    // Make sure we always have suppliers data to work with
-    setSuppliers(suppliersData || []);
+    try {
+      console.log("Loading suppliers data:", suppliersData);
+      // Make sure we always have suppliers data to work with
+      if (Array.isArray(suppliersData) && suppliersData.length > 0) {
+        setSuppliers(suppliersData);
+      } else {
+        console.error("Suppliers data is empty or not an array:", suppliersData);
+        setSuppliers([]);
+      }
 
-    // Initialize localStorage with sample purchase data if needed
-    if (!localStorage.getItem("purchases")) {
-      localStorage.setItem("purchases", JSON.stringify(purchasesData));
+      // Initialize localStorage with sample purchase data if needed
+      if (!localStorage.getItem("purchases")) {
+        localStorage.setItem("purchases", JSON.stringify(purchasesData));
+      }
+    } catch (error) {
+      console.error("Error loading suppliers:", error);
+      setSuppliers([]);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -77,13 +90,12 @@ export const useSupplierPayments = () => {
         if (purchase.id === selectedPurchase.id) {
           const newTotalPaid = purchase.totalPaid + paymentAmount;
           const newBalance = purchase.totalAmount - newTotalPaid;
-          const newStatus = newBalance <= 0 ? 'payée' as const : 'impayée' as const;
           
           return {
             ...purchase,
             totalPaid: newTotalPaid,
             balance: newBalance,
-            status: newStatus
+            status: newBalance <= 0 ? 'payée' as const : 'impayée' as const
           };
         }
         return purchase;
@@ -155,6 +167,7 @@ export const useSupplierPayments = () => {
     setPaymentMethod,
     handleSupplierSelect,
     handlePaymentClick,
-    handlePaymentSubmit
+    handlePaymentSubmit,
+    isLoading
   };
 };
