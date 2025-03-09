@@ -21,7 +21,10 @@ export const useInitialItems = ({
       // Load purchase items if they exist
       if (initialPurchase.items && initialPurchase.items.length > 0) {
         console.log("Setting purchase items from initialPurchase.items:", initialPurchase.items);
-        setPurchaseItems([...initialPurchase.items]); // Create a new array to ensure state update
+        // Create a deep copy to ensure there are no reference issues
+        const itemsCopy = JSON.parse(JSON.stringify(initialPurchase.items));
+        console.log("Deep copy of items:", itemsCopy);
+        setPurchaseItems(itemsCopy);
       } else {
         // We'll need to reconstruct purchaseItems from initialPurchase
         console.log("Reconstructing purchase items from initialPurchase single item");
@@ -37,7 +40,9 @@ export const useInitialItems = ({
 
       // Set payment methods if they exist
       if (initialPurchase.paymentMethods && initialPurchase.paymentMethods.length > 0) {
-        setPaymentMethods([...initialPurchase.paymentMethods]); // Create a new array to ensure state update
+        // Create a deep copy to ensure there are no reference issues
+        const methodsCopy = JSON.parse(JSON.stringify(initialPurchase.paymentMethods));
+        setPaymentMethods(methodsCopy);
       }
     }
   }, [initialPurchase, setPurchaseItems, setPaymentMethods]);

@@ -11,22 +11,27 @@ interface ProductSelectorProps {
 }
 
 export const ProductSelector = ({ items, onSelectProduct, onAddItem }: ProductSelectorProps) => {
+  console.log("ProductSelector received items:", items.length);
+  
   const handleSelectProduct = (product: Product) => {
-    // If there's an empty item, use it, otherwise add a new one
+    // Find an empty item slot or create a new one
     const emptyItemIndex = items.findIndex(item => !item.productName);
+    
     if (emptyItemIndex >= 0) {
+      console.log(`Using existing empty item at index ${emptyItemIndex} for product ${product.name}`);
       onSelectProduct(product, emptyItemIndex);
     } else {
-      // First add the item, then wait for the state to update before setting the product
+      // Add a new item first, then update it
+      console.log(`Adding new item for product ${product.name}`);
       onAddItem();
       
-      // Use a longer timeout to ensure the new item is properly added to the state
+      // Use setTimeout to ensure state updates have completed
       setTimeout(() => {
-        // Make sure we're updating the correct index (which should be the last item)
+        // The new item will be at the end of the array
         const newIndex = items.length;
-        console.log("Adding to new item at index:", newIndex);
+        console.log(`Setting product on new item at index ${newIndex}`);
         onSelectProduct(product, newIndex);
-      }, 100);
+      }, 150); // Increased timeout for more reliability
     }
   };
 

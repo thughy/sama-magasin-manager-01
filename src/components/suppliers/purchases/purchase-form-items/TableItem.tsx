@@ -15,6 +15,8 @@ interface TableItemProps {
 }
 
 export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItemProps) => {
+  console.log(`Rendering TableItem at index ${index} with item:`, item);
+  
   return (
     <TableRow>
       <TableCell data-testid={`product-name-${index}`}>{item.productName || "—"}</TableCell>
@@ -24,7 +26,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="1"
           value={item.quantity}
           onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
-          className="w-16" // Keep existing width
+          className="w-16"
         />
       </TableCell>
       <TableCell>
@@ -34,7 +36,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
             console.log(`Updating depot for item ${index} to:`, value);
             onUpdateItem(index, 'depot', value);
           }}
-          className="w-full" // Keep existing width class
+          className="w-full"
         />
       </TableCell>
       <TableCell>
@@ -43,7 +45,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="0"
           value={item.unitPrice}
           onChange={(e) => onUpdateItem(index, 'unitPrice', Number(e.target.value))}
-          className="w-24" // Increased width from w-20 to w-24
+          className="w-24"
         />
       </TableCell>
       <TableCell>
@@ -52,7 +54,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
           min="0"
           value={item.sellPrice || 0}
           onChange={(e) => onUpdateItem(index, 'sellPrice', Number(e.target.value))}
-          className="w-24" // Increased width from w-20 to w-24
+          className="w-24"
         />
       </TableCell>
       <TableCell className="font-medium">

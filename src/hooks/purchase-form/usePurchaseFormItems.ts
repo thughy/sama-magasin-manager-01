@@ -3,7 +3,11 @@ import { useState, useEffect } from 'react';
 import { PurchaseItem } from '@/types/purchase';
 
 export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
-  const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>(initialItems.length > 0 ? [...initialItems] : []);
+  // Create a deep copy of initialItems to prevent reference issues
+  const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>(() => {
+    console.log("Initializing usePurchaseFormItems with:", initialItems);
+    return initialItems.length > 0 ? JSON.parse(JSON.stringify(initialItems)) : [];
+  });
 
   // Log when purchaseItems changes
   useEffect(() => {
@@ -30,8 +34,11 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       depot: '' // Initialize with an empty value
     };
     
-    setPurchaseItems(items => [...items, newItem]);
-    console.log("New item should be added now");
+    setPurchaseItems(items => {
+      const newItems = [...items, newItem];
+      console.log("Items after adding:", newItems.length);
+      return newItems;
+    });
   };
 
   const removePurchaseItem = (index: number) => {
