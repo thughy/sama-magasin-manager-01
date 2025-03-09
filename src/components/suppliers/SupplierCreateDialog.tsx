@@ -30,9 +30,19 @@ export const SupplierCreateDialog = ({
     status: "impayée" as const
   });
 
+  const [errors, setErrors] = useState<{
+    name?: string;
+    phone?: string;
+  }>({});
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewSupplier(prev => ({ ...prev, [name]: value }));
+    
+    // Effacer les erreurs lors de la saisie
+    if (errors[name as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [name]: undefined }));
+    }
   };
 
   const resetForm = () => {
@@ -46,10 +56,26 @@ export const SupplierCreateDialog = ({
       totalPaid: 0,
       status: "impayée"
     });
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors: {name?: string; phone?: string} = {};
+    
+    if (!newSupplier.name || newSupplier.name.trim() === "") {
+      newErrors.name = "Le nom est obligatoire";
+    }
+    
+    if (!newSupplier.phone || newSupplier.phone.trim() === "") {
+      newErrors.phone = "Le téléphone est obligatoire";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
-    if (!newSupplier.name) return;
+    if (!validateForm()) return;
     
     // Create a new supplier with minimal fields and default values for the rest
     const createdSupplier: Supplier = {
@@ -86,14 +112,19 @@ export const SupplierCreateDialog = ({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">Nom</Label>
-            <Input
-              id="name"
-              name="name"
-              value={newSupplier.name}
-              onChange={handleInputChange}
-              className="col-span-3"
-            />
+            <Label htmlFor="name" className="text-right">Nom *</Label>
+            <div className="col-span-3">
+              <Input
+                id="name"
+                name="name"
+                value={newSupplier.name}
+                onChange={handleInputChange}
+                className={errors.name ? "border-red-500" : ""}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="address" className="text-right">Adresse</Label>
@@ -106,14 +137,19 @@ export const SupplierCreateDialog = ({
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="phone" className="text-right">Téléphone</Label>
-            <Input
-              id="phone"
-              name="phone"
-              value={newSupplier.phone}
-              onChange={handleInputChange}
-              className="col-span-3"
-            />
+            <Label htmlFor="phone" className="text-right">Téléphone *</Label>
+            <div className="col-span-3">
+              <Input
+                id="phone"
+                name="phone"
+                value={newSupplier.phone}
+                onChange={handleInputChange}
+                className={errors.phone ? "border-red-500" : ""}
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="email" className="text-right">Email</Label>
