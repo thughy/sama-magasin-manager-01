@@ -3,7 +3,7 @@ import React, { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Clock, Edit, Printer, Wallet } from "lucide-react";
+import { Building, Clock, Edit, FileText, Printer, Wallet } from "lucide-react";
 import { Purchase } from "@/types/purchase";
 import { Badge } from "@/components/ui/badge";
 import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
@@ -84,11 +84,26 @@ export function PurchaseList({ purchases = [], onPaymentClick, onEditClick, onVi
         </CardHeader>
         <CardContent>
           <div ref={printRef}>
-            <div className="print-only mb-6 border-b pb-4">
-              <h1 className="text-2xl font-bold mb-2">ENTREPRISE XYZ</h1>
-              <p className="text-sm">123 Rue du Commerce, Dakar, Sénégal</p>
-              <p className="text-sm">Tel: +221 33 123 45 67 | Email: contact@entreprise-xyz.sn</p>
-              <h2 className="text-xl font-semibold mt-4">Factures du fournisseur</h2>
+            <div className="print-only mb-8">
+              <div className="text-center border-b pb-6">
+                <div className="flex items-center justify-center mb-2">
+                  <Building className="h-8 w-8 mr-2" />
+                  <h1 className="text-3xl font-bold">ENTREPRISE XYZ</h1>
+                </div>
+                <p className="text-sm">123 Rue du Commerce, Dakar, Sénégal</p>
+                <p className="text-sm">Tel: +221 33 123 45 67 | Email: contact@entreprise-xyz.sn</p>
+                <p className="text-sm">NINEA: 123456789 | RC: SN-DKR-2020-B-12345</p>
+              </div>
+              
+              <div className="mt-6 mb-4">
+                <div className="flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  <h2 className="text-xl font-semibold">Historique des factures fournisseur</h2>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Liste complète des factures et de leurs statuts
+                </p>
+              </div>
             </div>
             
             <Table>
@@ -114,7 +129,7 @@ export function PurchaseList({ purchases = [], onPaymentClick, onEditClick, onVi
                       {purchase.balance.toLocaleString()} F CFA
                     </TableCell>
                     <TableCell>
-                      <Badge variant={purchase.status === 'payée' ? 'success' : 'destructive'}>
+                      <Badge variant={purchase.status === 'payée' ? 'success' : 'destructive'} className="print:bg-transparent print:border print:border-current">
                         {purchase.status}
                       </Badge>
                     </TableCell>
@@ -156,10 +171,44 @@ export function PurchaseList({ purchases = [], onPaymentClick, onEditClick, onVi
               </TableBody>
             </Table>
 
+            {/* Payment methods summary for print only */}
+            <div className="mt-8 print-only">
+              <h3 className="text-lg font-semibold mb-2">Récapitulatif financier</h3>
+              <div className="border p-4 rounded-md">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium">Total des factures:</p>
+                    <p className="text-lg font-bold">
+                      {purchases.reduce((sum, p) => sum + p.totalAmount, 0).toLocaleString()} F CFA
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Montant payé:</p>
+                    <p className="text-lg font-bold">
+                      {purchases.reduce((sum, p) => sum + p.totalPaid, 0).toLocaleString()} F CFA
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Solde restant:</p>
+                    <p className="text-lg font-bold">
+                      {purchases.reduce((sum, p) => sum + p.balance, 0).toLocaleString()} F CFA
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Nombre de factures:</p>
+                    <p className="text-lg font-bold">{purchases.length}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-10 print-only">
               <div className="border-t pt-4">
                 <p className="text-sm text-center text-muted-foreground">
                   Document imprimé le {new Date().toLocaleDateString('fr-FR')} à {new Date().toLocaleTimeString('fr-FR')}
+                </p>
+                <p className="text-sm text-center text-muted-foreground">
+                  Ce document est un historique des factures et ne constitue pas une facture en soi.
                 </p>
               </div>
             </div>
