@@ -146,11 +146,6 @@
   @page {
     size: A4;
     margin: 1.5cm; /* Standard margin for documents */
-    
-    /* Add CSS counter for pages */
-    @bottom-right {
-      content: counter(page) " sur " counter(pages);
-    }
   }
   
   body {
@@ -161,24 +156,18 @@
     padding: 0;
   }
   
-  /* Page numbering */
-  .current-page::after {
-    content: counter(page);
-  }
-  
-  .total-pages::after {
-    content: counter(pages);
-  }
-  
+  /* Hide non-print elements */
   .print-hidden,
   .print\:hidden {
     display: none !important;
   }
   
+  /* Show print-only elements */
   .print-only {
     display: block !important;
   }
   
+  /* Table styles for printing */
   .print-supplier-invoices {
     width: 100%;
     padding: 0;
@@ -216,7 +205,7 @@
     page-break-inside: avoid;
   }
   
-  /* Additional A4 specific styles */
+  /* Page break control */
   .page-break {
     page-break-after: always;
   }
@@ -224,6 +213,22 @@
   /* Ensure element does not break across pages */
   .no-break {
     page-break-inside: avoid;
+  }
+  
+  /* Counter-based page numbering */
+  body {
+    counter-reset: page;
+  }
+  
+  .current-page::before {
+    content: counter(page);
+    counter-increment: page;
+  }
+  
+  @page {
+    @bottom-right {
+      content: counter(page) " of " counter(pages);
+    }
   }
 }
 

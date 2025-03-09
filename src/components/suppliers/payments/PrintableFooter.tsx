@@ -1,7 +1,33 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 
 export const PrintableFooter: React.FC = () => {
+  // Set up page numbering when the component mounts
+  useEffect(() => {
+    const handleBeforePrint = () => {
+      // Reset the counters before printing
+      let pageNum = 0;
+      const totalPages = document.querySelectorAll('.page-break').length + 1;
+      
+      // Update all current-page elements
+      document.querySelectorAll('.current-page').forEach(el => {
+        pageNum++;
+        el.textContent = pageNum.toString();
+      });
+      
+      // Update all total-pages elements
+      document.querySelectorAll('.total-pages').forEach(el => {
+        el.textContent = totalPages.toString();
+      });
+    };
+
+    window.addEventListener('beforeprint', handleBeforePrint);
+    
+    return () => {
+      window.removeEventListener('beforeprint', handleBeforePrint);
+    };
+  }, []);
+
   return (
     <div className="mt-6 print-only no-break">
       <div className="border-t pt-2">
@@ -10,7 +36,7 @@ export const PrintableFooter: React.FC = () => {
             Document imprimé le {new Date().toLocaleDateString('fr-FR')} à {new Date().toLocaleTimeString('fr-FR')}
           </p>
           <p className="text-sm text-muted-foreground page-number">
-            Page <span className="current-page"></span> sur <span className="total-pages"></span>
+            Page <span className="current-page">1</span> sur <span className="total-pages">1</span>
           </p>
         </div>
         <p className="text-sm text-center text-muted-foreground">
