@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Purchase } from "@/types/purchase";
 import { format } from "date-fns";
+import { X } from "lucide-react";
 
 interface PaymentDialogProps {
   purchase: Purchase | null;
@@ -125,7 +126,14 @@ export function PaymentDialog({
             />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex flex-row justify-between sm:justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            Fermer
+          </Button>
           <Button
             type="submit"
             onClick={onSubmit}
