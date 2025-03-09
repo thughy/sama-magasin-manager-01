@@ -42,6 +42,7 @@ export const PurchaseOrderConvertDialog = ({
               id: selectedOrder.supplierId,
               name: selectedOrder.supplierName,
               contact: '',
+              address: '', // Adding the missing address property
               phone: '',
               email: '',
               balance: 0,

@@ -38,6 +38,7 @@ export const usePurchaseOrderForm = ({
           id: initialOrder.supplierId,
           name: initialOrder.supplierName,
           contact: '',
+          address: '', // Adding the missing address property
           phone: '',
           email: '',
           balance: 0,
