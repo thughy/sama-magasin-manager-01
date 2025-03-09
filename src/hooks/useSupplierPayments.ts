@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Purchase } from "@/types/purchase";
 import { Supplier } from "@/data/suppliersData";
 import { suppliersData } from "@/data/suppliersData";
@@ -19,17 +19,15 @@ export const useSupplierPayments = () => {
 
   // Load suppliers on mount
   useEffect(() => {
+    console.info("SupplierPayments component mounted");
+    
     try {
       // Set loading state
       setIsLoading(true);
       
-      // Check if suppliersData is valid
-      if (suppliersData && Array.isArray(suppliersData)) {
-        setSuppliers(suppliersData);
-      } else {
-        console.error("Suppliers data is not valid");
-        setSuppliers([]);
-      }
+      // Initialize suppliers
+      setSuppliers(suppliersData || []);
+      console.info("Suppliers loaded:", suppliersData);
 
       // Initialize localStorage with sample purchase data if needed
       if (!localStorage.getItem("purchases")) {
@@ -39,13 +37,17 @@ export const useSupplierPayments = () => {
       console.error("Error loading suppliers data:", error);
       setSuppliers([]);
     } finally {
-      // End loading state
-      setIsLoading(false);
+      // End loading state after a short delay to avoid UI flashing
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     }
   }, []);
 
   // Load purchases for selected supplier
   useEffect(() => {
+    console.info("Selected supplier changed:", selectedSupplier);
+    
     if (!selectedSupplier) {
       setSupplierPurchases([]);
       return;
@@ -70,17 +72,17 @@ export const useSupplierPayments = () => {
     }
   }, [selectedSupplier]);
 
-  const handleSupplierSelect = (supplier: Supplier) => {
+  const handleSupplierSelect = useCallback((supplier: Supplier) => {
     setSelectedSupplier(supplier);
-  };
+  }, []);
 
-  const handlePaymentClick = (purchase: Purchase) => {
+  const handlePaymentClick = useCallback((purchase: Purchase) => {
     setSelectedPurchase(purchase);
     setPaymentAmount(purchase.balance);
     setIsPaymentDialogOpen(true);
-  };
+  }, []);
 
-  const handlePaymentSubmit = () => {
+  const handlePaymentSubmit = useCallback(() => {
     if (!selectedPurchase || !selectedSupplier) return;
 
     const storedPurchases = localStorage.getItem("purchases");
@@ -149,7 +151,7 @@ export const useSupplierPayments = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [paymentAmount, selectedPurchase, selectedSupplier, suppliers, toast]);
 
   const calculateSupplierBalance = (supplierId: number, purchases: Purchase[]): number => {
     const supplierPurchases = purchases.filter(p => p.supplierId === supplierId);

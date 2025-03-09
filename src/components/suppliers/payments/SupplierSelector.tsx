@@ -21,16 +21,18 @@ interface SupplierSelectorProps {
   suppliers: Supplier[];
   selectedSupplier: Supplier | null;
   onSupplierSelect: (supplier: Supplier) => void;
+  isLoading?: boolean;
 }
 
 export function SupplierSelector({ 
   suppliers, 
   selectedSupplier, 
-  onSupplierSelect 
+  onSupplierSelect,
+  isLoading = false
 }: SupplierSelectorProps) {
   const [open, setOpen] = React.useState(false);
-
-  // Guarantee we have a safe array to work with
+  
+  // Ensure suppliers is always an array
   const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
   
   return (
@@ -47,12 +49,14 @@ export function SupplierSelector({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder="Rechercher un fournisseur..." />
-          <CommandEmpty>Aucun fournisseur trouvé.</CommandEmpty>
-          <CommandGroup>
-            {safeSuppliers.length > 0 ? (
-              safeSuppliers.map((supplier) => (
+        {isLoading ? (
+          <div className="py-6 text-center text-sm">Chargement des fournisseurs...</div>
+        ) : (
+          <Command>
+            <CommandInput placeholder="Rechercher un fournisseur..." />
+            <CommandEmpty>Aucun fournisseur trouvé.</CommandEmpty>
+            <CommandGroup>
+              {safeSuppliers.map((supplier) => (
                 <CommandItem
                   key={supplier.id}
                   value={supplier.name}
@@ -71,12 +75,10 @@ export function SupplierSelector({
                   />
                   {supplier.name}
                 </CommandItem>
-              ))
-            ) : (
-              <CommandItem disabled>Chargement des fournisseurs...</CommandItem>
-            )}
-          </CommandGroup>
-        </Command>
+              ))}
+            </CommandGroup>
+          </Command>
+        )}
       </PopoverContent>
     </Popover>
   );

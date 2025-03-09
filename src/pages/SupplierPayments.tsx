@@ -28,32 +28,6 @@ const SupplierPayments = () => {
     isLoading
   } = useSupplierPayments();
 
-  // Always make sure suppliers is an array
-  const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
-
-  if (safeSuppliers.length === 0 && !isLoading) {
-    return (
-      <MainLayout>
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Paiement Fournisseur</h1>
-            <p className="text-muted-foreground">
-              Gérez tous les paiements effectués à vos fournisseurs
-            </p>
-          </div>
-          
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Erreur de chargement</AlertTitle>
-            <AlertDescription>
-              Impossible de charger les données des fournisseurs. Veuillez rafraîchir la page.
-            </AlertDescription>
-          </Alert>
-        </div>
-      </MainLayout>
-    );
-  }
-
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -64,6 +38,18 @@ const SupplierPayments = () => {
           </p>
         </div>
 
+        {/* Error state */}
+        {!isLoading && suppliers.length === 0 && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Erreur de chargement</AlertTitle>
+            <AlertDescription>
+              Impossible de charger les données des fournisseurs. Veuillez rafraîchir la page.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Supplier selection card */}
         <Card>
           <CardHeader>
             <CardTitle>Sélection du fournisseur</CardTitle>
@@ -78,14 +64,16 @@ const SupplierPayments = () => {
               </div>
             ) : (
               <SupplierSelector 
-                suppliers={safeSuppliers}
+                suppliers={suppliers}
                 selectedSupplier={selectedSupplier}
                 onSupplierSelect={handleSupplierSelect}
+                isLoading={isLoading}
               />
             )}
           </CardContent>
         </Card>
 
+        {/* Supplier info and purchases list */}
         {selectedSupplier && (
           <div className="space-y-6">
             <SupplierInfo supplier={selectedSupplier} />
@@ -96,6 +84,7 @@ const SupplierPayments = () => {
           </div>
         )}
 
+        {/* Payment dialog */}
         {selectedPurchase && (
           <PaymentDialog
             purchase={selectedPurchase}
