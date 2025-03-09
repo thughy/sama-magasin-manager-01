@@ -5,6 +5,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Button } from "@/components/ui/button";
 import { Wallet } from "lucide-react";
 import { Purchase } from "@/types/purchase";
+import { Badge } from "@/components/ui/badge";
 
 interface PurchaseListProps {
   purchases: Purchase[];
@@ -25,11 +26,11 @@ export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListPro
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Factures impayées</CardTitle>
+          <CardTitle>Factures du fournisseur</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center p-8 text-muted-foreground">
-            Aucune facture impayée pour ce fournisseur
+            Aucune facture pour ce fournisseur
           </div>
         </CardContent>
       </Card>
@@ -39,7 +40,7 @@ export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListPro
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Factures impayées</CardTitle>
+        <CardTitle>Factures du fournisseur</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -50,6 +51,7 @@ export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListPro
               <TableHead>Total</TableHead>
               <TableHead>Payé</TableHead>
               <TableHead>Solde</TableHead>
+              <TableHead>Statut</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -60,8 +62,13 @@ export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListPro
                 <TableCell>{formatDate(purchase.purchaseDate)}</TableCell>
                 <TableCell>{purchase.totalAmount.toLocaleString()} F CFA</TableCell>
                 <TableCell>{purchase.totalPaid.toLocaleString()} F CFA</TableCell>
-                <TableCell className="font-medium text-red-500">
+                <TableCell className={purchase.status === 'impayée' ? 'font-medium text-red-500' : 'font-medium text-green-500'}>
                   {purchase.balance.toLocaleString()} F CFA
+                </TableCell>
+                <TableCell>
+                  <Badge variant={purchase.status === 'payée' ? 'success' : 'destructive'}>
+                    {purchase.status}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <Button 
@@ -69,6 +76,7 @@ export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListPro
                     size="sm" 
                     className="ml-auto"
                     onClick={() => onPaymentClick(purchase)}
+                    disabled={purchase.status === 'payée'}
                   >
                     <Wallet className="mr-2 h-4 w-4" />
                     Payer

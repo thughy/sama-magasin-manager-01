@@ -75,8 +75,9 @@ export const useSupplierPayments = () => {
       }
 
       const allPurchases: Purchase[] = JSON.parse(storedPurchases);
+      // Modified to show all purchases for the supplier, not just unpaid ones
       const filteredPurchases = allPurchases.filter(
-        (purchase) => purchase.supplierId === selectedSupplier.id && purchase.status === 'impayée'
+        (purchase) => purchase.supplierId === selectedSupplier.id
       );
       
       setSupplierPurchases(filteredPurchases);
