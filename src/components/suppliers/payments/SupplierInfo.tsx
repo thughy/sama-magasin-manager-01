@@ -15,10 +15,8 @@ export function SupplierInfo({ supplier }: SupplierInfoProps) {
 
   const handlePrint = useReactToPrint({
     documentTitle: `Compte Fournisseur - ${supplier?.name || "Fournisseur"}`,
-    // The correct property according to the react-to-print typings
-    bodyClass: "print-content",
-    // For React 18, we need to pass the ref's current value as a function
-    onBeforeGetContent: () => Promise.resolve(),
+    // Use contentRef which is the current recommended approach
+    contentRef: printRef,
     onPrintError: (errorLocation, error) => {
       console.error(`Print error at ${errorLocation}:`, error);
     },
@@ -35,7 +33,7 @@ export function SupplierInfo({ supplier }: SupplierInfoProps) {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => handlePrint(printRef.current)}
+          onClick={handlePrint}
         >
           <Printer className="mr-2 h-4 w-4" />
           Imprimer

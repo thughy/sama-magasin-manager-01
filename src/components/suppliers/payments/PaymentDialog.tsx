@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Purchase } from "@/types/purchase";
+import { format } from "date-fns";
 
 interface PaymentDialogProps {
   purchase: Purchase | null;
@@ -15,6 +16,8 @@ interface PaymentDialogProps {
   onPaymentAmountChange: (amount: number) => void;
   paymentMethod: 'cash' | 'wave' | 'orangeMoney' | 'cheque' | 'bank';
   onPaymentMethodChange: (method: 'cash' | 'wave' | 'orangeMoney' | 'cheque' | 'bank') => void;
+  paymentDate: string;
+  onPaymentDateChange: (date: string) => void;
   onSubmit: () => void;
 }
 
@@ -26,6 +29,8 @@ export function PaymentDialog({
   onPaymentAmountChange,
   paymentMethod,
   onPaymentMethodChange,
+  paymentDate,
+  onPaymentDateChange,
   onSubmit
 }: PaymentDialogProps) {
   if (!purchase) return null;
@@ -107,12 +112,24 @@ export function PaymentDialog({
               </SelectContent>
             </Select>
           </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="date" className="text-right">
+              Date
+            </Label>
+            <Input
+              id="date"
+              type="date"
+              value={paymentDate}
+              onChange={(e) => onPaymentDateChange(e.target.value)}
+              className="col-span-3"
+            />
+          </div>
         </div>
         <DialogFooter>
           <Button
             type="submit"
             onClick={onSubmit}
-            disabled={paymentAmount <= 0 || paymentAmount > purchase.balance}
+            disabled={paymentAmount <= 0 || paymentAmount > purchase.balance || !paymentDate}
           >
             Valider le paiement
           </Button>

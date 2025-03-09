@@ -3,7 +3,7 @@ export interface PaymentMethod {
   id: string;
   method: 'cash' | 'wave' | 'orangeMoney' | 'cheque' | 'bank';
   amount: number;
-  date?: string; // Add date field for payment history
+  date: string; // Make date required for payment methods
 }
 
 export interface PurchaseItem {

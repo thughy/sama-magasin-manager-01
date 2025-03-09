@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PurchaseForm } from "@/components/suppliers/purchases/PurchaseForm";
+import { PaymentHistoryDialog } from "@/components/suppliers/payments/PaymentHistoryDialog";
 
 const SupplierPayments = () => {
   const {
@@ -23,6 +24,8 @@ const SupplierPayments = () => {
     setPaymentAmount,
     paymentMethod,
     setPaymentMethod,
+    paymentDate,
+    setPaymentDate,
     handleSupplierSelect,
     handlePaymentClick,
     handlePaymentSubmit,
@@ -30,7 +33,10 @@ const SupplierPayments = () => {
     isPurchaseFormOpen,
     setIsPurchaseFormOpen,
     handleEditPurchase,
-    handleSavePurchase
+    handleSavePurchase,
+    isPaymentHistoryOpen,
+    setIsPaymentHistoryOpen,
+    handleViewPaymentHistory
   } = useSupplierPayments();
 
   return (
@@ -86,6 +92,7 @@ const SupplierPayments = () => {
               purchases={supplierPurchases || []}
               onPaymentClick={handlePaymentClick}
               onEditClick={handleEditPurchase}
+              onViewHistory={handleViewPaymentHistory}
             />
           </div>
         )}
@@ -100,6 +107,8 @@ const SupplierPayments = () => {
             onPaymentAmountChange={setPaymentAmount}
             paymentMethod={paymentMethod}
             onPaymentMethodChange={setPaymentMethod}
+            paymentDate={paymentDate}
+            onPaymentDateChange={setPaymentDate}
             onSubmit={handlePaymentSubmit}
           />
         )}
@@ -111,6 +120,15 @@ const SupplierPayments = () => {
             onClose={() => setIsPurchaseFormOpen(false)}
             initialPurchase={selectedPurchase}
             onSave={handleSavePurchase}
+          />
+        )}
+
+        {/* Payment History Dialog */}
+        {selectedPurchase && (
+          <PaymentHistoryDialog
+            purchase={selectedPurchase}
+            open={isPaymentHistoryOpen}
+            onOpenChange={setIsPaymentHistoryOpen}
           />
         )}
       </div>

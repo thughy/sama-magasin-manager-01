@@ -1,19 +1,21 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { Purchase } from "@/types/purchase";
 import { Supplier } from "@/data/suppliersData";
 import { suppliersData } from "@/data/suppliersData";
 import { purchasesData } from "@/data/purchasesData";
 import { useToast } from "./use-toast";
+import { format } from "date-fns";
 
 export const useSupplierPayments = () => {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [supplierPurchases, setSupplierPurchases] = useState<Purchase[]>([]);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [isPaymentHistoryOpen, setIsPaymentHistoryOpen] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'wave' | 'orangeMoney' | 'cheque' | 'bank'>('cash');
+  const [paymentDate, setPaymentDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [isPurchaseFormOpen, setIsPurchaseFormOpen] = useState(false);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
@@ -76,7 +78,6 @@ export const useSupplierPayments = () => {
       }
 
       const allPurchases: Purchase[] = JSON.parse(storedPurchases);
-      // Modified to show all purchases for the supplier, not just unpaid ones
       const filteredPurchases = allPurchases.filter(
         (purchase) => purchase.supplierId === selectedSupplier.id
       );
@@ -95,7 +96,13 @@ export const useSupplierPayments = () => {
   const handlePaymentClick = useCallback((purchase: Purchase) => {
     setSelectedPurchase(purchase);
     setPaymentAmount(purchase.balance);
+    setPaymentDate(format(new Date(), 'yyyy-MM-dd'));
     setIsPaymentDialogOpen(true);
+  }, []);
+
+  const handleViewPaymentHistory = useCallback((purchase: Purchase) => {
+    setSelectedPurchase(purchase);
+    setIsPaymentHistoryOpen(true);
   }, []);
 
   const handleEditPurchase = useCallback((purchase: Purchase) => {
@@ -193,7 +200,7 @@ export const useSupplierPayments = () => {
             id: `payment-${Date.now()}`,
             method: paymentMethod,
             amount: paymentAmount,
-            date: new Date().toISOString() // Add the date for payment history
+            date: paymentDate
           };
           
           return {
@@ -201,7 +208,6 @@ export const useSupplierPayments = () => {
             totalPaid: newTotalPaid,
             balance: newBalance,
             status: newBalance <= 0 ? 'payée' as const : 'impayée' as const,
-            // Add or update payment methods array
             paymentMethods: [
               ...(purchase.paymentMethods || []),
               newPaymentMethod
@@ -255,7 +261,7 @@ export const useSupplierPayments = () => {
         variant: "destructive",
       });
     }
-  }, [paymentAmount, paymentMethod, selectedPurchase, selectedSupplier, suppliers, toast]);
+  }, [paymentAmount, paymentMethod, paymentDate, selectedPurchase, selectedSupplier, suppliers, toast]);
 
   const calculateSupplierBalance = (supplierId: number, purchases: Purchase[]): number => {
     const supplierPurchases = purchases.filter(p => p.supplierId === supplierId);
@@ -274,12 +280,16 @@ export const useSupplierPayments = () => {
     supplierPurchases,
     isPaymentDialogOpen,
     setIsPaymentDialogOpen,
+    isPaymentHistoryOpen,
+    setIsPaymentHistoryOpen,
     selectedPurchase,
     setSelectedPurchase,
     paymentAmount,
     setPaymentAmount,
     paymentMethod,
     setPaymentMethod,
+    paymentDate,
+    setPaymentDate,
     isPurchaseFormOpen,
     setIsPurchaseFormOpen,
     handleSupplierSelect,
@@ -287,6 +297,7 @@ export const useSupplierPayments = () => {
     handlePaymentSubmit,
     handleEditPurchase,
     handleSavePurchase,
+    handleViewPaymentHistory,
     isLoading
   };
 };
