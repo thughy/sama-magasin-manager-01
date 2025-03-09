@@ -17,21 +17,25 @@ interface TableItemProps {
 export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItemProps) => {
   console.log(`Rendering TableItem at index ${index} with item:`, item);
   
+  // Calculate subtotals
+  const purchaseSubtotal = (item.quantity || 0) * (item.unitPrice || 0);
+  const sellSubtotal = (item.quantity || 0) * (item.sellPrice || 0);
+  
   return (
-    <TableRow>
+    <TableRow key={`purchase-item-${index}`}>
       <TableCell data-testid={`product-name-${index}`}>{item.productName || "—"}</TableCell>
       <TableCell>
         <Input
           type="number"
           min="1"
-          value={item.quantity}
+          value={item.quantity || 1}
           onChange={(e) => onUpdateItem(index, 'quantity', Number(e.target.value))}
           className="w-16"
         />
       </TableCell>
       <TableCell>
         <DepotSelector
-          value={item.depot || ""}
+          value={item.depot || "Principal"}
           onChange={(value) => {
             console.log(`Updating depot for item ${index} to:`, value);
             onUpdateItem(index, 'depot', value);
@@ -43,7 +47,7 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
         <Input
           type="number"
           min="0"
-          value={item.unitPrice}
+          value={item.unitPrice || 0}
           onChange={(e) => onUpdateItem(index, 'unitPrice', Number(e.target.value))}
           className="w-24"
         />
@@ -58,10 +62,10 @@ export const TableItem = ({ item, index, onRemoveItem, onUpdateItem }: TableItem
         />
       </TableCell>
       <TableCell className="font-medium">
-        {(item.quantity * item.unitPrice).toLocaleString()}
+        {purchaseSubtotal.toLocaleString()}
       </TableCell>
       <TableCell className="font-medium">
-        {(item.quantity * (item.sellPrice || 0)).toLocaleString()}
+        {sellSubtotal.toLocaleString()}
       </TableCell>
       <TableCell>
         <Button

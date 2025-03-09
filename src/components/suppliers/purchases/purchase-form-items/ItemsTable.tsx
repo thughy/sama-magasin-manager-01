@@ -13,7 +13,7 @@ interface ItemsTableProps {
 }
 
 export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProps) => {
-  console.log("ItemsTable rendering with items:", items);
+  console.log("ItemsTable rendering with items:", items.length, items);
   
   return (
     <Table>
@@ -24,7 +24,7 @@ export const ItemsTable = ({ items, onRemoveItem, onUpdateItem }: ItemsTableProp
         ) : (
           items.map((item, index) => (
             <TableItem
-              key={`item-${index}`} // Add a more specific key with index
+              key={`item-${index}-${item.productId || 'empty'}`}
               item={item}
               index={index}
               onRemoveItem={onRemoveItem}

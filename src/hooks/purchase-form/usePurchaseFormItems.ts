@@ -1,12 +1,14 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PurchaseItem } from '@/types/purchase';
 
 export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
-  // Create a deep copy of initialItems to prevent reference issues
+  // Initialize state with a function to avoid reference issues
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>(() => {
     console.log("Initializing usePurchaseFormItems with:", initialItems);
-    return initialItems.length > 0 ? JSON.parse(JSON.stringify(initialItems)) : [];
+    return initialItems.length > 0 
+      ? initialItems.map(item => ({ ...item }))  // Create new objects to avoid reference issues
+      : [];
   });
 
   // Log when purchaseItems changes
@@ -22,7 +24,7 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
     }
   }, []);
 
-  const addPurchaseItem = () => {
+  const addPurchaseItem = useCallback(() => {
     console.log("Adding new purchase item");
     
     const newItem = {
@@ -31,59 +33,59 @@ export const usePurchaseFormItems = (initialItems: PurchaseItem[] = []) => {
       quantity: 1,
       unitPrice: 0,
       sellPrice: 0,
-      depot: '' // Initialize with an empty value
+      depot: 'Principal' // Initialize with a default value
     };
     
-    setPurchaseItems(items => {
-      const newItems = [...items, newItem];
-      console.log("Items after adding:", newItems.length);
+    setPurchaseItems(prevItems => {
+      const newItems = [...prevItems, newItem];
+      console.log("Items after adding:", newItems);
       return newItems;
     });
-  };
+  }, []);
 
-  const removePurchaseItem = (index: number) => {
+  const removePurchaseItem = useCallback((index: number) => {
     console.log(`Removing purchase item at index ${index}`);
-    setPurchaseItems(items => items.filter((_, i) => i !== index));
-  };
+    setPurchaseItems(prevItems => prevItems.filter((_, i) => i !== index));
+  }, []);
 
-  const updatePurchaseItem = (index: number, field: keyof PurchaseItem, value: any) => {
+  const updatePurchaseItem = useCallback((index: number, field: keyof PurchaseItem, value: any) => {
     console.log(`Updating item ${index}, field: ${field}, value:`, value);
     
-    setPurchaseItems(items => {
+    setPurchaseItems(prevItems => {
       // Make sure the index is valid
-      if (index >= items.length) {
-        console.warn(`Invalid index: ${index}, items length: ${items.length}`);
-        return items;
+      if (index >= prevItems.length) {
+        console.warn(`Invalid index: ${index}, items length: ${prevItems.length}`);
+        return prevItems;
       }
       
       // Create a new array with the updated item
-      const newItems = [...items];
+      const newItems = [...prevItems];
       newItems[index] = { ...newItems[index], [field]: value };
       
-      console.log(`Item ${index} updated, new value for ${field}:`, newItems[index][field]);
+      console.log(`Item ${index} updated, new value:`, newItems[index]);
       return newItems;
     });
-  };
+  }, []);
 
   // New method to update multiple fields at once
-  const updatePurchaseItemFields = (index: number, fieldsToUpdate: Partial<PurchaseItem>) => {
+  const updatePurchaseItemFields = useCallback((index: number, fieldsToUpdate: Partial<PurchaseItem>) => {
     console.log(`Updating multiple fields for item ${index}:`, fieldsToUpdate);
     
-    setPurchaseItems(items => {
+    setPurchaseItems(prevItems => {
       // Make sure the index is valid
-      if (index >= items.length) {
-        console.warn(`Invalid index: ${index}, items length: ${items.length}`);
-        return items;
+      if (index >= prevItems.length) {
+        console.warn(`Invalid index: ${index}, items length: ${prevItems.length}`);
+        return prevItems;
       }
       
       // Create a new array with the updated item
-      const newItems = [...items];
+      const newItems = [...prevItems];
       newItems[index] = { ...newItems[index], ...fieldsToUpdate };
       
       console.log(`Item ${index} updated with multiple fields, new value:`, newItems[index]);
       return newItems;
     });
-  };
+  }, []);
 
   return {
     purchaseItems,

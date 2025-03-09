@@ -21,18 +21,27 @@ export const useInitialItems = ({
       // Load purchase items if they exist
       if (initialPurchase.items && initialPurchase.items.length > 0) {
         console.log("Setting purchase items from initialPurchase.items:", initialPurchase.items);
-        // Create a deep copy to ensure there are no reference issues
-        const itemsCopy = JSON.parse(JSON.stringify(initialPurchase.items));
-        console.log("Deep copy of items:", itemsCopy);
+        
+        // Create a fresh array with new object references
+        const itemsCopy = initialPurchase.items.map(item => ({
+          productId: item.productId,
+          productName: item.productName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          sellPrice: item.sellPrice || 0,
+          depot: item.depot || 'Principal'
+        }));
+        
+        console.log("Mapped items copy:", itemsCopy);
         setPurchaseItems(itemsCopy);
       } else {
         // We'll need to reconstruct purchaseItems from initialPurchase
         console.log("Reconstructing purchase items from initialPurchase single item");
         setPurchaseItems([{
-          productId: '0',
-          productName: initialPurchase.productName,
-          quantity: initialPurchase.quantity,
-          unitPrice: initialPurchase.unitPrice,
+          productId: initialPurchase.productName ? '0' : '',
+          productName: initialPurchase.productName || '',
+          quantity: initialPurchase.quantity || 1,
+          unitPrice: initialPurchase.unitPrice || 0,
           sellPrice: 0,
           depot: 'Principal' // Default depot for existing items
         }]);
@@ -40,8 +49,13 @@ export const useInitialItems = ({
 
       // Set payment methods if they exist
       if (initialPurchase.paymentMethods && initialPurchase.paymentMethods.length > 0) {
-        // Create a deep copy to ensure there are no reference issues
-        const methodsCopy = JSON.parse(JSON.stringify(initialPurchase.paymentMethods));
+        // Create a fresh array with new object references
+        const methodsCopy = initialPurchase.paymentMethods.map(method => ({
+          id: method.id,
+          method: method.method,
+          amount: method.amount
+        }));
+        
         setPaymentMethods(methodsCopy);
       }
     }
