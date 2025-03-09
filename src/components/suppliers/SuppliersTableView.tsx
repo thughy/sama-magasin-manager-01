@@ -2,9 +2,10 @@
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FileEdit, Trash2, Eye, FileText } from "lucide-react";
+import { FileEdit, Trash2, Eye, FileText, CreditCard } from "lucide-react";
 import { Supplier } from "@/data/suppliersData";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 interface SuppliersTableViewProps {
   suppliers: Supplier[];
@@ -17,6 +18,14 @@ export const SuppliersTableView = ({
   onEdit, 
   onOpenPurchaseOrder 
 }: SuppliersTableViewProps) => {
+  const navigate = useNavigate();
+
+  const handleAccessAccount = (supplier: Supplier) => {
+    // Store the selected supplier ID in localStorage to pre-select it on the payments page
+    localStorage.setItem("selectedSupplierId", supplier.id.toString());
+    navigate("/suppliers/payments");
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -72,6 +81,13 @@ export const SuppliersTableView = ({
                     onClick={() => onOpenPurchaseOrder(supplier)}
                   >
                     <FileText className="h-4 w-4 text-blue-500" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => handleAccessAccount(supplier)}
+                  >
+                    <CreditCard className="h-4 w-4 text-green-500" />
                   </Button>
                   <Button variant="ghost" size="icon">
                     <Trash2 className="h-4 w-4 text-red-500" />
