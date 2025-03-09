@@ -11,13 +11,13 @@ export const PrintableSupplierInfo: React.FC<PrintableSupplierInfoProps> = ({ su
   if (!supplier) return null;
   
   return (
-    <div className="my-6 border p-4 rounded-lg no-break">
-      <div className="flex items-center mb-2">
+    <div className="my-3 border p-3 rounded-lg no-break">
+      <div className="flex items-center mb-1">
         <User className="h-5 w-5 mr-2" />
         <h2 className="text-xl font-semibold">Informations du fournisseur</h2>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 mt-3">
+      <div className="grid grid-cols-2 gap-3 mt-2">
         <div className="flex items-start">
           <Building className="h-4 w-4 mr-2 mt-1" />
           <div>

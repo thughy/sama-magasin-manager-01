@@ -3,8 +3,8 @@ import React from "react";
 
 export const PrintableFooter: React.FC = () => {
   return (
-    <div className="mt-16 print-only no-break">
-      <div className="border-t pt-4">
+    <div className="mt-6 print-only no-break">
+      <div className="border-t pt-2">
         <p className="text-sm text-center text-muted-foreground">
           Document imprimé le {new Date().toLocaleDateString('fr-FR')} à {new Date().toLocaleTimeString('fr-FR')}
         </p>

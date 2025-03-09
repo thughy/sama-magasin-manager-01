@@ -175,13 +175,13 @@
     width: 100%;
     border-collapse: collapse;
     page-break-inside: avoid;
-    margin-bottom: 1cm;
+    margin-bottom: 0.5cm;
   }
   
   .print-supplier-invoices td,
   .print-supplier-invoices th {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 4px;
   }
   
   .print-payment-history table {
@@ -193,7 +193,7 @@
   .print-payment-history td,
   .print-payment-history th {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 4px;
   }
   
   .print-supplier table {

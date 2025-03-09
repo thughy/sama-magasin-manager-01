@@ -10,10 +10,10 @@ export const FinancialSummary: React.FC<FinancialSummaryProps> = ({ purchases })
   if (!purchases || purchases.length === 0) return null;
   
   return (
-    <div className="mt-8 print-only">
-      <h3 className="text-lg font-semibold mb-2">Récapitulatif financier</h3>
-      <div className="border p-4 rounded-md">
-        <div className="grid grid-cols-2 gap-4">
+    <div className="mt-4 print-only">
+      <h3 className="text-lg font-semibold mb-1">Récapitulatif financier</h3>
+      <div className="border p-3 rounded-md">
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <p className="text-sm font-medium">Total des factures:</p>
             <p className="text-lg font-bold">
