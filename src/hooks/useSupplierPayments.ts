@@ -61,7 +61,7 @@ export const useSupplierPayments = () => {
       if (purchase.id === selectedPurchase.id) {
         const newTotalPaid = purchase.totalPaid + paymentAmount;
         const newBalance = purchase.totalAmount - newTotalPaid;
-        const newStatus = newBalance <= 0 ? 'payée' : 'impayée';
+        const newStatus = newBalance <= 0 ? 'payée' as const : 'impayée' as const;
         
         return {
           ...purchase,
@@ -80,7 +80,7 @@ export const useSupplierPayments = () => {
     const updatedSuppliers = suppliers.map(supplier => {
       if (supplier.id === selectedSupplier.id) {
         const newBalance = calculateSupplierBalance(supplier.id, updatedPurchases);
-        const newStatus = newBalance <= 0 ? 'payée' : 'impayée';
+        const newStatus = newBalance <= 0 ? 'payée' as const : 'impayée' as const;
         
         return {
           ...supplier,
