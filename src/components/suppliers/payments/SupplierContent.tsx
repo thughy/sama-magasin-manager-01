@@ -7,7 +7,7 @@ import { Purchase } from "@/types/purchase";
 
 interface SupplierContentProps {
   supplier: Supplier;
-  purchases: Purchase[];
+  purchases: Purchase[] | null | undefined;
   onPaymentClick: (purchase: Purchase) => void;
   onEditClick: (purchase: Purchase) => void;
   onViewHistory: (purchase: Purchase) => void;
@@ -30,7 +30,7 @@ export const SupplierContent: React.FC<SupplierContentProps> = ({
         purchases={safePurchases}
         onPaymentClick={onPaymentClick}
         onEditClick={onEditClick}
-        onViewHistory={onViewHistory}
+        onHistoryClick={onViewHistory}
         supplier={supplier}
       />
     </div>

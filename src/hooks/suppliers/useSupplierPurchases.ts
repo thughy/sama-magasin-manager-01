@@ -22,39 +22,42 @@ export const useSupplierPurchases = (selectedSupplier: Supplier | null) => {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const storedPurchases = localStorage.getItem("purchases");
-      
-      if (!storedPurchases) {
-        console.info("No purchases found in localStorage");
-        setSupplierPurchases([]);
-        setIsLoading(false);
-        return;
-      }
+    // Use setTimeout to prevent state updates in the same render cycle
+    setTimeout(() => {
+      try {
+        const storedPurchases = localStorage.getItem("purchases");
+        
+        if (!storedPurchases) {
+          console.info("No purchases found in localStorage");
+          setSupplierPurchases([]);
+          setIsLoading(false);
+          return;
+        }
 
-      const allPurchases: Purchase[] = JSON.parse(storedPurchases);
-      
-      if (!Array.isArray(allPurchases)) {
-        console.error("Stored purchases is not an array:", allPurchases);
+        const allPurchases: Purchase[] = JSON.parse(storedPurchases);
+        
+        if (!Array.isArray(allPurchases)) {
+          console.error("Stored purchases is not an array:", allPurchases);
+          setSupplierPurchases([]);
+          setIsLoading(false);
+          return;
+        }
+        
+        const filteredPurchases = allPurchases.filter(
+          (purchase) => purchase?.supplierId === selectedSupplier.id
+        );
+        
+        // Important: Always set the supplier purchases, even if the array is empty
+        setSupplierPurchases(filteredPurchases);
+        console.info(`Found ${filteredPurchases.length} purchases for supplier ${selectedSupplier.name}`);
+      } catch (error) {
+        console.error("Error parsing purchases:", error);
+        setError(error instanceof Error ? error : new Error(String(error)));
         setSupplierPurchases([]);
+      } finally {
         setIsLoading(false);
-        return;
       }
-      
-      const filteredPurchases = allPurchases.filter(
-        (purchase) => purchase?.supplierId === selectedSupplier.id
-      );
-      
-      // Important: Always set the supplier purchases, even if the array is empty
-      setSupplierPurchases(filteredPurchases);
-      console.info(`Found ${filteredPurchases.length} purchases for supplier ${selectedSupplier.name}`);
-    } catch (error) {
-      console.error("Error parsing purchases:", error);
-      setError(error instanceof Error ? error : new Error(String(error)));
-      setSupplierPurchases([]);
-    } finally {
-      setIsLoading(false);
-    }
+    }, 0);
   }, [selectedSupplier]);
 
   return {

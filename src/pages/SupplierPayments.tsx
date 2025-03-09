@@ -7,6 +7,7 @@ import { ErrorAlert } from "@/components/suppliers/payments/ErrorAlert";
 import { SupplierSelectionCard } from "@/components/suppliers/payments/SupplierSelectionCard";
 import { SupplierContent } from "@/components/suppliers/payments/SupplierContent";
 import { PaymentDialogs } from "@/components/suppliers/payments/PaymentDialogs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SupplierPayments = () => {
   const {
@@ -32,7 +33,8 @@ const SupplierPayments = () => {
     handleSavePurchase,
     isPaymentHistoryOpen,
     setIsPaymentHistoryOpen,
-    handleViewPaymentHistory
+    handleViewPaymentHistory,
+    purchasesError
   } = useSupplierPayments();
 
   return (
@@ -60,8 +62,24 @@ const SupplierPayments = () => {
           isLoading={isLoading}
         />
 
+        {/* Display error if there's an error loading purchases */}
+        {purchasesError && (
+          <ErrorAlert 
+            title="Erreur de chargement des factures" 
+            description={purchasesError.message} 
+          />
+        )}
+
+        {/* Loading state for supplier content */}
+        {isLoading && selectedSupplier && (
+          <div className="space-y-4">
+            <Skeleton className="h-[200px] w-full rounded-lg" />
+            <Skeleton className="h-[300px] w-full rounded-lg" />
+          </div>
+        )}
+
         {/* Supplier info and purchases list */}
-        {selectedSupplier && (
+        {!isLoading && selectedSupplier && (
           <SupplierContent
             supplier={selectedSupplier}
             purchases={supplierPurchases}
@@ -72,23 +90,25 @@ const SupplierPayments = () => {
         )}
 
         {/* All Dialogs */}
-        <PaymentDialogs
-          selectedPurchase={selectedPurchase}
-          isPaymentDialogOpen={isPaymentDialogOpen}
-          setIsPaymentDialogOpen={setIsPaymentDialogOpen}
-          paymentAmount={paymentAmount}
-          setPaymentAmount={setPaymentAmount}
-          paymentMethod={paymentMethod}
-          setPaymentMethod={setPaymentMethod}
-          paymentDate={paymentDate}
-          setPaymentDate={setPaymentDate}
-          onPaymentSubmit={handlePaymentSubmit}
-          isPurchaseFormOpen={isPurchaseFormOpen}
-          setIsPurchaseFormOpen={setIsPurchaseFormOpen}
-          onSavePurchase={handleSavePurchase}
-          isPaymentHistoryOpen={isPaymentHistoryOpen}
-          setIsPaymentHistoryOpen={setIsPaymentHistoryOpen}
-        />
+        {selectedPurchase && (
+          <PaymentDialogs
+            selectedPurchase={selectedPurchase}
+            isPaymentDialogOpen={isPaymentDialogOpen}
+            setIsPaymentDialogOpen={setIsPaymentDialogOpen}
+            paymentAmount={paymentAmount}
+            setPaymentAmount={setPaymentAmount}
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+            paymentDate={paymentDate}
+            setPaymentDate={setPaymentDate}
+            onPaymentSubmit={handlePaymentSubmit}
+            isPurchaseFormOpen={isPurchaseFormOpen}
+            setIsPurchaseFormOpen={setIsPurchaseFormOpen}
+            onSavePurchase={handleSavePurchase}
+            isPaymentHistoryOpen={isPaymentHistoryOpen}
+            setIsPaymentHistoryOpen={setIsPaymentHistoryOpen}
+          />
+        )}
       </div>
     </MainLayout>
   );
