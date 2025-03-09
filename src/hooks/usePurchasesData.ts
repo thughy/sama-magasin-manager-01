@@ -9,6 +9,13 @@ export const usePurchasesData = () => {
   const [supplierSearchTerm, setSupplierSearchTerm] = useState("");
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined
+  });
   const [selectedStatus, setSelectedStatus] = useState<"all" | "payée" | "impayée">("all");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPurchaseFormOpen, setIsPurchaseFormOpen] = useState(false);
@@ -60,9 +67,21 @@ export const usePurchasesData = () => {
       }
     }
     
-    // Filter by date
-    if (selectedDate && purchase.purchaseDate !== selectedDate) {
+    // Filter by single date (if not using date range)
+    if (selectedDate && !dateRange.from && purchase.purchaseDate !== selectedDate) {
       return false;
+    }
+    
+    // Filter by date range
+    if (dateRange.from) {
+      const purchaseDate = new Date(purchase.purchaseDate);
+      const fromDate = dateRange.from;
+      const toDate = dateRange.to || new Date(); // Use current date if no end date
+      
+      // Check if purchase date is outside the range
+      if (purchaseDate < fromDate || purchaseDate > toDate) {
+        return false;
+      }
     }
     
     // Filter by status
@@ -138,6 +157,7 @@ export const usePurchasesData = () => {
     setSupplierSearchTerm("");
     setProductSearchTerm("");
     setSelectedDate(undefined);
+    setDateRange({ from: undefined, to: undefined });
     setSelectedStatus("all");
   }, []);
 
@@ -149,6 +169,8 @@ export const usePurchasesData = () => {
     setProductSearchTerm,
     selectedDate,
     setSelectedDate,
+    dateRange,
+    setDateRange,
     selectedStatus,
     setSelectedStatus,
     isDeleteDialogOpen,

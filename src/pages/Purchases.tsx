@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +22,8 @@ const Purchases = () => {
     setProductSearchTerm,
     selectedDate,
     setSelectedDate,
+    dateRange,
+    setDateRange,
     selectedStatus,
     setSelectedStatus,
     isDeleteDialogOpen,
@@ -108,6 +111,8 @@ const Purchases = () => {
               setProductSearchTerm={setProductSearchTerm}
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
               selectedStatus={selectedStatus}
               setSelectedStatus={setSelectedStatus}
               onClearFilters={clearFilters}

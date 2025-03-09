@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/select";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 
 interface PurchasesFiltersProps {
   supplierSearchTerm: string;
@@ -21,6 +23,11 @@ interface PurchasesFiltersProps {
   setProductSearchTerm: (term: string) => void;
   selectedDate: string | undefined;
   setSelectedDate: (date: string | undefined) => void;
+  dateRange: {
+    from: Date | undefined;
+    to: Date | undefined;
+  };
+  setDateRange: (range: { from: Date | undefined; to: Date | undefined }) => void;
   selectedStatus: "all" | "payée" | "impayée";
   setSelectedStatus: (status: "all" | "payée" | "impayée") => void;
   onClearFilters: () => void;
@@ -33,20 +40,39 @@ export const PurchasesFilters = ({
   setProductSearchTerm,
   selectedDate,
   setSelectedDate,
+  dateRange,
+  setDateRange,
   selectedStatus,
   setSelectedStatus,
   onClearFilters
 }: PurchasesFiltersProps) => {
   const handleClearSupplierSearch = () => setSupplierSearchTerm("");
   const handleClearProductSearch = () => setProductSearchTerm("");
-  const handleClearDate = () => setSelectedDate(undefined);
+  const handleClearDate = () => {
+    setSelectedDate(undefined);
+    setDateRange({ from: undefined, to: undefined });
+  };
   
   // Convert string date to Date object for the Calendar component
   const dateValue = selectedDate ? new Date(selectedDate) : undefined;
   
   // Handle date selection from the Calendar component
   const handleDateSelect = (date: Date | undefined) => {
+    // When selecting a single date, clear the date range
+    setDateRange({ from: undefined, to: undefined });
     setSelectedDate(date ? date.toISOString().split('T')[0] : undefined);
+  };
+  
+  // Handle date range selection
+  const handleDateRangeSelect = (range: DateRange | undefined) => {
+    if (range) {
+      // When selecting a date range, clear the single date
+      setSelectedDate(undefined);
+      setDateRange({
+        from: range.from,
+        to: range.to
+      });
+    }
   };
   
   return (
@@ -93,6 +119,7 @@ export const PurchasesFilters = ({
         )}
       </div>
       
+      {/* Date Selector */}
       <Popover>
         <PopoverTrigger asChild>
           <Button 
@@ -100,7 +127,9 @@ export const PurchasesFilters = ({
             className="gap-2"
           >
             <Calendar className="h-4 w-4" />
-            {selectedDate ? format(new Date(selectedDate), 'dd/MM/yyyy') : "Date"}
+            {selectedDate 
+              ? format(new Date(selectedDate), 'dd/MM/yyyy') 
+              : "Date"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -121,6 +150,45 @@ export const PurchasesFilters = ({
         </PopoverContent>
       </Popover>
       
+      {/* Date Range Selector */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button 
+            variant={(dateRange.from || dateRange.to) ? "default" : "outline"}
+            className="gap-2"
+          >
+            <Calendar className="h-4 w-4" />
+            {dateRange.from && dateRange.to ? (
+              <>
+                {format(dateRange.from, 'dd/MM/yy')} - {format(dateRange.to, 'dd/MM/yy')}
+              </>
+            ) : dateRange.from ? (
+              <>
+                {format(dateRange.from, 'dd/MM/yy')} - ...
+              </>
+            ) : "Période"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <CalendarComponent
+            initialFocus
+            mode="range"
+            defaultMonth={dateRange.from}
+            selected={{ from: dateRange.from, to: dateRange.to }}
+            onSelect={handleDateRangeSelect}
+            numberOfMonths={2}
+            locale={fr}
+          />
+          {(dateRange.from || dateRange.to) && (
+            <div className="p-2 border-t flex justify-end">
+              <Button variant="ghost" size="sm" onClick={handleClearDate}>
+                Effacer
+              </Button>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
+      
       <Select value={selectedStatus} onValueChange={setSelectedStatus}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Statut" />
@@ -132,7 +200,7 @@ export const PurchasesFilters = ({
         </SelectContent>
       </Select>
       
-      {(supplierSearchTerm || productSearchTerm || selectedDate || selectedStatus !== "all") && (
+      {(supplierSearchTerm || productSearchTerm || selectedDate || dateRange.from || dateRange.to || selectedStatus !== "all") && (
         <Button variant="outline" size="icon" onClick={onClearFilters}>
           <X className="h-4 w-4" />
         </Button>
