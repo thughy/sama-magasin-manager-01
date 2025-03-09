@@ -14,14 +14,16 @@ export const useSupplierHandlers = (
   setPaymentDate: (date: string) => void
 ) => {
   const handleSupplierSelect = useCallback((supplier: Supplier) => {
-    // Reset all state related to the previous supplier
+    // First, reset all state related to the previous supplier
     setSelectedPurchase(null);
     setIsPaymentDialogOpen(false);
     setIsPaymentHistoryOpen(false);
     setIsPurchaseFormOpen(false);
     
-    // Set the new supplier
-    setSelectedSupplier(supplier);
+    // Then set the new supplier
+    setTimeout(() => {
+      setSelectedSupplier(supplier);
+    }, 0);
   }, [setSelectedSupplier, setSelectedPurchase, setIsPaymentDialogOpen, setIsPaymentHistoryOpen, setIsPurchaseFormOpen]);
 
   const handlePaymentClick = useCallback((purchase: Purchase) => {

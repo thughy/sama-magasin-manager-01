@@ -56,7 +56,7 @@ export function SupplierSelector({
           <Command>
             <CommandInput placeholder="Rechercher un fournisseur..." />
             <CommandEmpty>Aucun fournisseur trouvé.</CommandEmpty>
-            <CommandGroup>
+            <CommandGroup className="max-h-[300px] overflow-auto">
               {safeSuppliers.map((supplier) => (
                 <CommandItem
                   key={supplier.id}

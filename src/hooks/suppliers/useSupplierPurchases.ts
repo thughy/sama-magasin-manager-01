@@ -13,6 +13,7 @@ export const useSupplierPurchases = (selectedSupplier: Supplier | null) => {
     
     // Reset state when supplier changes
     setSupplierPurchases([]);
+    setError(null);
     
     if (!selectedSupplier) {
       return;
@@ -20,7 +21,6 @@ export const useSupplierPurchases = (selectedSupplier: Supplier | null) => {
 
     // Set loading state
     setIsLoading(true);
-    setError(null);
 
     // Use setTimeout to prevent state updates in the same render cycle
     // and to avoid race conditions
@@ -58,7 +58,7 @@ export const useSupplierPurchases = (selectedSupplier: Supplier | null) => {
       } finally {
         setIsLoading(false);
       }
-    }, 100); // Slightly longer timeout to ensure DOM is ready
+    }, 300); // Slightly longer timeout to ensure DOM is ready
 
     // Cleanup function to cancel timeout if component unmounts or supplier changes
     return () => {
