@@ -30,10 +30,10 @@ export function SupplierSelector({
 }: SupplierSelectorProps) {
   const [open, setOpen] = React.useState(false);
 
-  // Add safety check to ensure suppliers is always an array
+  // Make absolutely sure we have an array to work with
   const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
   
-  console.log("Rendering SupplierSelector with suppliers:", safeSuppliers);
+  console.log("Rendering SupplierSelector with suppliers count:", safeSuppliers.length);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -52,27 +52,29 @@ export function SupplierSelector({
         <Command>
           <CommandInput placeholder="Rechercher un fournisseur..." />
           <CommandEmpty>Aucun fournisseur trouvé.</CommandEmpty>
-          <CommandGroup>
-            {safeSuppliers.length > 0 ? safeSuppliers.map((supplier) => (
-              <CommandItem
-                key={supplier.id}
-                value={supplier.name}
-                onSelect={() => {
-                  onSupplierSelect(supplier);
-                  setOpen(false);
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    selectedSupplier?.id === supplier.id
-                      ? "opacity-100"
-                      : "opacity-0"
-                  )}
-                />
-                {supplier.name}
-              </CommandItem>
-            )) : (
+          <CommandGroup className="max-h-60 overflow-auto">
+            {safeSuppliers.length > 0 ? (
+              safeSuppliers.map((supplier) => (
+                <CommandItem
+                  key={supplier.id}
+                  value={supplier.name}
+                  onSelect={() => {
+                    onSupplierSelect(supplier);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedSupplier?.id === supplier.id
+                        ? "opacity-100"
+                        : "opacity-0"
+                    )}
+                  />
+                  {supplier.name}
+                </CommandItem>
+              ))
+            ) : (
               <CommandItem disabled>Chargement des fournisseurs...</CommandItem>
             )}
           </CommandGroup>

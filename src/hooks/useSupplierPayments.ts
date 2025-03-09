@@ -17,50 +17,60 @@ export const useSupplierPayments = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load suppliers on mount
+  // Load suppliers on mount - Make sure this runs only once
   useEffect(() => {
-    try {
-      console.log("Loading suppliers data:", suppliersData);
-      // Make sure we always have suppliers data to work with
-      if (Array.isArray(suppliersData) && suppliersData.length > 0) {
-        setSuppliers(suppliersData);
-      } else {
-        console.error("Suppliers data is empty or not an array:", suppliersData);
-        setSuppliers([]);
-      }
+    const loadData = () => {
+      try {
+        console.log("Loading suppliers data from source:", suppliersData);
+        
+        // Safety check for suppliers data
+        if (suppliersData && Array.isArray(suppliersData)) {
+          setSuppliers(suppliersData);
+          console.log("Successfully loaded suppliers:", suppliersData.length);
+        } else {
+          console.error("Suppliers data is not valid:", suppliersData);
+          setSuppliers([]);
+        }
 
-      // Initialize localStorage with sample purchase data if needed
-      if (!localStorage.getItem("purchases")) {
-        localStorage.setItem("purchases", JSON.stringify(purchasesData));
+        // Initialize localStorage with sample purchase data if needed
+        if (!localStorage.getItem("purchases")) {
+          localStorage.setItem("purchases", JSON.stringify(purchasesData));
+          console.log("Initialized purchase data in localStorage");
+        }
+      } catch (error) {
+        console.error("Error loading suppliers data:", error);
+        setSuppliers([]);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error loading suppliers:", error);
-      setSuppliers([]);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    loadData();
   }, []);
 
   // Load purchases for selected supplier
   useEffect(() => {
-    if (selectedSupplier) {
+    if (!selectedSupplier) {
+      setSupplierPurchases([]);
+      return;
+    }
+
+    try {
       const storedPurchases = localStorage.getItem("purchases");
-      if (storedPurchases) {
-        try {
-          const allPurchases: Purchase[] = JSON.parse(storedPurchases);
-          const filteredPurchases = allPurchases.filter(
-            (purchase) => purchase.supplierId === selectedSupplier.id && purchase.status === 'impayée'
-          );
-          console.log("Filtered purchases for supplier:", filteredPurchases);
-          setSupplierPurchases(filteredPurchases);
-        } catch (error) {
-          console.error("Error parsing purchases:", error);
-          setSupplierPurchases([]);
-        }
-      } else {
+      if (!storedPurchases) {
+        console.log("No purchases found in localStorage");
         setSupplierPurchases([]);
+        return;
       }
-    } else {
+
+      const allPurchases: Purchase[] = JSON.parse(storedPurchases);
+      const filteredPurchases = allPurchases.filter(
+        (purchase) => purchase.supplierId === selectedSupplier.id && purchase.status === 'impayée'
+      );
+      console.log("Filtered purchases for supplier:", filteredPurchases);
+      setSupplierPurchases(filteredPurchases);
+    } catch (error) {
+      console.error("Error parsing purchases:", error);
       setSupplierPurchases([]);
     }
   }, [selectedSupplier]);
