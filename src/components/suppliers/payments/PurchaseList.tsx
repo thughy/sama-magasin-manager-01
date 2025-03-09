@@ -48,6 +48,11 @@ export function PurchaseList({ purchases = [], onPaymentClick, onEditClick, onVi
     }
   };
 
+  // Fix: Create a separate onClick handler function that calls handlePrint
+  const onPrintButtonClick = () => {
+    handlePrint();
+  };
+
   if (!purchases || purchases.length === 0) {
     return (
       <Card>
@@ -71,7 +76,7 @@ export function PurchaseList({ purchases = [], onPaymentClick, onEditClick, onVi
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={handlePrint}
+            onClick={onPrintButtonClick} 
           >
             <Printer className="mr-2 h-4 w-4" />
             Imprimer les factures
