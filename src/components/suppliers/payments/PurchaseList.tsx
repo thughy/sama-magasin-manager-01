@@ -11,13 +11,17 @@ interface PurchaseListProps {
   onPaymentClick: (purchase: Purchase) => void;
 }
 
-export function PurchaseList({ purchases, onPaymentClick }: PurchaseListProps) {
+export function PurchaseList({ purchases = [], onPaymentClick }: PurchaseListProps) {
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('fr-FR').format(date);
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('fr-FR').format(date);
+    } catch (error) {
+      return dateString;
+    }
   };
 
-  if (purchases.length === 0) {
+  if (!purchases || purchases.length === 0) {
     return (
       <Card>
         <CardHeader>

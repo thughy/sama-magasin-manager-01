@@ -24,7 +24,7 @@ interface SupplierSelectorProps {
 }
 
 export function SupplierSelector({ 
-  suppliers, 
+  suppliers = [], // Provide default empty array to prevent undefined errors
   selectedSupplier, 
   onSupplierSelect 
 }: SupplierSelectorProps) {

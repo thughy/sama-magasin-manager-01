@@ -17,7 +17,8 @@ export const useSupplierPayments = () => {
 
   // Load suppliers on mount
   useEffect(() => {
-    setSuppliers(suppliersData);
+    console.log("Loading suppliers data:", suppliersData);
+    setSuppliers(suppliersData || []);
   }, []);
 
   // Load purchases for selected supplier
@@ -25,11 +26,17 @@ export const useSupplierPayments = () => {
     if (selectedSupplier) {
       const storedPurchases = localStorage.getItem("purchases");
       if (storedPurchases) {
-        const allPurchases: Purchase[] = JSON.parse(storedPurchases);
-        const filteredPurchases = allPurchases.filter(
-          (purchase) => purchase.supplierId === selectedSupplier.id && purchase.status === 'impayée'
-        );
-        setSupplierPurchases(filteredPurchases);
+        try {
+          const allPurchases: Purchase[] = JSON.parse(storedPurchases);
+          const filteredPurchases = allPurchases.filter(
+            (purchase) => purchase.supplierId === selectedSupplier.id && purchase.status === 'impayée'
+          );
+          console.log("Filtered purchases for supplier:", filteredPurchases);
+          setSupplierPurchases(filteredPurchases);
+        } catch (error) {
+          console.error("Error parsing purchases:", error);
+          setSupplierPurchases([]);
+        }
       } else {
         setSupplierPurchases([]);
       }
@@ -39,6 +46,7 @@ export const useSupplierPayments = () => {
   }, [selectedSupplier]);
 
   const handleSupplierSelect = (supplier: Supplier) => {
+    console.log("Selected supplier:", supplier);
     setSelectedSupplier(supplier);
   };
 
@@ -54,62 +62,71 @@ export const useSupplierPayments = () => {
     const storedPurchases = localStorage.getItem("purchases");
     if (!storedPurchases) return;
 
-    const allPurchases: Purchase[] = JSON.parse(storedPurchases);
-    
-    // Update the purchase with new payment
-    const updatedPurchases = allPurchases.map(purchase => {
-      if (purchase.id === selectedPurchase.id) {
-        const newTotalPaid = purchase.totalPaid + paymentAmount;
-        const newBalance = purchase.totalAmount - newTotalPaid;
-        const newStatus = newBalance <= 0 ? 'payée' as const : 'impayée' as const;
-        
-        return {
-          ...purchase,
-          totalPaid: newTotalPaid,
-          balance: newBalance,
-          status: newStatus
-        };
-      }
-      return purchase;
-    });
+    try {
+      const allPurchases: Purchase[] = JSON.parse(storedPurchases);
+      
+      // Update the purchase with new payment
+      const updatedPurchases = allPurchases.map(purchase => {
+        if (purchase.id === selectedPurchase.id) {
+          const newTotalPaid = purchase.totalPaid + paymentAmount;
+          const newBalance = purchase.totalAmount - newTotalPaid;
+          const newStatus = newBalance <= 0 ? 'payée' as const : 'impayée' as const;
+          
+          return {
+            ...purchase,
+            totalPaid: newTotalPaid,
+            balance: newBalance,
+            status: newStatus
+          };
+        }
+        return purchase;
+      });
 
-    // Save updated purchases
-    localStorage.setItem("purchases", JSON.stringify(updatedPurchases));
+      // Save updated purchases
+      localStorage.setItem("purchases", JSON.stringify(updatedPurchases));
 
-    // Update supplier data
-    const updatedSuppliers = suppliers.map(supplier => {
-      if (supplier.id === selectedSupplier.id) {
-        const newBalance = calculateSupplierBalance(supplier.id, updatedPurchases);
-        const newStatus = newBalance <= 0 ? 'payée' as const : 'impayée' as const;
-        
-        return {
-          ...supplier,
-          balance: newBalance,
-          totalPaid: supplier.totalPaid + paymentAmount,
-          status: newStatus
-        };
-      }
-      return supplier;
-    });
+      // Update supplier data
+      const updatedSuppliers = suppliers.map(supplier => {
+        if (supplier.id === selectedSupplier.id) {
+          const newBalance = calculateSupplierBalance(supplier.id, updatedPurchases);
+          const newStatus = newBalance <= 0 ? 'payée' as const : 'impayée' as const;
+          
+          return {
+            ...supplier,
+            balance: newBalance,
+            totalPaid: supplier.totalPaid + paymentAmount,
+            status: newStatus
+          };
+        }
+        return supplier;
+      });
 
-    // Update local state
-    setSuppliers(updatedSuppliers);
-    
-    // Refresh purchases for supplier
-    const updatedSupplierPurchases = updatedPurchases.filter(
-      (purchase) => purchase.supplierId === selectedSupplier.id && purchase.status === 'impayée'
-    );
-    setSupplierPurchases(updatedSupplierPurchases);
+      // Update local state
+      setSuppliers(updatedSuppliers);
+      
+      // Refresh purchases for supplier
+      const updatedSupplierPurchases = updatedPurchases.filter(
+        (purchase) => purchase.supplierId === selectedSupplier.id && purchase.status === 'impayée'
+      );
+      setSupplierPurchases(updatedSupplierPurchases);
 
-    // Close dialog and show success toast
-    setIsPaymentDialogOpen(false);
-    setSelectedPurchase(null);
-    setPaymentAmount(0);
-    
-    toast({
-      title: "Paiement enregistré",
-      description: `Paiement de ${paymentAmount.toLocaleString()} F CFA effectué pour la facture ${selectedPurchase.reference}`,
-    });
+      // Close dialog and show success toast
+      setIsPaymentDialogOpen(false);
+      setSelectedPurchase(null);
+      setPaymentAmount(0);
+      
+      toast({
+        title: "Paiement enregistré",
+        description: `Paiement de ${paymentAmount.toLocaleString()} F CFA effectué pour la facture ${selectedPurchase.reference}`,
+      });
+    } catch (error) {
+      console.error("Error during payment processing:", error);
+      toast({
+        title: "Erreur de paiement",
+        description: "Une erreur s'est produite lors du traitement du paiement",
+        variant: "destructive",
+      });
+    }
   };
 
   const calculateSupplierBalance = (supplierId: number, purchases: Purchase[]): number => {

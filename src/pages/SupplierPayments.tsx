@@ -6,6 +6,7 @@ import { SupplierInfo } from "@/components/suppliers/payments/SupplierInfo";
 import { PurchaseList } from "@/components/suppliers/payments/PurchaseList";
 import { PaymentDialog } from "@/components/suppliers/payments/PaymentDialog";
 import { useSupplierPayments } from "@/hooks/useSupplierPayments";
+import { useEffect } from "react";
 
 const SupplierPayments = () => {
   const {
@@ -23,6 +24,16 @@ const SupplierPayments = () => {
     handlePaymentClick,
     handlePaymentSubmit
   } = useSupplierPayments();
+
+  // Add logging to debug the component
+  useEffect(() => {
+    console.log("SupplierPayments component mounted");
+    console.log("Suppliers loaded:", suppliers);
+  }, [suppliers]);
+
+  useEffect(() => {
+    console.log("Selected supplier changed:", selectedSupplier);
+  }, [selectedSupplier]);
 
   return (
     <MainLayout>
@@ -43,7 +54,7 @@ const SupplierPayments = () => {
           </CardHeader>
           <CardContent>
             <SupplierSelector 
-              suppliers={suppliers}
+              suppliers={suppliers || []}
               selectedSupplier={selectedSupplier}
               onSupplierSelect={handleSupplierSelect}
             />
@@ -54,22 +65,24 @@ const SupplierPayments = () => {
           <div className="space-y-6">
             <SupplierInfo supplier={selectedSupplier} />
             <PurchaseList 
-              purchases={supplierPurchases}
+              purchases={supplierPurchases || []}
               onPaymentClick={handlePaymentClick}
             />
           </div>
         )}
 
-        <PaymentDialog
-          purchase={selectedPurchase}
-          open={isPaymentDialogOpen}
-          onOpenChange={setIsPaymentDialogOpen}
-          paymentAmount={paymentAmount}
-          onPaymentAmountChange={setPaymentAmount}
-          paymentMethod={paymentMethod}
-          onPaymentMethodChange={setPaymentMethod}
-          onSubmit={handlePaymentSubmit}
-        />
+        {selectedPurchase && (
+          <PaymentDialog
+            purchase={selectedPurchase}
+            open={isPaymentDialogOpen}
+            onOpenChange={setIsPaymentDialogOpen}
+            paymentAmount={paymentAmount}
+            onPaymentAmountChange={setPaymentAmount}
+            paymentMethod={paymentMethod}
+            onPaymentMethodChange={setPaymentMethod}
+            onSubmit={handlePaymentSubmit}
+          />
+        )}
       </div>
     </MainLayout>
   );

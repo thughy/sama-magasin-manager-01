@@ -8,6 +8,10 @@ interface SupplierInfoProps {
 }
 
 export function SupplierInfo({ supplier }: SupplierInfoProps) {
+  if (!supplier) {
+    return null;
+  }
+
   return (
     <Card>
       <CardHeader className="pb-2">
