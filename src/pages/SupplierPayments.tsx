@@ -1,16 +1,12 @@
 
+import React from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SupplierSelector } from "@/components/suppliers/payments/SupplierSelector";
-import { SupplierInfo } from "@/components/suppliers/payments/SupplierInfo";
-import { PurchaseList } from "@/components/suppliers/payments/PurchaseList";
-import { PaymentDialog } from "@/components/suppliers/payments/PaymentDialog";
 import { useSupplierPayments } from "@/hooks/useSupplierPayments";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PurchaseForm } from "@/components/suppliers/purchases/PurchaseForm";
-import { PaymentHistoryDialog } from "@/components/suppliers/payments/PaymentHistoryDialog";
+import { PaymentsHeader } from "@/components/suppliers/payments/PaymentsHeader";
+import { ErrorAlert } from "@/components/suppliers/payments/ErrorAlert";
+import { SupplierSelectionCard } from "@/components/suppliers/payments/SupplierSelectionCard";
+import { SupplierContent } from "@/components/suppliers/payments/SupplierContent";
+import { PaymentDialogs } from "@/components/suppliers/payments/PaymentDialogs";
 
 const SupplierPayments = () => {
   const {
@@ -42,96 +38,57 @@ const SupplierPayments = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Paiement Fournisseur</h1>
-          <p className="text-muted-foreground">
-            Gérez tous les paiements effectués à vos fournisseurs
-          </p>
-        </div>
+        {/* Header Section */}
+        <PaymentsHeader 
+          title="Paiement Fournisseur" 
+          description="Gérez tous les paiements effectués à vos fournisseurs" 
+        />
 
         {/* Error state */}
         {!isLoading && suppliers.length === 0 && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Erreur de chargement</AlertTitle>
-            <AlertDescription>
-              Impossible de charger les données des fournisseurs. Veuillez rafraîchir la page.
-            </AlertDescription>
-          </Alert>
+          <ErrorAlert 
+            title="Erreur de chargement" 
+            description="Impossible de charger les données des fournisseurs. Veuillez rafraîchir la page." 
+          />
         )}
 
         {/* Supplier selection card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Sélection du fournisseur</CardTitle>
-            <CardDescription>
-              Sélectionnez un fournisseur pour voir ses factures impayées
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-10 w-full" />
-              </div>
-            ) : (
-              <SupplierSelector 
-                suppliers={suppliers}
-                selectedSupplier={selectedSupplier}
-                onSupplierSelect={handleSupplierSelect}
-                isLoading={isLoading}
-              />
-            )}
-          </CardContent>
-        </Card>
+        <SupplierSelectionCard
+          suppliers={suppliers}
+          selectedSupplier={selectedSupplier}
+          onSupplierSelect={handleSupplierSelect}
+          isLoading={isLoading}
+        />
 
         {/* Supplier info and purchases list */}
         {selectedSupplier && (
-          <div className="space-y-6">
-            <SupplierInfo supplier={selectedSupplier} />
-            <PurchaseList 
-              purchases={supplierPurchases || []}
-              onPaymentClick={handlePaymentClick}
-              onEditClick={handleEditPurchase}
-              onViewHistory={handleViewPaymentHistory}
-              supplier={selectedSupplier} // Pass the supplier data to PurchaseList
-            />
-          </div>
-        )}
-
-        {/* Payment dialog */}
-        {selectedPurchase && (
-          <PaymentDialog
-            purchase={selectedPurchase}
-            open={isPaymentDialogOpen}
-            onOpenChange={setIsPaymentDialogOpen}
-            paymentAmount={paymentAmount}
-            onPaymentAmountChange={setPaymentAmount}
-            paymentMethod={paymentMethod}
-            onPaymentMethodChange={setPaymentMethod}
-            paymentDate={paymentDate}
-            onPaymentDateChange={setPaymentDate}
-            onSubmit={handlePaymentSubmit}
+          <SupplierContent
+            supplier={selectedSupplier}
+            purchases={supplierPurchases}
+            onPaymentClick={handlePaymentClick}
+            onEditClick={handleEditPurchase}
+            onViewHistory={handleViewPaymentHistory}
           />
         )}
 
-        {/* Purchase Edit Form */}
-        {selectedPurchase && (
-          <PurchaseForm
-            isOpen={isPurchaseFormOpen}
-            onClose={() => setIsPurchaseFormOpen(false)}
-            initialPurchase={selectedPurchase}
-            onSave={handleSavePurchase}
-          />
-        )}
-
-        {/* Payment History Dialog */}
-        {selectedPurchase && (
-          <PaymentHistoryDialog
-            purchase={selectedPurchase}
-            open={isPaymentHistoryOpen}
-            onOpenChange={setIsPaymentHistoryOpen}
-          />
-        )}
+        {/* All Dialogs */}
+        <PaymentDialogs
+          selectedPurchase={selectedPurchase}
+          isPaymentDialogOpen={isPaymentDialogOpen}
+          setIsPaymentDialogOpen={setIsPaymentDialogOpen}
+          paymentAmount={paymentAmount}
+          setPaymentAmount={setPaymentAmount}
+          paymentMethod={paymentMethod}
+          setPaymentMethod={setPaymentMethod}
+          paymentDate={paymentDate}
+          setPaymentDate={setPaymentDate}
+          onPaymentSubmit={handlePaymentSubmit}
+          isPurchaseFormOpen={isPurchaseFormOpen}
+          setIsPurchaseFormOpen={setIsPurchaseFormOpen}
+          onSavePurchase={handleSavePurchase}
+          isPaymentHistoryOpen={isPaymentHistoryOpen}
+          setIsPaymentHistoryOpen={setIsPaymentHistoryOpen}
+        />
       </div>
     </MainLayout>
   );
