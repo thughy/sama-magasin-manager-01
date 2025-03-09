@@ -146,6 +146,11 @@
   @page {
     size: A4;
     margin: 1.5cm; /* Standard margin for documents */
+    
+    /* Add CSS counter for pages */
+    @bottom-right {
+      content: counter(page) " sur " counter(pages);
+    }
   }
   
   body {
@@ -154,6 +159,15 @@
     font-size: 12pt;
     margin: 0;
     padding: 0;
+  }
+  
+  /* Page numbering */
+  .current-page::after {
+    content: counter(page);
+  }
+  
+  .total-pages::after {
+    content: counter(pages);
   }
   
   .print-hidden,
