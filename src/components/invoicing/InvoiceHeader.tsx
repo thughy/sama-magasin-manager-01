@@ -2,7 +2,6 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ClientSearchInput } from "@/components/proforma/client-search/ClientSearchInput";
 import { Client } from "@/data/clientsData";
 import { useFormContext } from "react-hook-form";
 
@@ -25,9 +24,10 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
 }) => {
   const { setValue } = useFormContext();
 
-  const handleClientSelection = (client: Client) => {
-    onClientSelect(client);
-    setValue("clientName", client.name);
+  const handleClientNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    onClientSelect({ id: "", name: value } as Client);
+    setValue("clientName", value);
   };
 
   return (
@@ -58,13 +58,13 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <ClientSearchInput 
+      <div>
+        <Label htmlFor="clientName">Nom du client</Label>
+        <Input
+          id="clientName"
           value={clientName}
-          onChange={() => {}}
-          onSelectClient={handleClientSelection}
-          onCreateClient={() => {}}
-          selectedClient={clientName ? { id: "", name: clientName } as Client : null}
+          onChange={handleClientNameChange}
+          placeholder="Entrez le nom du client"
         />
       </div>
     </div>
