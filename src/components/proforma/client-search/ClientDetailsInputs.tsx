@@ -32,8 +32,9 @@ export function ClientDetailsInputs({ control, selectedClient }: ClientDetailsIn
                 type="email" 
                 placeholder="Email du client" 
                 {...field} 
-                disabled={!selectedClient}
-                className={!selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                disabled={selectedClient}
+                className={selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                readOnly={selectedClient}
               />
             </FormControl>
           </FormItem>
@@ -50,8 +51,9 @@ export function ClientDetailsInputs({ control, selectedClient }: ClientDetailsIn
               <Input 
                 placeholder="Téléphone du client" 
                 {...field} 
-                disabled={!selectedClient}
-                className={!selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                disabled={selectedClient}
+                className={selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                readOnly={selectedClient}
               />
             </FormControl>
           </FormItem>

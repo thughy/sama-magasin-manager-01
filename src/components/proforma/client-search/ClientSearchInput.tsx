@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Client, clientsData } from "@/data/clientsData";
 
@@ -48,6 +48,11 @@ export function ClientSearchInput({
     onChange(newValue);
   };
 
+  const handleClearClient = () => {
+    onChange("");
+    setSearchTerm("");
+  };
+
   return (
     <FormItem>
       <FormLabel>Nom du client</FormLabel>
@@ -57,8 +62,23 @@ export function ClientSearchInput({
             placeholder="Nom du client" 
             value={selectedClient ? selectedClient.name : searchTerm}
             onChange={handleChange}
+            readOnly={!!selectedClient}
+            disabled={!!selectedClient}
+            className={selectedClient ? "bg-gray-100 cursor-not-allowed pr-16" : ""}
             required
           />
+          {selectedClient ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-8 top-1/2 -translate-y-1/2 h-6 w-6"
+              onClick={handleClearClient}
+              title="Effacer le client sélectionné"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          ) : null}
           <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
       </FormControl>
