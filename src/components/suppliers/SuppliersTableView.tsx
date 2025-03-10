@@ -86,6 +86,7 @@ export const SuppliersTableView = ({
                     variant="ghost" 
                     size="icon"
                     onClick={() => handleAccessAccount(supplier)}
+                    title="Voir le compte"
                   >
                     <CreditCard className="h-4 w-4 text-green-500" />
                   </Button>

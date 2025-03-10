@@ -22,15 +22,9 @@ const PaymentJournal = () => {
   
   const printRef = useRef<HTMLDivElement>(null);
   
-  // Fixed the useReactToPrint hook syntax by using the correct property names
   const handlePrint = useReactToPrint({
     documentTitle: "Journal_des_paiements",
-    onBeforeGetContent: () => {
-      return new Promise<void>((resolve) => {
-        resolve();
-      });
-    },
-    // Using contentRef instead of content function
+    // Using contentRef instead of content function as per react-to-print v3 API
     contentRef: printRef,
     pageStyle: `
       @page {
