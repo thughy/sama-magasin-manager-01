@@ -9,6 +9,7 @@ import { Client } from "@/data/clientsData";
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import { SaveProformaDialog } from "./SaveProformaDialog";
+import { Save } from "lucide-react";
 
 interface ProformaItem {
   id: string;
@@ -80,16 +81,18 @@ export function ProformaFormStep({
         </form>
       </Form>
 
-      <div className="flex justify-between sm:justify-between mt-6">
+      <div className="flex justify-between items-center gap-4 mt-6 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onGoBack}>
           Retour
         </Button>
-        <div className="flex space-x-2">
+        <div className="flex gap-3">
           <Button 
             type="button"
             variant="outline" 
             onClick={() => setSaveDialogOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 font-medium"
           >
+            <Save size={18} />
             Enregistrer
           </Button>
           <Button 
