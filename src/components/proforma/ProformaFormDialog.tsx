@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
@@ -13,6 +14,7 @@ import { AddClientDialog } from "@/components/clients/AddClientDialog";
 import { ClientSearchInput } from "./client-search/ClientSearchInput";
 import { ClientDetailsInputs } from "./client-search/ClientDetailsInputs";
 import { ProformaDetailsInputs } from "./proforma-details/ProformaDetailsInputs";
+import { ProformaItems } from "./proforma-items/ProformaItems";
 import { useProformaForm } from "@/hooks/useProformaForm";
 
 interface ProformaFormDialogProps {
@@ -31,7 +33,13 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
     handleSelectClient,
     handleCreateClient,
     handleSaveClient,
-    onSubmit
+    onSubmit,
+    // Articles et services
+    proformaItems,
+    handleAddItem,
+    handleUpdateItem,
+    handleRemoveItem,
+    calculateTotalAmount
   } = useProformaForm(() => onOpenChange(false));
 
   return (
@@ -40,6 +48,9 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Créer une facture proforma</DialogTitle>
+            <DialogDescription>
+              Créez une facture proforma pour un client avec articles et services
+            </DialogDescription>
           </DialogHeader>
           
           <Form {...form}>
@@ -69,6 +80,17 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
               />
               
               <ProformaDetailsInputs control={form.control} />
+              
+              <ProformaItems
+                items={proformaItems}
+                onAddItem={handleAddItem}
+                onUpdateItem={handleUpdateItem}
+                onRemoveItem={handleRemoveItem}
+              />
+              
+              <div className="text-right text-xl font-bold mt-4">
+                Total: {calculateTotalAmount().toLocaleString()} XOF
+              </div>
               
               <DialogFooter className="mt-6">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

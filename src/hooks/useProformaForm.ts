@@ -5,6 +5,8 @@ import { Client } from "@/data/clientsData";
 import { useToast } from "@/components/ui/use-toast";
 import { useClientsData } from "@/hooks/useClientsData";
 import { Proforma } from "@/components/proforma/ProformasTable";
+import { Item } from "@/types/product";
+import { ProformaItem } from "@/components/proforma/proforma-items/ProformaItemsTable";
 
 export interface ProformaFormValues {
   clientName: string;
@@ -22,6 +24,7 @@ export function useProformaForm(onClose: () => void) {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientDialogOpen, setClientDialogOpen] = useState(false);
   const [proformas, setProformas] = useState<Proforma[]>([]);
+  const [proformaItems, setProformaItems] = useState<ProformaItem[]>([]);
   
   const form = useForm<ProformaFormValues>({
     defaultValues: {
@@ -57,13 +60,44 @@ export function useProformaForm(onClose: () => void) {
     handleSelectClient(newClient);
   };
 
+  const handleAddItem = (item: Item) => {
+    const newItem: ProformaItem = {
+      id: `item-${Date.now()}`,
+      name: item.name,
+      type: item.type,
+      quantity: 1,
+      unitPrice: item.type === "product" ? item.sellPrice : item.amount,
+    };
+    
+    setProformaItems([...proformaItems, newItem]);
+  };
+
+  const handleUpdateItem = (id: string, field: string, value: string | number) => {
+    setProformaItems(
+      proformaItems.map((item) => 
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  const handleRemoveItem = (id: string) => {
+    setProformaItems(proformaItems.filter((item) => item.id !== id));
+  };
+
+  const calculateTotalAmount = () => {
+    return proformaItems.reduce((total, item) => total + (item.quantity * item.unitPrice), 0);
+  };
+
   function onSubmit(data: ProformaFormValues) {
+    // Calculate total from items
+    const totalAmount = calculateTotalAmount();
+    
     // Create new proforma
     const newProforma: Proforma = {
       id: `PRO-${proformas.length + 1}`,
       reference: data.reference,
       clientName: data.clientName,
-      amount: data.amount,
+      amount: totalAmount.toString(),
       description: data.description,
       date: new Date().toLocaleDateString('fr-FR')
     };
@@ -79,6 +113,7 @@ export function useProformaForm(onClose: () => void) {
     
     form.reset();
     setSelectedClient(null);
+    setProformaItems([]);
     onClose();
   }
 
@@ -94,6 +129,12 @@ export function useProformaForm(onClose: () => void) {
     handleCreateClient,
     handleSaveClient,
     onSubmit,
-    proformas
+    proformas,
+    // Articles et services
+    proformaItems,
+    handleAddItem,
+    handleUpdateItem,
+    handleRemoveItem,
+    calculateTotalAmount
   };
 }
