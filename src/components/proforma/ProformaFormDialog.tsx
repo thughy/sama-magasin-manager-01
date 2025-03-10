@@ -174,7 +174,13 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Email du client" {...field} />
+                      <Input 
+                        type="email" 
+                        placeholder="Email du client" 
+                        {...field} 
+                        disabled={!selectedClient}
+                        className={!selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -187,7 +193,12 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
                   <FormItem>
                     <FormLabel>Téléphone</FormLabel>
                     <FormControl>
-                      <Input placeholder="Téléphone du client" {...field} />
+                      <Input 
+                        placeholder="Téléphone du client" 
+                        {...field} 
+                        disabled={!selectedClient}
+                        className={!selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
