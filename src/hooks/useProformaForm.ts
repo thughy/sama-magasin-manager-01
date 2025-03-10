@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { Client } from "@/data/clientsData";
 import { useToast } from "@/components/ui/use-toast";
 import { useClientsData } from "@/hooks/useClientsData";
+import { Proforma } from "@/components/proforma/ProformasTable";
 
 export interface ProformaFormValues {
   clientName: string;
@@ -20,6 +21,7 @@ export function useProformaForm(onClose: () => void) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientDialogOpen, setClientDialogOpen] = useState(false);
+  const [proformas, setProformas] = useState<Proforma[]>([]);
   
   const form = useForm<ProformaFormValues>({
     defaultValues: {
@@ -56,11 +58,25 @@ export function useProformaForm(onClose: () => void) {
   };
 
   function onSubmit(data: ProformaFormValues) {
+    // Create new proforma
+    const newProforma: Proforma = {
+      id: `PRO-${proformas.length + 1}`,
+      reference: data.reference,
+      clientName: data.clientName,
+      amount: data.amount,
+      description: data.description,
+      date: new Date().toLocaleDateString('fr-FR')
+    };
+    
+    // Add to proformas list
+    setProformas([...proformas, newProforma]);
+    
     toast({
       title: "Facture proforma créée",
       description: `Facture ${data.reference} créée pour ${data.clientName}`,
       duration: 3000,
     });
+    
     form.reset();
     setSelectedClient(null);
     onClose();
@@ -77,6 +93,7 @@ export function useProformaForm(onClose: () => void) {
     handleSelectClient,
     handleCreateClient,
     handleSaveClient,
-    onSubmit
+    onSubmit,
+    proformas
   };
 }

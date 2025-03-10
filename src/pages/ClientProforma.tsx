@@ -1,3 +1,4 @@
+
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,11 +7,15 @@ import { RefreshCw, Search, Save } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ProformaFormDialog } from "@/components/proforma/ProformaFormDialog";
+import { ProformasTable } from "@/components/proforma/ProformasTable";
+import { useProformaForm } from "@/hooks/useProformaForm";
 
 const ClientProforma = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const { toast } = useToast();
+  const proformaForm = useProformaForm(() => setFormDialogOpen(false));
+  const { proformas } = proformaForm;
 
   const handleRefresh = () => {
     toast({
@@ -29,6 +34,30 @@ const ClientProforma = () => {
         duration: 3000,
       });
     }
+  };
+
+  const handleEditProforma = (proforma: any) => {
+    toast({
+      title: "Modifier",
+      description: `Modification de la proforma: ${proforma.reference}`,
+      duration: 3000,
+    });
+  };
+
+  const handleViewProforma = (proforma: any) => {
+    toast({
+      title: "Voir",
+      description: `Affichage de la proforma: ${proforma.reference}`,
+      duration: 3000,
+    });
+  };
+
+  const handleDeleteProforma = (proforma: any) => {
+    toast({
+      title: "Supprimer",
+      description: `Suppression de la proforma: ${proforma.reference}`,
+      duration: 3000,
+    });
   };
 
   return (
@@ -75,12 +104,12 @@ const ClientProforma = () => {
             </Button>
           </form>
 
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <h3 className="text-lg font-medium">Aucun document proforma trouvé</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              La liste des proformas s'affichera ici
-            </p>
-          </div>
+          <ProformasTable 
+            proformas={proformas}
+            onEdit={handleEditProforma}
+            onView={handleViewProforma}
+            onDelete={handleDeleteProforma}
+          />
         </Card>
       </div>
       
