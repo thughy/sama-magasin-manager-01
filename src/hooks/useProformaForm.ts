@@ -52,7 +52,7 @@ export function useProformaForm(onClose: () => void) {
 
   const triggerPrint = () => {
     if (printRef.current) {
-      handlePrint(null, () => printRef.current);
+      handlePrint({ content: () => printRef.current });
     }
   };
 
