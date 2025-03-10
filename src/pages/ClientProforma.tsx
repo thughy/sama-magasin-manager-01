@@ -3,7 +3,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RefreshCw, Search } from "lucide-react";
+import { RefreshCw, Search, Save } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -28,6 +28,14 @@ const ClientProforma = () => {
         duration: 3000,
       });
     }
+  };
+
+  const handleSave = () => {
+    toast({
+      title: "Enregistrer",
+      description: "Facture proforma créée avec succès",
+      duration: 3000,
+    });
   };
 
   return (
@@ -64,6 +72,10 @@ const ClientProforma = () => {
               />
             </div>
             <Button type="submit">Rechercher</Button>
+            <Button type="button" onClick={handleSave} className="flex items-center gap-2">
+              <Save size={18} />
+              Enregistrer
+            </Button>
           </form>
 
           <div className="flex flex-col items-center justify-center py-12 text-center">
