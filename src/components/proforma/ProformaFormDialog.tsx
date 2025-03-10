@@ -56,36 +56,40 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="clientName"
-                  render={({ field }) => (
-                    <ClientSearchInput
-                      value={searchTerm}
-                      onChange={(value) => {
-                        setSearchTerm(value);
-                        field.onChange(value);
-                      }}
-                      onSelectClient={handleSelectClient}
-                      onCreateClient={handleCreateClient}
-                      selectedClient={selectedClient}
-                    />
-                  )}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-3">
+                  <FormField
+                    control={form.control}
+                    name="clientName"
+                    render={({ field }) => (
+                      <ClientSearchInput
+                        value={searchTerm}
+                        onChange={(value) => {
+                          setSearchTerm(value);
+                          field.onChange(value);
+                        }}
+                        onSelectClient={handleSelectClient}
+                        onCreateClient={handleCreateClient}
+                        selectedClient={selectedClient}
+                      />
+                    )}
+                  />
+                </div>
                 
-                <FormField
-                  control={form.control}
-                  name="reference"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Référence</FormLabel>
-                      <FormControl>
-                        <Input {...field} readOnly />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                <div className="md:col-span-1">
+                  <FormField
+                    control={form.control}
+                    name="reference"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Référence</FormLabel>
+                        <FormControl>
+                          <Input {...field} readOnly className="bg-gray-100" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
               
               <ClientDetailsInputs 
