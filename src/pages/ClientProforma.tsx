@@ -9,34 +9,27 @@ import { useToast } from "@/components/ui/use-toast";
 import { ProformaFormDialog } from "@/components/proforma/ProformaFormDialog";
 import { ProformasTable } from "@/components/proforma/ProformasTable";
 import { useProformaForm } from "@/hooks/useProformaForm";
-import { proformaApi } from "@/services/api";
 
 const ClientProforma = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const proformaForm = useProformaForm(() => setFormDialogOpen(false));
-  const { proformas } = proformaForm;
+  const proformaForm = useProformaForm(() => {
+    setFormDialogOpen(false);
+    handleRefresh(); // Rafraîchir la liste après avoir fermé le formulaire
+  });
+  const { proformas, loadProformas } = proformaForm;
 
   const handleRefresh = async () => {
     setIsLoading(true);
     try {
-      const response = await proformaApi.getAll();
-      if (response.success && response.data) {
-        proformaForm.loadProformas();
-        toast({
-          title: "Actualiser",
-          description: "Les données ont été actualisées",
-          duration: 3000,
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: response.error || "Impossible de charger les données",
-          duration: 3000,
-        });
-      }
+      await loadProformas();
+      toast({
+        title: "Actualiser",
+        description: "Les données ont été actualisées",
+        duration: 3000,
+      });
     } catch (error) {
       console.error("Erreur lors de l'actualisation:", error);
       toast({
@@ -146,6 +139,15 @@ const ClientProforma = () => {
     handleRefresh();
   }, []);
 
+  // Filtrer les proformas selon le terme de recherche
+  const filteredProformas = searchTerm.trim() === "" 
+    ? proformas 
+    : proformas.filter(p => 
+        p.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
@@ -192,7 +194,7 @@ const ClientProforma = () => {
           </form>
 
           <ProformasTable 
-            proformas={proformas}
+            proformas={filteredProformas}
             onEdit={handleEditProforma}
             onView={handleViewProforma}
             onDelete={handleDeleteProforma}

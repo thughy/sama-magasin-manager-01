@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Client } from "@/data/clientsData";
 import { useToast } from "@/components/ui/use-toast";
@@ -55,9 +55,9 @@ export function useProformaForm(onClose: () => void) {
   };
   
   // Chargement initial
-  useState(() => {
+  useEffect(() => {
     loadProformas();
-  });
+  }, []);
   
   const generateReference = () => `PRO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
   
@@ -165,7 +165,7 @@ export function useProformaForm(onClose: () => void) {
     const totalAmount = calculateTotalAmount();
     
     const newProforma: Proforma = {
-      id: `PRO-${proformas.length + 1}`,
+      id: `PRO-${Date.now()}`,
       reference: data.reference,
       clientName: data.clientName,
       amount: totalAmount.toString(),
@@ -184,7 +184,7 @@ export function useProformaForm(onClose: () => void) {
       
       if (response.success) {
         // Mise à jour de l'état local
-        setProformas([...proformas, newProforma]);
+        await loadProformas(); // Recharger les proformas depuis l'API
         
         toast({
           title: "Facture proforma créée",
