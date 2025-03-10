@@ -14,7 +14,8 @@ import {
   Tags,
   Layers3,
   Download,
-  Wallet
+  Wallet,
+  ScrollText
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar";
 
@@ -40,7 +41,8 @@ export const navItems: NavItem[] = [
       { title: "Liste des fournisseurs", url: "/suppliers", icon: Truck },
       { title: "Bon de commande", url: "/suppliers/purchase-orders", icon: FileText },
       { title: "Achat de marchandises", url: "/suppliers/purchases", icon: Download },
-      { title: "Paiement fournisseur", url: "/suppliers/payments", icon: Wallet }
+      { title: "Paiement fournisseur", url: "/suppliers/payments", icon: Wallet },
+      { title: "Journal des paiements", url: "/suppliers/payment-journal", icon: ScrollText }
     ]
   },
   { 
