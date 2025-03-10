@@ -37,11 +37,11 @@ export function InvoiceItemsTable({
     if (existingItemIndex !== -1) {
       // Item already exists, update quantity
       const existingItem = items[existingItemIndex];
-      const newQuantity = existingItem.quantity + 1;
+      const newQuantity = Number(existingItem.quantity) + 1; // Ensure quantity is a number
       
       // Calculate new total price considering discount
-      const unitPrice = existingItem.unitPrice;
-      const discount = existingItem.discount || 0;
+      const unitPrice = Number(existingItem.unitPrice);
+      const discount = Number(existingItem.discount || 0);
       const discountAmount = (unitPrice * discount) / 100;
       const discountedPrice = unitPrice - discountAmount;
       const newTotalPrice = newQuantity * discountedPrice;

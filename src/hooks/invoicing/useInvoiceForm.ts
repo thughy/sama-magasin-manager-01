@@ -74,14 +74,15 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
   const handleUpdateItem = (id: string, field: keyof InvoiceItem, value: any) => {
     setItems(items.map(item => {
       if (item.id === id) {
+        // First create a new item with the updated field
         const updatedItem = { ...item, [field]: value };
         
         // Recalculate totalPrice if quantity, unitPrice, or discount changes
         if (field === 'quantity' || field === 'unitPrice' || field === 'discount') {
           updatedItem.totalPrice = calculateItemTotal(
-            updatedItem.quantity, 
-            updatedItem.unitPrice, 
-            updatedItem.discount || 0
+            Number(updatedItem.quantity), 
+            Number(updatedItem.unitPrice), 
+            Number(updatedItem.discount || 0)
           );
         }
         

@@ -39,11 +39,6 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           onChange={(e) => {
             const newQuantity = Number(e.target.value) || 1;
             onUpdateItem(item.id, "quantity", newQuantity);
-            onUpdateItem(
-              item.id, 
-              "totalPrice", 
-              calculateTotalPrice(newQuantity, item.unitPrice, item.discount)
-            );
           }}
           className="w-20"
         />
@@ -56,11 +51,6 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           onChange={(e) => {
             const newUnitPrice = Number(e.target.value) || 0;
             onUpdateItem(item.id, "unitPrice", newUnitPrice);
-            onUpdateItem(
-              item.id, 
-              "totalPrice", 
-              calculateTotalPrice(item.quantity, newUnitPrice, item.discount)
-            );
           }}
           className="w-28"
         />
@@ -74,11 +64,6 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           onChange={(e) => {
             const newDiscount = Number(e.target.value) || 0;
             onUpdateItem(item.id, "discount", newDiscount);
-            onUpdateItem(
-              item.id, 
-              "totalPrice", 
-              calculateTotalPrice(item.quantity, item.unitPrice, newDiscount)
-            );
           }}
           className="w-20"
         />
