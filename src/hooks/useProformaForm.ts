@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Client } from "@/data/clientsData";
@@ -111,10 +110,19 @@ export function useProformaForm(onClose: () => void) {
       duration: 3000,
     });
     
-    form.reset();
+    // Reset form but don't close it
+    form.reset({
+      clientName: "",
+      clientEmail: "",
+      clientPhone: "",
+      reference: `PRO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      description: "",
+      amount: "",
+    });
     setSelectedClient(null);
     setProformaItems([]);
-    onClose();
+    
+    // Don't call onClose() to keep dialog open
   }
 
   return {
