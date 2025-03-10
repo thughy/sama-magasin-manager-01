@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ProformaFormDialog } from "@/components/proforma/ProformaFormDialog";
 import { ProformasTable } from "@/components/proforma/ProformasTable";
 import { useProformaForm } from "@/hooks/useProformaForm";
+import { proformaApi } from "@/services/api"; // Ajout de l'import manquant
 
 const ClientProforma = () => {
   const [searchTerm, setSearchTerm] = useState("");
