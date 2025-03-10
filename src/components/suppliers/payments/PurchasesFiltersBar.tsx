@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { FilterX } from "lucide-react";
 import { PurchasesStatusFilter } from "./PurchasesStatusFilter";
 import { PurchasesDateFilters } from "./PurchasesDateFilters";
 import { PurchasesReferenceFilter } from "./PurchasesReferenceFilter";
@@ -58,8 +58,13 @@ export const PurchasesFiltersBar: React.FC<PurchasesFiltersBarProps> = ({
       
       {/* Bouton pour réinitialiser tous les filtres */}
       {hasActiveFilters && (
-        <Button variant="outline" size="icon" onClick={resetFilters}>
-          <X className="h-4 w-4" />
+        <Button 
+          variant="outline" 
+          onClick={resetFilters}
+          className="ml-auto flex items-center gap-2"
+        >
+          <FilterX className="h-4 w-4" /> 
+          <span className="hidden sm:inline">Désactiver les filtres</span>
         </Button>
       )}
     </div>
