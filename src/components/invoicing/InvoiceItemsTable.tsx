@@ -72,12 +72,12 @@ export function InvoiceItemsTable({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium">Articles et services</h3>
-        <div className="relative w-1/2">
+        <div className="relative w-2/3">
           <Input
             placeholder="Rechercher un article ou service par nom ou code barre..."
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pr-10"
+            className="pr-10 w-full"
           />
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-1">
             <Search className="h-4 w-4 text-gray-400" />
