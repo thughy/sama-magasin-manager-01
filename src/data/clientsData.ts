@@ -7,6 +7,7 @@ export interface Client {
   type: string;
   balance: number;
   lastPurchase: string;
+  address?: string;
 }
 
 // Données fictives pour les clients
@@ -19,6 +20,7 @@ export const clientsData: Client[] = [
     type: "Régulier",
     balance: 75000,
     lastPurchase: "12/05/2023",
+    address: "Dakar, Senegal"
   },
   {
     id: "CLI002",
@@ -28,6 +30,7 @@ export const clientsData: Client[] = [
     type: "VIP",
     balance: 0,
     lastPurchase: "20/06/2023",
+    address: "Thiès, Senegal"
   },
   {
     id: "CLI003",
@@ -37,6 +40,7 @@ export const clientsData: Client[] = [
     type: "Occasionnel",
     balance: 12500,
     lastPurchase: "05/07/2023",
+    address: "Saint-Louis, Senegal"
   },
   {
     id: "CLI004",
@@ -46,6 +50,7 @@ export const clientsData: Client[] = [
     type: "Régulier",
     balance: 35000,
     lastPurchase: "18/07/2023",
+    address: "Ziguinchor, Senegal"
   },
   {
     id: "CLI005",
@@ -55,5 +60,6 @@ export const clientsData: Client[] = [
     type: "VIP",
     balance: 150000,
     lastPurchase: "02/08/2023",
+    address: "Kaolack, Senegal"
   },
 ];

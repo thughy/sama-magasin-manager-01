@@ -4,9 +4,10 @@ import { Card } from "@/components/ui/card";
 import { ClientsHeader } from "@/components/clients/ClientsHeader";
 import { ClientsSearch } from "@/components/clients/ClientsSearch";
 import { ClientsTable } from "@/components/clients/ClientsTable";
-import { useClientsData } from "@/hooks/useClientsData";
+import { useClientsData, NewClient } from "@/hooks/useClientsData";
 import { useToast } from "@/components/ui/use-toast";
-import { useCallback } from "react";
+import { useState, useCallback } from "react";
+import { AddClientDialog } from "@/components/clients/AddClientDialog";
 
 const Clients = () => {
   const {
@@ -16,15 +17,27 @@ const Clients = () => {
     setSelectedType,
     filteredClients,
     clientTypes,
-    refreshClients
+    refreshClients,
+    addClient
   } = useClientsData();
 
   const { toast } = useToast();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const handleAddClient = () => {
-    // Function to handle adding a new client
-    console.log("Adding a new client");
+    setIsAddDialogOpen(true);
   };
+
+  const handleSaveClient = useCallback((data: NewClient) => {
+    const newClient = addClient(data);
+    setIsAddDialogOpen(false);
+    
+    toast({
+      title: "Client ajouté",
+      description: `${newClient.name} a été ajouté avec succès.`,
+      duration: 3000,
+    });
+  }, [addClient, toast]);
 
   const handleRefresh = useCallback(() => {
     refreshClients();
@@ -55,6 +68,12 @@ const Clients = () => {
           <ClientsTable clients={filteredClients} />
         </Card>
       </div>
+      
+      <AddClientDialog 
+        open={isAddDialogOpen} 
+        onOpenChange={setIsAddDialogOpen} 
+        onSave={handleSaveClient}
+      />
     </MainLayout>
   );
 };

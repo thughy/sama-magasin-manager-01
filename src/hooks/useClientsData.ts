@@ -2,6 +2,13 @@
 import { useState, useMemo, useCallback } from "react";
 import { clientsData, Client } from "@/data/clientsData";
 
+export interface NewClient {
+  name: string;
+  phone: string;
+  email: string;
+  address?: string;
+}
+
 export const useClientsData = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -33,6 +40,26 @@ export const useClientsData = () => {
     setClients([...clientsData]);
   }, []);
 
+  // Function to add a new client
+  const addClient = useCallback((newClient: NewClient) => {
+    const clientId = `CLI${String(clients.length + 1).padStart(3, '0')}`;
+    const clientType = "Nouveau";
+    
+    const client: Client = {
+      id: clientId,
+      name: newClient.name,
+      phone: newClient.phone,
+      email: newClient.email,
+      address: newClient.address || "",
+      type: clientType,
+      balance: 0,
+      lastPurchase: new Date().toLocaleDateString('fr-FR')
+    };
+    
+    setClients(prevClients => [...prevClients, client]);
+    return client;
+  }, [clients]);
+
   return {
     searchTerm,
     setSearchTerm,
@@ -40,6 +67,7 @@ export const useClientsData = () => {
     setSelectedType,
     filteredClients,
     clientTypes,
-    refreshClients
+    refreshClients,
+    addClient
   };
 };
