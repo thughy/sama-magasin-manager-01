@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 import { Client } from "@/data/clientsData";
@@ -9,7 +8,6 @@ import { useProformaState } from "./useProformaState";
 import { useClientSelection } from "./useClientSelection";
 import { useProformaPrinting } from "./useProformaPrinting";
 
-// Extended type that includes the additional client details needed for printing
 interface ProformaWithClientDetails extends Proforma {
   clientEmail?: string;
   clientPhone?: string;
@@ -27,7 +25,6 @@ export interface ProformaFormValues {
 export function useProformaForm(onClose: () => void) {
   const { toast } = useToast();
   
-  // Import functionality from smaller hooks
   const {
     proformas,
     proformaItems,
@@ -61,10 +58,8 @@ export function useProformaForm(onClose: () => void) {
 
   const { printRef, triggerPrint } = useProformaPrinting();
 
-  // Generate a unique reference for new proformas
   const generateReference = () => `PRO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
   
-  // Initialize the form
   const form = useForm<ProformaFormValues>({
     defaultValues: {
       clientName: "",
@@ -76,7 +71,6 @@ export function useProformaForm(onClose: () => void) {
     },
   });
 
-  // Reset form to initial state
   const resetForm = () => {
     setSelectedClient(null);
     setProformaItems([]);
@@ -92,7 +86,6 @@ export function useProformaForm(onClose: () => void) {
     });
   };
 
-  // Load an existing proforma for editing
   const loadProformaForEdit = async (proforma: Proforma) => {
     setIsLoading(true);
     try {
@@ -100,7 +93,6 @@ export function useProformaForm(onClose: () => void) {
       if (response.success && response.data) {
         const proformaData = response.data;
         
-        // Set form values
         form.reset({
           clientName: proformaData.clientName,
           clientEmail: proformaData.clientEmail || "",
@@ -110,18 +102,16 @@ export function useProformaForm(onClose: () => void) {
           amount: proformaData.amount,
         });
         
-        // Set items if available
         if (proformaData.items && Array.isArray(proformaData.items)) {
           setProformaItems(proformaData.items);
         }
         
-        // Set edit mode
         setIsEditMode(true);
         setCurrentProforma(proformaData as ProformaWithClientDetails);
         
         toast({
           title: "Proforma chargée",
-          description: `La proforma ${proformaData.reference} est prête à être modifiée`,
+          description: `La proforma ${proformaData.reference} est prête à être modifiée",
           duration: 3000,
         });
       } else {
@@ -143,7 +133,6 @@ export function useProformaForm(onClose: () => void) {
     }
   };
 
-  // Handle client selection and populate form fields
   const handleClientSelect = (client: Client) => {
     const selectedClient = handleSelectClient(client);
     form.setValue("clientName", selectedClient.name);
@@ -151,7 +140,6 @@ export function useProformaForm(onClose: () => void) {
     form.setValue("clientPhone", selectedClient.phone || "");
   };
 
-  // Form submission handler
   async function onSubmit(data: ProformaFormValues) {
     setIsLoading(true);
     const totalAmount = calculateTotalAmount();
@@ -169,7 +157,6 @@ export function useProformaForm(onClose: () => void) {
       let response;
       
       if (isEditMode) {
-        // Update existing proforma
         response = await proformaApi.update({
           ...proformaData,
           items: proformaItems,
@@ -185,7 +172,6 @@ export function useProformaForm(onClose: () => void) {
           });
         }
       } else {
-        // Create new proforma
         response = await proformaApi.create({
           ...proformaData,
           items: proformaItems,
@@ -203,20 +189,16 @@ export function useProformaForm(onClose: () => void) {
       }
       
       if (response && response.success) {
-        // Mise à jour de l'état local
-        await loadProformas(); // Recharger les proformas depuis l'API
+        await loadProformas();
         
-        // Sauvegarder les données actuelles pour l'impression
-        setCurrentProforma({
+        const proformaWithDetails: ProformaWithClientDetails = {
           ...proformaData,
           clientEmail: data.clientEmail,
           clientPhone: data.clientPhone
-        } as ProformaWithClientDetails);
+        };
         
-        // Afficher le dialogue d'impression
+        setCurrentProforma(proformaWithDetails, isEditMode);
         setShowPrintDialog(true);
-        
-        // On ne réinitialise pas le formulaire ici pour que les données soient disponibles pour l'impression
       } else {
         toast({
           title: "Erreur",
@@ -236,7 +218,6 @@ export function useProformaForm(onClose: () => void) {
     }
   }
 
-  // Return all the necessary functions and state
   return {
     form,
     searchTerm,
