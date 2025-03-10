@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { RefreshCw, Search, Save } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { ProformaFormDialog } from "@/components/proforma/ProformaFormDialog";
 
 const ClientProforma = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const handleRefresh = () => {
@@ -28,14 +30,6 @@ const ClientProforma = () => {
         duration: 3000,
       });
     }
-  };
-
-  const handleSave = () => {
-    toast({
-      title: "Enregistrer",
-      description: "Facture proforma créée avec succès",
-      duration: 3000,
-    });
   };
 
   return (
@@ -72,7 +66,11 @@ const ClientProforma = () => {
               />
             </div>
             <Button type="submit">Rechercher</Button>
-            <Button type="button" onClick={handleSave} className="flex items-center gap-2">
+            <Button 
+              type="button" 
+              onClick={() => setFormDialogOpen(true)} 
+              className="flex items-center gap-2"
+            >
               <Save size={18} />
               Enregistrer
             </Button>
@@ -86,6 +84,11 @@ const ClientProforma = () => {
           </div>
         </Card>
       </div>
+      
+      <ProformaFormDialog 
+        open={formDialogOpen} 
+        onOpenChange={setFormDialogOpen} 
+      />
     </MainLayout>
   );
 };
