@@ -9,21 +9,26 @@ import { generateReference } from "@/utils/proformaUtils";
 import { Proforma } from "@/components/proforma/ProformasTable";
 import { proformaApi } from "@/services/api";
 import { useToast } from "@/components/ui/use-toast";
-import { useEffect } from "react";
+import { useEffect, useCallback, useRef } from "react";
 
 export type { ProformaFormValues } from "@/types/proforma";
 
 export function useProformaForm(onClose: () => void) {
   const { toast } = useToast();
+  const initialRender = useRef(true);
+  
+  // Use default form values in a variable to ensure consistency
+  const defaultValues = {
+    clientName: "",
+    clientEmail: "",
+    clientPhone: "",
+    reference: generateReference(),
+    description: "",
+    amount: "",
+  };
+  
   const form = useForm<ProformaFormValues>({
-    defaultValues: {
-      clientName: "",
-      clientEmail: "",
-      clientPhone: "",
-      reference: generateReference(),
-      description: "",
-      amount: "",
-    },
+    defaultValues: { ...defaultValues },
   });
 
   const {
@@ -67,16 +72,12 @@ export function useProformaForm(onClose: () => void) {
     return selectedClient;
   };
   
-  const resetForm = () => {
-    // Clear form state first
-    form.reset({
-      clientName: "",
-      clientEmail: "",
-      clientPhone: "",
-      reference: generateReference(),
-      description: "",
-      amount: "",
-    }, { keepDefaultValues: false });
+  // Improve resetForm to be more thorough
+  const resetForm = useCallback(() => {
+    console.log("Starting form reset");
+    
+    // Clear all form state first with a fresh copy of default values
+    form.reset({ ...defaultValues }, { keepDefaultValues: true });
     
     // Reset all other state
     setSelectedClient(null);
@@ -86,7 +87,7 @@ export function useProformaForm(onClose: () => void) {
     setCurrentProforma(null);
     
     console.log("Form has been completely reset");
-  };
+  }, [form, setSelectedClient, setProformaItems, setSearchTerm, setIsEditMode, setCurrentProforma]);
 
   const loadProformaForEdit = async (proforma: Proforma) => {
     console.log("Loading proforma for edit:", proforma.id);
@@ -105,8 +106,8 @@ export function useProformaForm(onClose: () => void) {
       setIsEditMode(true);
       setCurrentProforma(proformaData);
       
-      // Then update form values - use a separate variable to ensure the values are updated
-      const formData = {
+      // Prepare form data with explicit values to avoid undefined
+      const formData: ProformaFormValues = {
         clientName: proformaData.clientName || "",
         clientEmail: proformaData.clientEmail || "",
         clientPhone: proformaData.clientPhone || "",
@@ -117,8 +118,10 @@ export function useProformaForm(onClose: () => void) {
       
       console.log("Setting form values:", formData);
       
-      // Use form.reset to completely replace all values
-      form.reset(formData, { keepDefaultValues: false });
+      // Set each form field individually to ensure they're all updated
+      Object.entries(formData).forEach(([key, value]) => {
+        form.setValue(key as keyof ProformaFormValues, value);
+      });
       
       // Set proforma items if available
       if (proformaData.items && Array.isArray(proformaData.items)) {
@@ -153,16 +156,27 @@ export function useProformaForm(onClose: () => void) {
 
   // This effect ensures form values are properly set when editing
   useEffect(() => {
+    // Skip the first render
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
+    
     if (isEditMode && currentProforma) {
-      // Ensure form values are updated when edit mode changes
-      form.reset({
-        clientName: currentProforma.clientName || "",
-        clientEmail: currentProforma.clientEmail || "",
-        clientPhone: currentProforma.clientPhone || "",
-        reference: currentProforma.reference || "",
-        description: currentProforma.description || "",
-        amount: currentProforma.amount?.toString() || "0",
-      }, { keepDefaultValues: false });
+      console.log("Effect: Updating form values from currentProforma");
+      
+      // Update form values with a small delay to ensure the form is ready
+      setTimeout(() => {
+        // Ensure form values are updated when edit mode changes
+        form.setValue("clientName", currentProforma.clientName || "");
+        form.setValue("clientEmail", currentProforma.clientEmail || "");
+        form.setValue("clientPhone", currentProforma.clientPhone || "");
+        form.setValue("reference", currentProforma.reference || "");
+        form.setValue("description", currentProforma.description || "");
+        form.setValue("amount", currentProforma.amount?.toString() || "0");
+        
+        console.log("Effect: Form values updated");
+      }, 50);
     }
   }, [isEditMode, currentProforma, form]);
 

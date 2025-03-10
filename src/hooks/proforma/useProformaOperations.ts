@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Proforma } from "@/components/proforma/ProformasTable";
@@ -26,25 +25,31 @@ export function useProformaOperations({
     try {
       // Start the editing process
       setIsEditing(true);
+      console.log("Starting edit process for proforma:", proforma.id);
       
-      // Get the full proforma data first
+      // First completely reset the form to clear any previous data
+      resetForm();
+      console.log("Form reset completed");
+      
+      // Open the dialog - this is important to happen BEFORE loading data
+      setFormDialogOpen(true);
+      
+      // Add a delay to ensure the dialog is fully open and form state is reset
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Get the full proforma data
+      console.log("Fetching proforma data for:", proforma.id);
       const response = await proformaApi.getById(proforma.id);
+      
       if (!response.success || !response.data) {
         throw new Error(response.error || "Impossible de charger la proforma");
       }
       
-      // Complete reset of form state
-      resetForm();
+      // Add another small delay to ensure form is ready to receive data
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Open dialog and wait for it to be fully rendered
-      setFormDialogOpen(true);
-      
-      // Use a more substantial delay to ensure the dialog is fully rendered
-      // and form state is completely reset
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Now load the proforma data for editing
-      await loadProformaForEdit(proforma);
+      // Now load the proforma data for editing - after dialog is open and form is reset
+      await loadProformaForEdit(response.data);
       
       toast({
         title: "Modification",
@@ -61,7 +66,11 @@ export function useProformaOperations({
       // Close the form dialog if there's an error
       setFormDialogOpen(false);
     } finally {
-      setIsEditing(false);
+      // Delay setting isEditing to false to ensure all operations are complete
+      setTimeout(() => {
+        setIsEditing(false);
+        console.log("Edit process completed");
+      }, 300);
     }
   };
 

@@ -1,4 +1,3 @@
-
 /**
  * API Service pour communiquer avec le backend
  * 
@@ -43,6 +42,11 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
+}
+
+// Create a deep clone helper to avoid reference issues
+function deepClone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 // Fonction générique pour effectuer des requêtes HTTP
@@ -117,7 +121,7 @@ async function handleLocalStorage<T>(
           // For proformas, ensure necessary data exists
           if (entityType === 'proformas' && item) {
             // Create a deep copy to ensure we don't modify the original data
-            const itemCopy = JSON.parse(JSON.stringify(item));
+            const itemCopy = deepClone(item);
             
             // Add client details if not present
             if (!itemCopy.clientEmail) {
@@ -129,16 +133,16 @@ async function handleLocalStorage<T>(
             
             // Add items if not present
             if (!itemCopy.items || !Array.isArray(itemCopy.items) || itemCopy.items.length === 0) {
-              itemCopy.items = JSON.parse(JSON.stringify(SAMPLE_ITEMS)); // Use deep copy
+              itemCopy.items = deepClone(SAMPLE_ITEMS);
             }
             
             console.log("Returning proforma with items:", itemCopy);
             return { success: true, data: itemCopy as T };
           }
           
-          return { success: true, data: item as T };
+          return { success: true, data: deepClone(item) as T };
         }
-        return { success: true, data: data as T };
+        return { success: true, data: deepClone(data) as T };
         
       case 'POST':
         // Générer un ID si non fourni
@@ -151,9 +155,9 @@ async function handleLocalStorage<T>(
           console.log(`[LocalStorage] Creating proforma with ${body.items.length} items`);
         }
         
-        data.push(body);
+        data.push(deepClone(body));
         localStorage.setItem(storageKey, JSON.stringify(data));
-        return { success: true, data: body as T };
+        return { success: true, data: deepClone(body) as T };
         
       case 'PUT':
         if (!entityId) return { success: false, error: 'ID manquant' };
@@ -164,10 +168,10 @@ async function handleLocalStorage<T>(
         }
         
         data = data.map((item: any) => 
-          item.id === entityId ? { ...item, ...body } : item
+          item.id === entityId ? { ...deepClone(item), ...deepClone(body) } : item
         );
         localStorage.setItem(storageKey, JSON.stringify(data));
-        return { success: true, data: body as T };
+        return { success: true, data: deepClone(body) as T };
         
       case 'DELETE':
         if (!entityId) return { success: false, error: 'ID manquant' };
