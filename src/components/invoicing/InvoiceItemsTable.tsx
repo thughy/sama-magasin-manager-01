@@ -53,17 +53,35 @@ export function InvoiceItemsTable({
   };
   
   const handleSelectItem = (item: Item) => {
-    const newItem = {
-      id: `item-${Date.now()}`,
-      productId: item.id,
-      productName: item.name,
-      quantity: 1,
-      unitPrice: item.type === 'product' ? item.sellPrice : item.amount,
-      totalPrice: item.type === 'product' ? item.sellPrice : item.amount,
-      type: item.type
-    };
+    // Check if the item already exists in the invoice
+    const existingItemIndex = items.findIndex(
+      existingItem => existingItem.productId === item.id
+    );
     
-    onAddItem(newItem);
+    if (existingItemIndex !== -1) {
+      // Item already exists, update quantity
+      const existingItem = items[existingItemIndex];
+      const newQuantity = existingItem.quantity + 1;
+      const newTotalPrice = newQuantity * existingItem.unitPrice;
+      
+      // Update the item
+      onUpdateItem(existingItem.id, "quantity", newQuantity);
+      onUpdateItem(existingItem.id, "totalPrice", newTotalPrice);
+    } else {
+      // Item doesn't exist, add as new
+      const newItem = {
+        id: `item-${Date.now()}`,
+        productId: item.id,
+        productName: item.name,
+        quantity: 1,
+        unitPrice: item.type === 'product' ? item.sellPrice : item.amount,
+        totalPrice: item.type === 'product' ? item.sellPrice : item.amount,
+        type: item.type
+      };
+      
+      onAddItem(newItem);
+    }
+    
     setSearchTerm("");
     setShowResults(false);
   };
