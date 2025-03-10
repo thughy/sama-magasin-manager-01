@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Client } from "@/data/clientsData";
@@ -29,23 +30,40 @@ export function useProformaForm(onClose: () => void) {
   const [currentProforma, setCurrentProforma] = useState<Proforma | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
   
+  const generateReference = () => `PRO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  
   const form = useForm<ProformaFormValues>({
     defaultValues: {
       clientName: "",
       clientEmail: "",
       clientPhone: "",
-      reference: `PRO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      reference: generateReference(),
       description: "",
       amount: "",
     },
   });
+
+  const resetForm = () => {
+    setSelectedClient(null);
+    setProformaItems([]);
+    setSearchTerm("");
+    form.reset({
+      clientName: "",
+      clientEmail: "",
+      clientPhone: "",
+      reference: generateReference(),
+      description: "",
+      amount: "",
+    });
+  };
 
   const handlePrint = useReactToPrint({
     documentTitle: currentProforma ? `Proforma_${currentProforma.reference}` : "Proforma",
     onAfterPrint: () => {
       setShowPrintDialog(false);
       setCurrentProforma(null);
-      onClose();
+      resetForm();
+      // Don't close the form dialog after printing
     },
     pageStyle: `
       @page {
@@ -136,6 +154,8 @@ export function useProformaForm(onClose: () => void) {
     setCurrentProforma(newProforma);
     
     setShowPrintDialog(true);
+    
+    // Don't reset the form here - let it happen after printing
   }
 
   return {
@@ -160,6 +180,7 @@ export function useProformaForm(onClose: () => void) {
     showPrintDialog,
     setShowPrintDialog,
     currentProforma,
-    triggerPrint
+    triggerPrint,
+    resetForm
   };
 }
