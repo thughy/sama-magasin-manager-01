@@ -7,6 +7,7 @@ import { PaymentMethodsSection } from "@/components/suppliers/purchases/PaymentM
 import { useInvoiceForm } from "@/hooks/invoicing/useInvoiceForm";
 import { InvoiceHeader } from "./InvoiceHeader";
 import { InvoiceSummary } from "./InvoiceSummary";
+import { FormProvider, useForm } from "react-hook-form";
 
 interface InvoiceDialogProps {
   open: boolean;
@@ -16,6 +17,8 @@ interface InvoiceDialogProps {
 }
 
 export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDialogProps) => {
+  const methods = useForm();
+  
   const {
     reference,
     setReference,
@@ -45,53 +48,55 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
           <DialogTitle>{invoice ? "Modifier la facture" : "Nouvelle facture"}</DialogTitle>
         </DialogHeader>
 
-        <InvoiceHeader
-          reference={reference}
-          date={date}
-          clientName={clientName}
-          onReferenceChange={setReference}
-          onDateChange={setDate}
-          onClientSelect={handleClientSelect}
-        />
-
-        <div className="space-y-4 mt-4">
-          <InvoiceItemsTable 
-            items={items}
-            onAddItem={handleAddItem}
-            onUpdateItem={handleUpdateItem}
-            onRemoveItem={handleRemoveItem}
+        <FormProvider {...methods}>
+          <InvoiceHeader
+            reference={reference}
+            date={date}
+            clientName={clientName}
+            onReferenceChange={setReference}
+            onDateChange={setDate}
+            onClientSelect={handleClientSelect}
           />
-        </div>
 
-        <PaymentMethodsSection
-          paymentMethods={paymentMethods}
-          onAddPaymentMethod={addPaymentMethod}
-          onRemovePaymentMethod={removePaymentMethod}
-          onUpdatePaymentMethod={updatePaymentMethod}
-        />
+          <div className="space-y-4 mt-4">
+            <InvoiceItemsTable 
+              items={items}
+              onAddItem={handleAddItem}
+              onUpdateItem={handleUpdateItem}
+              onRemoveItem={handleRemoveItem}
+            />
+          </div>
 
-        <InvoiceSummary
-          totalAmount={totalAmount}
-          amountPaid={amountPaid}
-          balance={balance}
-        />
+          <PaymentMethodsSection
+            paymentMethods={paymentMethods}
+            onAddPaymentMethod={addPaymentMethod}
+            onRemovePaymentMethod={removePaymentMethod}
+            onUpdatePaymentMethod={updatePaymentMethod}
+          />
 
-        <DialogFooter>
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => onOpenChange(false)}
-          >
-            Annuler
-          </Button>
-          <Button 
-            type="button" 
-            onClick={handleSubmit} 
-            disabled={!clientId || items.length === 0}
-          >
-            {invoice ? "Mettre à jour" : "Enregistrer"}
-          </Button>
-        </DialogFooter>
+          <InvoiceSummary
+            totalAmount={totalAmount}
+            amountPaid={amountPaid}
+            balance={balance}
+          />
+
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+            >
+              Annuler
+            </Button>
+            <Button 
+              type="button" 
+              onClick={handleSubmit} 
+              disabled={!clientId || items.length === 0}
+            >
+              {invoice ? "Mettre à jour" : "Enregistrer"}
+            </Button>
+          </DialogFooter>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

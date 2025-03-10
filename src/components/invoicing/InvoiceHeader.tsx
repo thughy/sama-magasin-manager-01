@@ -46,13 +46,24 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
 
       <div className="space-y-2">
         <Label>Client</Label>
-        <ClientSearchInput 
-          value={clientName}
-          onChange={(value) => {}}
-          onSelectClient={onClientSelect}
-          onCreateClient={() => {}}
-          selectedClient={null}
-        />
+        <div className="relative">
+          <Input
+            value={clientName}
+            onChange={(e) => {}}
+            placeholder="Sélectionner un client"
+            className="w-full"
+            readOnly
+          />
+          <div className="absolute inset-0">
+            <ClientSearchInput 
+              value={clientName}
+              onChange={() => {}}
+              onSelectClient={onClientSelect}
+              onCreateClient={() => {}}
+              selectedClient={null}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
