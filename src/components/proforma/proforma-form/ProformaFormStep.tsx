@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -81,18 +80,17 @@ export function ProformaFormStep({
         </form>
       </Form>
 
-      <div className="flex justify-between items-center gap-4 mt-6 pt-4 border-t">
+      <div className="flex justify-between items-center gap-4 mt-6 pt-4 border-t border-gray-200">
         <Button type="button" variant="outline" onClick={onGoBack}>
           Retour
         </Button>
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <Button 
             type="button"
-            variant="outline" 
             onClick={() => setSaveDialogOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 font-medium"
+            className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2 px-5 py-2.5 font-medium rounded-md shadow-sm"
           >
-            <Save size={18} />
+            <Save size={20} />
             Enregistrer
           </Button>
           <Button 
