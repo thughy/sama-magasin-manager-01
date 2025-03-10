@@ -73,6 +73,16 @@
   .no-break {
     page-break-inside: avoid;
   }
+  
+  /* Hide page numbers in browser print dialog */
+  @page {
+    margin-bottom: 0;
+  }
+  
+  /* Hide page count in print preview */
+  html {
+    counter-reset: page;
+  }
 }
 
 @media screen {
