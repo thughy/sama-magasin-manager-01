@@ -171,7 +171,11 @@ export function InvoiceItemsTable({
                       type="number"
                       min="1"
                       value={item.quantity}
-                      onChange={(e) => onUpdateItem(item.id, "quantity", Number(e.target.value) || 1)}
+                      onChange={(e) => {
+                        const newQuantity = Number(e.target.value) || 1;
+                        onUpdateItem(item.id, "quantity", newQuantity);
+                        onUpdateItem(item.id, "totalPrice", newQuantity * item.unitPrice);
+                      }}
                       className="w-20"
                     />
                   </TableCell>
@@ -180,7 +184,11 @@ export function InvoiceItemsTable({
                       type="number"
                       min="0"
                       value={item.unitPrice}
-                      onChange={(e) => onUpdateItem(item.id, "unitPrice", Number(e.target.value) || 0)}
+                      onChange={(e) => {
+                        const newUnitPrice = Number(e.target.value) || 0;
+                        onUpdateItem(item.id, "unitPrice", newUnitPrice);
+                        onUpdateItem(item.id, "totalPrice", item.quantity * newUnitPrice);
+                      }}
                       className="w-28"
                     />
                   </TableCell>
