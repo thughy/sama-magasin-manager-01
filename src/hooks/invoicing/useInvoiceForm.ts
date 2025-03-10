@@ -6,15 +6,22 @@ import { usePaymentMethods } from "@/hooks/purchase-form/usePaymentMethods";
 import { Client } from "@/data/clientsData";
 import { Item } from "@/types/product";
 
+// Helper function to ensure a value is a number
+const ensureNumber = (value: any): number => {
+  if (typeof value === 'number') return value;
+  const parsed = Number(value);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partial<Invoice> & { id?: string }) => void) => {
   const [reference, setReference] = useState(invoice?.reference || `FAC-${Date.now().toString().slice(-6)}`);
   const [date, setDate] = useState(invoice?.date || format(new Date(), "yyyy-MM-dd"));
   const [clientId, setClientId] = useState(invoice?.clientId || "");
   const [clientName, setClientName] = useState(invoice?.clientName || "");
   const [items, setItems] = useState<InvoiceItem[]>(invoice?.items || []);
-  const [totalAmount, setTotalAmount] = useState(invoice?.totalAmount || 0);
-  const [amountPaid, setAmountPaid] = useState(invoice?.amountPaid || 0);
-  const [balance, setBalance] = useState(invoice?.balance || 0);
+  const [totalAmount, setTotalAmount] = useState(ensureNumber(invoice?.totalAmount));
+  const [amountPaid, setAmountPaid] = useState(ensureNumber(invoice?.amountPaid));
+  const [balance, setBalance] = useState(ensureNumber(invoice?.balance));
 
   const { 
     paymentMethods, 
@@ -27,15 +34,13 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
   useEffect(() => {
     // Calculate total amount from items
     const calculatedTotal = items.reduce((sum, item) => {
-      const itemTotal = parseFloat(item.totalPrice.toString());
-      return sum + (isNaN(itemTotal) ? 0 : itemTotal);
+      return sum + ensureNumber(item.totalPrice);
     }, 0);
     setTotalAmount(calculatedTotal);
     
     // Calculate total from payment methods
     const totalPaid = paymentMethods.reduce((sum, payment) => {
-      const paymentAmount = parseFloat(payment.amount.toString());
-      return sum + (isNaN(paymentAmount) ? 0 : paymentAmount);
+      return sum + ensureNumber(payment.amount);
     }, 0);
     setAmountPaid(totalPaid);
     
@@ -50,9 +55,9 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
 
   const calculateItemTotal = (quantity: number, unitPrice: number, discount: number = 0) => {
     // Ensure all inputs are numbers
-    quantity = parseFloat(quantity.toString());
-    unitPrice = parseFloat(unitPrice.toString());
-    discount = parseFloat(discount.toString());
+    quantity = ensureNumber(quantity);
+    unitPrice = ensureNumber(unitPrice);
+    discount = ensureNumber(discount);
     
     // Apply calculations
     const discountAmount = (unitPrice * discount) / 100;
@@ -61,54 +66,36 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
   };
 
   const handleAddItem = (item: any) => {
-    // Vérifie si l'item reçu est déjà au format InvoiceItem
-    if (item.productId && item.productName) {
-      // Ensure numeric properties are numbers
-      if (typeof item.quantity !== 'number') {
-        item.quantity = parseFloat(item.quantity);
-      }
-      if (typeof item.unitPrice !== 'number') {
-        item.unitPrice = parseFloat(item.unitPrice);
-      }
-      if (typeof item.discount !== 'number') {
-        item.discount = parseFloat(item.discount || 0);
-      }
-      if (typeof item.totalPrice !== 'number') {
-        item.totalPrice = parseFloat(item.totalPrice);
-      }
-      
-      setItems([...items, item]);
-      return;
+    // Make a copy to avoid mutation
+    const newItem = { ...item };
+    
+    // Ensure all numeric values are actually numbers
+    if (typeof newItem.quantity !== 'number') {
+      newItem.quantity = ensureNumber(newItem.quantity);
+    }
+    if (typeof newItem.unitPrice !== 'number') {
+      newItem.unitPrice = ensureNumber(newItem.unitPrice);
+    }
+    if (typeof newItem.discount !== 'number') {
+      newItem.discount = ensureNumber(newItem.discount || 0);
+    }
+    if (typeof newItem.totalPrice !== 'number') {
+      newItem.totalPrice = ensureNumber(newItem.totalPrice);
     }
     
-    // Sinon, convertir en InvoiceItem
-    const unitPrice = item.type === 'product' ? 
-      parseFloat(item.sellPrice.toString()) : 
-      parseFloat(item.amount.toString());
-    
-    const newItem: InvoiceItem = {
-      id: `item-${Date.now()}`,
-      productId: item.id,
-      productName: item.name,
-      quantity: 1,
-      unitPrice: unitPrice,
-      discount: 0, // Initialize discount to 0
-      totalPrice: unitPrice, // No discount initially
-      type: item.type
-    };
-    
+    console.log("Adding item to invoice:", newItem);
     setItems([...items, newItem]);
   };
 
   const handleUpdateItem = (id: string, field: keyof InvoiceItem, value: any) => {
     setItems(items.map(item => {
       if (item.id === id) {
-        // First create a new item with the updated field
+        // Create a copy of the item
         const updatedItem = { ...item };
         
-        // Ensure numeric values are always stored as numbers
+        // Handle numeric fields specially
         if (field === 'quantity' || field === 'unitPrice' || field === 'discount' || field === 'totalPrice') {
-          updatedItem[field] = parseFloat(value.toString());
+          updatedItem[field] = ensureNumber(value);
         } else {
           updatedItem[field] = value;
         }
@@ -118,9 +105,17 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
           updatedItem.totalPrice = calculateItemTotal(
             updatedItem.quantity, 
             updatedItem.unitPrice, 
-            updatedItem.discount || 0
+            updatedItem.discount
           );
         }
+        
+        console.log("Updated item:", { 
+          id, 
+          field, 
+          oldValue: item[field], 
+          newValue: updatedItem[field],
+          updatedItem 
+        });
         
         return updatedItem;
       }
@@ -144,7 +139,7 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
       amountPaid,
       balance,
       status: amountPaid === 0 ? 'unpaid' : amountPaid < totalAmount ? 'partial' : 'paid',
-      depot: "Principal", // Setting the main depot as requested
+      depot: "Principal",
       paymentMethods,
     };
     

@@ -38,26 +38,48 @@ export function InvoiceItemsTable({
       // Item already exists, update quantity
       const existingItem = items[existingItemIndex];
       
-      // Make sure all values are converted to numbers
-      const currentQuantity = parseInt(existingItem.quantity.toString(), 10);
+      // Convert all values to numbers explicitly
+      const currentQuantity = typeof existingItem.quantity === 'number' 
+        ? existingItem.quantity 
+        : Number(existingItem.quantity);
+        
+      // Increment by 1
       const newQuantity = currentQuantity + 1;
       
-      // Calculate new total price considering discount
-      const unitPrice = parseFloat(existingItem.unitPrice.toString());
-      const discount = parseFloat((existingItem.discount || 0).toString());
+      // Ensure other values are numbers for calculations
+      const unitPrice = typeof existingItem.unitPrice === 'number'
+        ? existingItem.unitPrice
+        : Number(existingItem.unitPrice);
+        
+      const discount = typeof existingItem.discount === 'number'
+        ? existingItem.discount
+        : Number(existingItem.discount || 0);
+        
+      // Calculate the discounted price
       const discountAmount = (unitPrice * discount) / 100;
       const discountedPrice = unitPrice - discountAmount;
+      
+      // Calculate new total price
       const newTotalPrice = newQuantity * discountedPrice;
       
-      // Update the item quantity
+      // First update the quantity
       onUpdateItem(existingItem.id, "quantity", newQuantity);
-      // Update the total price after quantity change
+      // Then update the total price
       onUpdateItem(existingItem.id, "totalPrice", newTotalPrice);
+      
+      console.log("Updated item quantity:", {
+        id: existingItem.id,
+        oldQuantity: currentQuantity,
+        newQuantity: newQuantity,
+        unitPrice,
+        discount,
+        newTotalPrice
+      });
     } else {
       // Item doesn't exist, add as new
       const unitPrice = item.type === 'product' ? 
-        parseFloat(item.sellPrice.toString()) : 
-        parseFloat(item.amount.toString());
+        (typeof item.sellPrice === 'number' ? item.sellPrice : Number(item.sellPrice)) : 
+        (typeof item.amount === 'number' ? item.amount : Number(item.amount));
       
       const newItem: InvoiceItem = {
         id: `item-${Date.now()}`,
@@ -65,12 +87,13 @@ export function InvoiceItemsTable({
         productName: item.name,
         quantity: 1,
         unitPrice: unitPrice,
-        discount: 0, // Initialize discount to 0
-        totalPrice: unitPrice, // Initial total is just the unit price since no discount
+        discount: 0,
+        totalPrice: unitPrice,
         type: item.type
       };
       
       onAddItem(newItem);
+      console.log("Added new item:", newItem);
     }
     
     resetSearch();

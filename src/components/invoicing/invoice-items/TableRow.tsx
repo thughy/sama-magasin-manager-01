@@ -15,7 +15,8 @@ interface InvoiceItemRowProps {
 export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItemRowProps) {
   // Function to ensure we're working with numbers
   const ensureNumber = (value: any): number => {
-    const parsed = parseFloat(value.toString());
+    if (typeof value === 'number') return value;
+    const parsed = Number(value);
     return isNaN(parsed) ? 0 : parsed;
   };
 
@@ -34,6 +35,12 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
     onUpdateItem(item.id, "discount", newDiscount);
   };
 
+  // Ensure item values are numbers for display
+  const displayQuantity = ensureNumber(item.quantity);
+  const displayUnitPrice = ensureNumber(item.unitPrice);
+  const displayDiscount = ensureNumber(item.discount || 0);
+  const displayTotalPrice = ensureNumber(item.totalPrice);
+
   return (
     <TableRow key={item.id}>
       <TableCell>
@@ -50,7 +57,7 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
         <Input
           type="number"
           min="1"
-          value={ensureNumber(item.quantity)}
+          value={displayQuantity}
           onChange={handleQuantityChange}
           className="w-20"
         />
@@ -59,7 +66,7 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
         <Input
           type="number"
           min="0"
-          value={ensureNumber(item.unitPrice)}
+          value={displayUnitPrice}
           onChange={handleUnitPriceChange}
           className="w-28"
         />
@@ -69,13 +76,13 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           type="number"
           min="0"
           max="100"
-          value={ensureNumber(item.discount || 0)}
+          value={displayDiscount}
           onChange={handleDiscountChange}
           className="w-20"
         />
       </TableCell>
       <TableCell className="text-right font-medium">
-        {ensureNumber(item.totalPrice).toLocaleString()} FCFA
+        {displayTotalPrice.toLocaleString()} FCFA
       </TableCell>
       <TableCell>
         <Button
