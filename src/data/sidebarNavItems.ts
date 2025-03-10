@@ -15,7 +15,9 @@ import {
   Layers3,
   Download,
   Wallet,
-  ScrollText
+  ScrollText,
+  User,
+  List
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar";
 
@@ -30,7 +32,15 @@ export const navItems: NavItem[] = [
       { title: "Categorie", url: "/products/categories", icon: Tags }
     ]
   },
-  { title: "Clients", icon: Users, href: "/clients" },
+  { 
+    title: "Clients", 
+    icon: Users, 
+    href: "/clients",
+    subItems: [
+      { title: "Nos clients", url: "/clients", icon: User },
+      { title: "Liste des clients", url: "/clients/list", icon: List }
+    ]
+  },
   { title: "Caisse", icon: CreditCard, href: "/cashier" },
   { title: "Ventes", icon: ShoppingCart, href: "/sales" },
   { 

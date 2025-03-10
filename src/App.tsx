@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductCategories from "./pages/ProductCategories";
 import Clients from "./pages/Clients";
+import ClientsList from "./pages/Clients"; // Using same component for both routes
 import Cashier from "./pages/Cashier";
 import Suppliers from "./pages/Suppliers";
 import PurchaseOrders from "./pages/PurchaseOrders";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/products" element={<Products />} />
           <Route path="/products/categories" element={<ProductCategories />} />
           <Route path="/clients" element={<Clients />} />
+          <Route path="/clients/list" element={<ClientsList />} />
           <Route path="/cashier" element={<Cashier />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/suppliers/purchase-orders" element={<PurchaseOrders />} />
