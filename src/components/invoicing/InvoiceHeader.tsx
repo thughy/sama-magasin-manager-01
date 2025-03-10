@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Client, clientsData } from "@/data/clientsData";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Phone, Mail } from "lucide-react";
 import { AddClientDialog } from "@/components/clients/AddClientDialog";
 
 interface InvoiceHeaderProps {
@@ -31,6 +31,8 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<Client[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [clientPhone, setClientPhone] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
 
   useEffect(() => {
     setInputValue(clientName);
@@ -41,6 +43,8 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
     if (inputValue.trim() === "") {
       setClientExists(true);
       setShowResults(false);
+      setClientPhone("");
+      setClientEmail("");
       return;
     }
 
@@ -54,10 +58,19 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
       setShowResults(true);
       
       // Check if exact client exists
-      const exists = clientsData.some(
+      const exactClient = clientsData.find(
         client => client.name.toLowerCase() === inputValue.toLowerCase()
       );
-      setClientExists(exists);
+      
+      if (exactClient) {
+        setClientExists(true);
+        setClientPhone(exactClient.phone);
+        setClientEmail(exactClient.email);
+      } else {
+        setClientExists(false);
+        setClientPhone("");
+        setClientEmail("");
+      }
     } else {
       setShowResults(false);
     }
@@ -81,6 +94,8 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
     setValue("clientName", client.name);
     setInputValue(client.name);
     setClientExists(true);
+    setClientPhone(client.phone);
+    setClientEmail(client.email);
     setShowResults(false);
   };
 
@@ -94,6 +109,8 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
       onClientSelect(newClient);
       setValue("clientName", newClient.name);
       setInputValue(newClient.name);
+      setClientPhone(newClient.phone);
+      setClientEmail(newClient.email || "");
       setClientExists(true);
     }
   };
@@ -190,6 +207,36 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
               </Button>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Add phone and email fields aligned in a row */}
+      <div className="grid grid-cols-2 gap-4 mt-2">
+        <div className="relative">
+          <Label htmlFor="clientPhone">Téléphone</Label>
+          <div className="relative">
+            <Input
+              id="clientPhone"
+              value={clientPhone}
+              readOnly
+              placeholder="Téléphone du client"
+              className="pl-10"
+            />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
+        </div>
+        <div className="relative">
+          <Label htmlFor="clientEmail">Email</Label>
+          <div className="relative">
+            <Input
+              id="clientEmail"
+              value={clientEmail}
+              readOnly
+              placeholder="Email du client"
+              className="pl-10"
+            />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
         </div>
       </div>
 
