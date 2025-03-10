@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Table,
@@ -10,11 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus, Search } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { InvoiceItem } from "@/services/api/invoicing";
+import { Item } from "@/types/product";
+import { ItemSearchBox } from "./ItemSearchBox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Item, Product, Service } from "@/types/product";
-import { Label } from "@/components/ui/label";
 
 interface InvoiceItemsTableProps {
   items: InvoiceItem[];
@@ -29,52 +28,46 @@ export function InvoiceItemsTable({
   onUpdateItem, 
   onRemoveItem 
 }: InvoiceItemsTableProps) {
-  const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
   
-  // Mock products data (in real app, this would come from API)
-  const [products, setProducts] = useState<Product[]>([
-    { id: "prod1", type: "product", name: "Ordinateur portable", barcode: "12345", category: "Électronique", buyPrice: 350000, sellPrice: 450000, stock: 10, minStock: 2, depot: "Principal" },
-    { id: "prod2", type: "product", name: "Téléphone mobile", barcode: "23456", category: "Électronique", buyPrice: 120000, sellPrice: 180000, stock: 15, minStock: 3, depot: "Principal" },
-    { id: "prod3", type: "product", name: "Imprimante", barcode: "34567", category: "Électronique", buyPrice: 75000, sellPrice: 95000, stock: 8, minStock: 2, depot: "Principal" },
-    { id: "prod4", type: "product", name: "Bureau", barcode: "45678", category: "Mobilier", buyPrice: 65000, sellPrice: 85000, stock: 5, minStock: 1, depot: "Principal" },
-    { id: "prod5", type: "product", name: "Chaise", barcode: "56789", category: "Mobilier", buyPrice: 25000, sellPrice: 35000, stock: 20, minStock: 5, depot: "Principal" },
-  ]);
-
-  const filteredProducts = products.filter(product => 
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.barcode.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleProductSelect = (product: Product) => {
-    onAddItem(product);
-    setIsProductDialogOpen(false);
+  const handleItemSelect = (item: Item) => {
+    const newItem = {
+      id: `item-${Date.now()}`,
+      productId: item.id,
+      productName: item.name,
+      quantity: 1,
+      unitPrice: item.type === 'product' ? item.sellPrice : item.amount,
+      totalPrice: item.type === 'product' ? item.sellPrice : item.amount,
+      type: item.type
+    };
+    
+    onAddItem(newItem);
+    setIsAddItemDialogOpen(false);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium">Articles</h3>
+        <h3 className="text-sm font-medium">Articles et services</h3>
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => setIsProductDialogOpen(true)}
+          onClick={() => setIsAddItemDialogOpen(true)}
         >
-          <Plus className="h-4 w-4 mr-1" />
-          Ajouter un article
+          Ajouter un article/service
         </Button>
       </div>
       
       {items.length === 0 ? (
         <div className="border rounded-md p-8 text-center">
-          <p className="text-muted-foreground">Aucun article dans la facture. Cliquez sur "Ajouter un article" pour commencer.</p>
+          <p className="text-muted-foreground">Aucun article/service dans la facture. Cliquez sur "Ajouter un article/service" pour commencer.</p>
         </div>
       ) : (
         <div className="border rounded-md">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Article</TableHead>
+                <TableHead>Article/Service</TableHead>
                 <TableHead className="w-24">Quantité</TableHead>
                 <TableHead className="w-32">Prix unitaire</TableHead>
                 <TableHead className="w-32 text-right">Total</TableHead>
@@ -84,7 +77,16 @@ export function InvoiceItemsTable({
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.productName}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      {item.productName}
+                      {item.type === 'service' && (
+                        <span className="ml-2 text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-0.5">
+                          Service
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Input
                       type="number"
@@ -131,64 +133,19 @@ export function InvoiceItemsTable({
         </div>
       )}
 
-      <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
+      <Dialog open={isAddItemDialogOpen} onOpenChange={setIsAddItemDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Ajouter un article</DialogTitle>
+            <DialogTitle>Ajouter un article ou service</DialogTitle>
           </DialogHeader>
           
           <div className="py-4">
-            <div className="relative mb-4">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher un article..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Article</TableHead>
-                    <TableHead>Catégorie</TableHead>
-                    <TableHead>Stock</TableHead>
-                    <TableHead>Prix</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredProducts.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">
-                        Aucun produit trouvé
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredProducts.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell>{product.category}</TableCell>
-                        <TableCell>{product.stock}</TableCell>
-                        <TableCell>{product.sellPrice.toLocaleString()} FCFA</TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleProductSelect(product)}
-                            disabled={product.stock <= 0}
-                          >
-                            <Plus className="h-4 w-4 mr-1" /> Ajouter
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <ItemSearchBox 
+              onSelectItem={handleItemSelect} 
+              onShowAddItemDialog={() => {
+                console.log("Fonctionnalité: Ajouter un nouvel article");
+              }} 
+            />
           </div>
         </DialogContent>
       </Dialog>

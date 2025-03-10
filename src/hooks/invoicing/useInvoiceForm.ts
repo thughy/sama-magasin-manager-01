@@ -1,9 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { Invoice, InvoiceItem } from "@/services/api";
+import { Invoice, InvoiceItem } from "@/services/api/invoicing";
 import { format } from "date-fns";
 import { usePaymentMethods } from "@/hooks/purchase-form/usePaymentMethods";
 import { Client } from "@/data/clientsData";
+import { Item } from "@/types/product";
 
 export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partial<Invoice> & { id?: string }) => void) => {
   const [reference, setReference] = useState(invoice?.reference || `FAC-${Date.now().toString().slice(-6)}`);
@@ -42,13 +43,21 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
   };
 
   const handleAddItem = (item: any) => {
+    // Vérifie si l'item reçu est déjà au format InvoiceItem
+    if (item.productId && item.productName) {
+      setItems([...items, item]);
+      return;
+    }
+    
+    // Sinon, convertir en InvoiceItem
     const newItem: InvoiceItem = {
       id: `item-${Date.now()}`,
       productId: item.id,
       productName: item.name,
       quantity: 1,
-      unitPrice: item.sellPrice || 0,
-      totalPrice: item.sellPrice || 0,
+      unitPrice: item.type === 'product' ? item.sellPrice : item.amount,
+      totalPrice: item.type === 'product' ? item.sellPrice : item.amount,
+      type: item.type
     };
     
     setItems([...items, newItem]);

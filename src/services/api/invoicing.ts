@@ -13,6 +13,7 @@ export interface InvoiceItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  type?: 'product' | 'service'; // Ajout du type pour distinguer les produits des services
 }
 
 export interface Invoice {
