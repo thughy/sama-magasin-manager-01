@@ -16,6 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Plus, Search } from "lucide-react";
 import { Client, clientsData } from "@/data/clientsData";
 import { useClientsData } from "@/hooks/useClientsData";
+import { AddClientDialog } from "@/components/clients/AddClientDialog";
 
 interface ProformaFormValues {
   clientName: string;
@@ -38,7 +39,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [showCreateClientDialog, setShowCreateClientDialog] = useState(false);
+  const [clientDialogOpen, setClientDialogOpen] = useState(false);
   
   const form = useForm<ProformaFormValues>({
     defaultValues: {
@@ -74,16 +75,19 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
   };
 
   const handleCreateClient = () => {
-    if (searchTerm.trim()) {
-      const newClient = addClient({
-        name: searchTerm,
-        phone: "",
-        email: "",
-      });
-      
-      handleSelectClient(newClient);
-      setShowCreateClientDialog(false);
-    }
+    setClientDialogOpen(true);
+    setShowResults(false);
+  };
+
+  const handleSaveClient = (data: { name: string; phone: string; email?: string; address?: string }) => {
+    const newClient = addClient({
+      name: data.name,
+      phone: data.phone,
+      email: data.email || "",
+      address: data.address
+    });
+    
+    handleSelectClient(newClient);
   };
 
   function onSubmit(data: ProformaFormValues) {
@@ -98,89 +102,135 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Créer une facture proforma</DialogTitle>
-        </DialogHeader>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="relative">
-              <FormField
-                control={form.control}
-                name="clientName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom du client</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input 
-                          placeholder="Nom du client" 
-                          value={selectedClient ? selectedClient.name : searchTerm}
-                          onChange={(e) => {
-                            if (selectedClient) {
-                              setSelectedClient(null);
-                            }
-                            setSearchTerm(e.target.value);
-                            field.onChange(e.target.value);
-                          }}
-                          required
-                        />
-                        <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              {showResults && (
-                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-                  {searchResults.length > 0 ? (
-                    <ul className="py-1">
-                      {searchResults.map((client) => (
-                        <li 
-                          key={client.id} 
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                          onClick={() => handleSelectClient(client)}
-                        >
-                          <div className="font-medium">{client.name}</div>
-                          <div className="text-sm text-gray-500">{client.phone} {client.email ? `• ${client.email}` : ''}</div>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="p-4 text-center">
-                      <p className="mb-2 text-gray-500">Aucun client trouvé</p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleCreateClient}
-                        className="flex items-center gap-1"
-                      >
-                        <Plus className="h-3 w-3" /> Créer un nouveau client
-                      </Button>
-                    </div>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Créer une facture proforma</DialogTitle>
+          </DialogHeader>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="relative">
+                <FormField
+                  control={form.control}
+                  name="clientName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom du client</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input 
+                            placeholder="Nom du client" 
+                            value={selectedClient ? selectedClient.name : searchTerm}
+                            onChange={(e) => {
+                              if (selectedClient) {
+                                setSelectedClient(null);
+                              }
+                              setSearchTerm(e.target.value);
+                              field.onChange(e.target.value);
+                            }}
+                            required
+                          />
+                          <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        </div>
+                      </FormControl>
+                    </FormItem>
                   )}
-                </div>
-              )}
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                />
+                
+                {showResults && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {searchResults.length > 0 ? (
+                      <ul className="py-1">
+                        {searchResults.map((client) => (
+                          <li 
+                            key={client.id} 
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => handleSelectClient(client)}
+                          >
+                            <div className="font-medium">{client.name}</div>
+                            <div className="text-sm text-gray-500">{client.phone} {client.email ? `• ${client.email}` : ''}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="p-4 text-center">
+                        <p className="mb-2 text-gray-500">Aucun client trouvé</p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={handleCreateClient}
+                          className="flex items-center gap-1"
+                        >
+                          <Plus className="h-3 w-3" /> Créer un nouveau client
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="clientEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="email" 
+                          placeholder="Email du client" 
+                          {...field} 
+                          disabled={!selectedClient}
+                          className={!selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="clientPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Téléphone</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Téléphone du client" 
+                          {...field} 
+                          disabled={!selectedClient}
+                          className={!selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="reference"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Référence</FormLabel>
+                      <FormControl>
+                        <Input {...field} readOnly />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
               <FormField
                 control={form.control}
-                name="clientEmail"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="email" 
-                        placeholder="Email du client" 
-                        {...field} 
-                        disabled={!selectedClient}
-                        className={!selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
-                      />
+                      <Input placeholder="Description des articles/services" {...field} required />
                     </FormControl>
                   </FormItem>
                 )}
@@ -188,76 +238,38 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
               
               <FormField
                 control={form.control}
-                name="clientPhone"
+                name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Téléphone</FormLabel>
+                    <FormLabel>Montant (XOF)</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="Téléphone du client" 
+                        type="number"
+                        placeholder="Montant total" 
                         {...field} 
-                        disabled={!selectedClient}
-                        className={!selectedClient ? "bg-gray-100 cursor-not-allowed" : ""}
+                        required 
                       />
                     </FormControl>
                   </FormItem>
                 )}
               />
               
-              <FormField
-                control={form.control}
-                name="reference"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Référence</FormLabel>
-                    <FormControl>
-                      <Input {...field} readOnly />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Description des articles/services" {...field} required />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Montant (XOF)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      placeholder="Montant total" 
-                      {...field} 
-                      required 
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            
-            <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Annuler
-              </Button>
-              <Button type="submit">Créer proforma</Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+              <DialogFooter className="mt-6">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                  Annuler
+                </Button>
+                <Button type="submit">Créer proforma</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <AddClientDialog 
+        open={clientDialogOpen}
+        onOpenChange={setClientDialogOpen}
+        onSave={handleSaveClient}
+      />
+    </>
   );
 }
