@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Dialog,
@@ -34,18 +35,16 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
     handleCreateClient,
     handleSaveClient,
     onSubmit,
-    // Articles et services
     proformaItems,
     handleAddItem,
     handleUpdateItem,
     handleRemoveItem,
     calculateTotalAmount,
-    // Print functionality
     printRef,
     showPrintDialog,
     setShowPrintDialog,
     currentProforma,
-    handlePrint
+    triggerPrint
   } = useProformaForm(() => onOpenChange(false));
 
   return (
@@ -151,7 +150,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
             <Button variant="outline" onClick={() => setShowPrintDialog(false)}>
               Fermer
             </Button>
-            <Button onClick={() => handlePrint(printRef)}>
+            <Button onClick={triggerPrint}>
               Imprimer / Télécharger PDF
             </Button>
           </DialogFooter>

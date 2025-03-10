@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Client } from "@/data/clientsData";
@@ -47,6 +48,12 @@ export function useProformaForm(onClose: () => void) {
       setCurrentProforma(null);
     },
   });
+
+  const triggerPrint = () => {
+    if (printRef.current) {
+      handlePrint({ content: () => printRef.current });
+    }
+  };
 
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
@@ -159,6 +166,6 @@ export function useProformaForm(onClose: () => void) {
     showPrintDialog,
     setShowPrintDialog,
     currentProforma,
-    handlePrint
+    triggerPrint
   };
 }
