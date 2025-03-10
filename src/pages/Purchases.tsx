@@ -1,13 +1,14 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PurchasesHeader } from "@/components/suppliers/purchases/PurchasesHeader";
 import { PurchasesFilters } from "@/components/suppliers/purchases/PurchasesFilters";
-import { PurchasesTable } from "@/components/suppliers/purchases/PurchasesTable";
+import { PurchasesTable } from "@/components/suppliers/payments/PurchasesTable";
 import { DeletePurchaseDialog } from "@/components/suppliers/purchases/DeletePurchaseDialog";
 import { PurchaseForm } from "@/components/suppliers/purchases/PurchaseForm";
 import { PurchasesTotals } from "@/components/suppliers/purchases/PurchasesTotals";
+import { PaymentHistoryDialog } from "@/components/suppliers/payments/PaymentHistoryDialog";
 import { usePurchasesData } from "@/hooks/usePurchasesData";
 import { useToast } from "@/hooks/use-toast";
 import { Purchase } from "@/types/purchase";
@@ -39,6 +40,10 @@ const Purchases = () => {
     confirmDeletePurchase,
     clearFilters
   } = usePurchasesData();
+
+  // State for payment history dialog
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [historyPurchase, setHistoryPurchase] = useState<Purchase | null>(null);
 
   useEffect(() => {
     console.log("Purchases page mounted");
@@ -89,6 +94,23 @@ const Purchases = () => {
     handlePurchaseFormClose();
   };
 
+  // Handle payment click (dummy function for now)
+  const handlePaymentClick = (purchase: Purchase) => {
+    console.log("Payment click for purchase:", purchase);
+    // Here you would open a payment dialog or navigate to a payment page
+    toast({
+      title: "Action de paiement",
+      description: `Paiement pour la facture ${purchase.reference}`,
+    });
+  };
+
+  // Handle history click
+  const handleHistoryClick = (purchase: Purchase) => {
+    console.log("History click for purchase:", purchase);
+    setHistoryPurchase(purchase);
+    setIsHistoryDialogOpen(true);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
@@ -120,8 +142,9 @@ const Purchases = () => {
 
             <PurchasesTable 
               purchases={purchases} 
-              onEdit={handleEditPurchase}
-              onDelete={handleDeletePurchase}
+              onEditClick={handleEditPurchase}
+              onPaymentClick={handlePaymentClick}
+              onHistoryClick={handleHistoryClick}
             />
           </CardContent>
         </Card>
@@ -140,6 +163,14 @@ const Purchases = () => {
         initialPurchase={selectedPurchase}
         onSave={handleSavePurchase}
       />
+
+      {historyPurchase && (
+        <PaymentHistoryDialog
+          open={isHistoryDialogOpen}
+          onOpenChange={setIsHistoryDialogOpen}
+          purchase={historyPurchase}
+        />
+      )}
     </MainLayout>
   );
 };
