@@ -1,13 +1,14 @@
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { clientsData, Client } from "@/data/clientsData";
 
 export const useClientsData = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string>("");
+  const [clients, setClients] = useState<Client[]>(clientsData);
 
   const filteredClients = useMemo(() => {
-    return clientsData.filter(client => {
+    return clients.filter(client => {
       const matchesSearch = 
         client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.phone.includes(searchTerm) ||
@@ -18,11 +19,18 @@ export const useClientsData = () => {
       
       return matchesSearch && matchesType;
     });
-  }, [searchTerm, selectedType]);
+  }, [searchTerm, selectedType, clients]);
 
   // Get unique client types
   const clientTypes = useMemo(() => {
-    return [...new Set(clientsData.map(client => client.type))];
+    return [...new Set(clients.map(client => client.type))];
+  }, [clients]);
+
+  // Function to refresh clients data
+  const refreshClients = useCallback(() => {
+    // In a real app, this would make an API call to get fresh data
+    // For now, we just reset to the original data
+    setClients([...clientsData]);
   }, []);
 
   return {
@@ -31,6 +39,7 @@ export const useClientsData = () => {
     selectedType,
     setSelectedType,
     filteredClients,
-    clientTypes
+    clientTypes,
+    refreshClients
   };
 };

@@ -1,12 +1,13 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 
 interface ClientsHeaderProps {
   onAddClient?: () => void;
+  onRefresh?: () => void;
 }
 
-export const ClientsHeader = ({ onAddClient }: ClientsHeaderProps) => {
+export const ClientsHeader = ({ onAddClient, onRefresh }: ClientsHeaderProps) => {
   return (
     <div className="flex items-center justify-between">
       <div>
@@ -15,10 +16,20 @@ export const ClientsHeader = ({ onAddClient }: ClientsHeaderProps) => {
           Gérez votre base de clients
         </p>
       </div>
-      <Button className="bg-sama-600 hover:bg-sama-700" onClick={onAddClient}>
-        <Plus size={16} className="mr-2" />
-        Nouveau client
-      </Button>
+      <div className="flex space-x-2">
+        <Button 
+          variant="outline" 
+          onClick={onRefresh}
+          className="flex items-center"
+        >
+          <RefreshCw size={16} className="mr-2" />
+          Actualiser
+        </Button>
+        <Button className="bg-sama-600 hover:bg-sama-700" onClick={onAddClient}>
+          <Plus size={16} className="mr-2" />
+          Nouveau client
+        </Button>
+      </div>
     </div>
   );
 };
