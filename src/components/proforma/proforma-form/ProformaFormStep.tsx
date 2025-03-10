@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -80,23 +81,23 @@ export function ProformaFormStep({
         </form>
       </Form>
 
-      <div className="flex justify-between items-center gap-4 mt-6 pt-4 border-t border-gray-200">
-        <Button type="button" variant="outline" onClick={onGoBack}>
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-8 pt-6 border-t border-gray-300">
+        <Button type="button" variant="outline" onClick={onGoBack} className="w-full md:w-auto">
           Retour
         </Button>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
           <Button 
             type="button"
             onClick={() => setSaveDialogOpen(true)}
-            className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2 px-5 py-2.5 font-medium rounded-md shadow-sm"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-md shadow-md border-2 border-orange-400"
           >
-            <Save size={20} />
+            <Save size={22} />
             Enregistrer
           </Button>
           <Button 
             type="button"
             onClick={handleSubmit} 
-            className="bg-sama-600 hover:bg-sama-700"
+            className="w-full bg-sama-600 hover:bg-sama-700 py-3 text-base"
           >
             Créer le proforma
           </Button>
