@@ -15,7 +15,7 @@ import { AddClientDialog } from "@/components/clients/AddClientDialog";
 import { ClientSearchInput } from "./client-search/ClientSearchInput";
 import { ClientDetailsInputs } from "./client-search/ClientDetailsInputs";
 import { ProformaItems } from "./proforma-items/ProformaItems";
-import { useProformaForm } from "@/hooks/useProformaForm";
+import { useProformaForm } from "@/hooks/proforma/useProformaForm";
 import { PrintableProforma } from "./PrintableProforma";
 
 interface ProformaFormDialogProps {
@@ -150,9 +150,9 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
               <PrintableProforma
                 ref={printRef}
                 proforma={currentProforma}
-                clientName={form.getValues().clientName}
-                clientEmail={form.getValues().clientEmail}
-                clientPhone={form.getValues().clientPhone}
+                clientName={form.getValues("clientName")}
+                clientEmail={form.getValues("clientEmail")}
+                clientPhone={form.getValues("clientPhone")}
                 items={proformaItems}
               />
             )}

@@ -124,11 +124,18 @@ export function useProformaForm(onClose: () => void) {
           duration: 3000,
         });
         
-        setCurrentProforma(newProforma);
+        // Sauvegarder les données actuelles pour l'impression
+        setCurrentProforma({
+          ...newProforma,
+          clientName: data.clientName,
+          clientEmail: data.clientEmail,
+          clientPhone: data.clientPhone
+        });
+        
+        // Afficher le dialogue d'impression
         setShowPrintDialog(true);
         
-        // Réinitialiser le formulaire après enregistrement réussi
-        resetForm();
+        // On ne réinitialise pas le formulaire ici pour que les données soient disponibles pour l'impression
       } else {
         toast({
           title: "Erreur",
