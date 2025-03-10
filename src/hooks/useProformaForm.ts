@@ -119,8 +119,11 @@ export function useProformaForm(onClose: () => void) {
       description: "",
       amount: "",
     });
+    
+    // Clear client data
     setSelectedClient(null);
     setProformaItems([]);
+    setSearchTerm("");
     
     // Don't call onClose() to keep dialog open
   }
