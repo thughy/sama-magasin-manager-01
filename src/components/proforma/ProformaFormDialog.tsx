@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { AddClientDialog } from "@/components/clients/AddClientDialog";
 import { ClientSearchInput } from "./client-search/ClientSearchInput";
 import { ClientDetailsInputs } from "./client-search/ClientDetailsInputs";
-import { ProformaDetailsInputs } from "./proforma-details/ProformaDetailsInputs";
 import { ProformaItems } from "./proforma-items/ProformaItems";
 import { useProformaForm } from "@/hooks/useProformaForm";
 
@@ -97,8 +96,6 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
                 selectedClient={!!selectedClient}
               />
               
-              <ProformaDetailsInputs control={form.control} />
-              
               <ProformaItems
                 items={proformaItems}
                 onAddItem={handleAddItem}
@@ -107,7 +104,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
               />
               
               <div className="text-right text-xl font-bold mt-4">
-                Total: {calculateTotalAmount().toLocaleString()} XOF
+                Total: {calculateTotalAmount().toLocaleString()} CFA
               </div>
               
               <DialogFooter className="mt-6">

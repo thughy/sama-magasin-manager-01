@@ -78,7 +78,7 @@ export function ProformaItemsTable({ items, onUpdateItem, onRemoveItem }: Profor
                 />
               </TableCell>
               <TableCell className="text-right font-medium">
-                {calculateItemTotal(item).toLocaleString()} XOF
+                {calculateItemTotal(item).toLocaleString()} CFA
               </TableCell>
               <TableCell>
                 <Button
@@ -96,7 +96,7 @@ export function ProformaItemsTable({ items, onUpdateItem, onRemoveItem }: Profor
               Total
             </TableCell>
             <TableCell className="text-right font-bold">
-              {calculateTotal().toLocaleString()} XOF
+              {calculateTotal().toLocaleString()} CFA
             </TableCell>
             <TableCell></TableCell>
           </TableRow>
