@@ -13,6 +13,7 @@ interface ProformaListContainerProps {
   onEdit: (proforma: Proforma) => void;
   onView: (proforma: Proforma) => void;
   onDelete: (proforma: Proforma) => void;
+  isEditing?: boolean; // Add the isEditing prop as optional
 }
 
 export const ProformaListContainer: React.FC<ProformaListContainerProps> = ({
@@ -23,7 +24,8 @@ export const ProformaListContainer: React.FC<ProformaListContainerProps> = ({
   filteredProformas,
   onEdit,
   onView,
-  onDelete
+  onDelete,
+  isEditing = false // Set a default value of false
 }) => {
   return (
     <Card className="p-5">
@@ -38,6 +40,7 @@ export const ProformaListContainer: React.FC<ProformaListContainerProps> = ({
         onEdit={onEdit}
         onView={onView}
         onDelete={onDelete}
+        isEditing={isEditing} // Pass isEditing to the table component
       />
     </Card>
   );
