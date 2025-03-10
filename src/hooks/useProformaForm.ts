@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Client } from "@/data/clientsData";
@@ -42,7 +41,6 @@ export function useProformaForm(onClose: () => void) {
   });
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
     documentTitle: currentProforma ? `Proforma_${currentProforma.reference}` : "Proforma",
     onAfterPrint: () => {
       setShowPrintDialog(false);
@@ -102,10 +100,8 @@ export function useProformaForm(onClose: () => void) {
   };
 
   function onSubmit(data: ProformaFormValues) {
-    // Calculate total from items
     const totalAmount = calculateTotalAmount();
     
-    // Create new proforma
     const newProforma: Proforma = {
       id: `PRO-${proformas.length + 1}`,
       reference: data.reference,
@@ -115,7 +111,6 @@ export function useProformaForm(onClose: () => void) {
       date: new Date().toLocaleDateString('fr-FR')
     };
     
-    // Add to proformas list
     setProformas([...proformas, newProforma]);
     
     toast({
@@ -124,13 +119,10 @@ export function useProformaForm(onClose: () => void) {
       duration: 3000,
     });
     
-    // Set current proforma for printing
     setCurrentProforma(newProforma);
     
-    // Show print dialog
     setShowPrintDialog(true);
     
-    // Reset form but don't close it
     form.reset({
       clientName: "",
       clientEmail: "",
@@ -140,12 +132,9 @@ export function useProformaForm(onClose: () => void) {
       amount: "",
     });
     
-    // Clear client data
     setSelectedClient(null);
     setProformaItems([]);
     setSearchTerm("");
-    
-    // Don't call onClose() to keep dialog open
   }
 
   return {
@@ -161,13 +150,11 @@ export function useProformaForm(onClose: () => void) {
     handleSaveClient,
     onSubmit,
     proformas,
-    // Articles et services
     proformaItems,
     handleAddItem,
     handleUpdateItem,
     handleRemoveItem,
     calculateTotalAmount,
-    // Print functionality
     printRef,
     showPrintDialog,
     setShowPrintDialog,
