@@ -13,10 +13,25 @@ interface InvoiceItemRowProps {
 }
 
 export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItemRowProps) {
-  const calculateTotalPrice = (quantity: number, unitPrice: number, discount: number) => {
-    const discountAmount = (unitPrice * discount) / 100;
-    const discountedPrice = unitPrice - discountAmount;
-    return quantity * discountedPrice;
+  // Function to ensure we're working with numbers
+  const ensureNumber = (value: any): number => {
+    const parsed = Number(value);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuantity = Math.max(1, ensureNumber(e.target.value));
+    onUpdateItem(item.id, "quantity", newQuantity);
+  };
+
+  const handleUnitPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUnitPrice = Math.max(0, ensureNumber(e.target.value));
+    onUpdateItem(item.id, "unitPrice", newUnitPrice);
+  };
+
+  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDiscount = Math.min(100, Math.max(0, ensureNumber(e.target.value)));
+    onUpdateItem(item.id, "discount", newDiscount);
   };
 
   return (
@@ -36,10 +51,7 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           type="number"
           min="1"
           value={item.quantity}
-          onChange={(e) => {
-            const newQuantity = Number(e.target.value) || 1;
-            onUpdateItem(item.id, "quantity", newQuantity);
-          }}
+          onChange={handleQuantityChange}
           className="w-20"
         />
       </TableCell>
@@ -48,10 +60,7 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           type="number"
           min="0"
           value={item.unitPrice}
-          onChange={(e) => {
-            const newUnitPrice = Number(e.target.value) || 0;
-            onUpdateItem(item.id, "unitPrice", newUnitPrice);
-          }}
+          onChange={handleUnitPriceChange}
           className="w-28"
         />
       </TableCell>
@@ -61,15 +70,12 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           min="0"
           max="100"
           value={item.discount || 0}
-          onChange={(e) => {
-            const newDiscount = Number(e.target.value) || 0;
-            onUpdateItem(item.id, "discount", newDiscount);
-          }}
+          onChange={handleDiscountChange}
           className="w-20"
         />
       </TableCell>
       <TableCell className="text-right font-medium">
-        {item.totalPrice.toLocaleString()} FCFA
+        {ensureNumber(item.totalPrice).toLocaleString()} FCFA
       </TableCell>
       <TableCell>
         <Button

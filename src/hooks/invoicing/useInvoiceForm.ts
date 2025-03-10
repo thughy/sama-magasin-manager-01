@@ -26,11 +26,11 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
 
   useEffect(() => {
     // Calculate total amount from items
-    const calculatedTotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
+    const calculatedTotal = items.reduce((sum, item) => sum + Number(item.totalPrice), 0);
     setTotalAmount(calculatedTotal);
     
     // Calculate total from payment methods
-    const totalPaid = paymentMethods.reduce((sum, payment) => sum + payment.amount, 0);
+    const totalPaid = paymentMethods.reduce((sum, payment) => sum + Number(payment.amount), 0);
     setAmountPaid(totalPaid);
     
     // Calculate balance
@@ -56,7 +56,7 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
     }
     
     // Sinon, convertir en InvoiceItem
-    const unitPrice = item.type === 'product' ? item.sellPrice : item.amount;
+    const unitPrice = item.type === 'product' ? Number(item.sellPrice) : Number(item.amount);
     const newItem: InvoiceItem = {
       id: `item-${Date.now()}`,
       productId: item.id,
