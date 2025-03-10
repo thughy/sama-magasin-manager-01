@@ -38,20 +38,29 @@ export function InvoiceItemsTable({
       // Item already exists, update quantity
       const existingItem = items[existingItemIndex];
       const newQuantity = existingItem.quantity + 1;
-      const newTotalPrice = newQuantity * existingItem.unitPrice;
+      
+      // Calculate new total price considering discount
+      const unitPrice = existingItem.unitPrice;
+      const discount = existingItem.discount || 0;
+      const discountAmount = (unitPrice * discount) / 100;
+      const discountedPrice = unitPrice - discountAmount;
+      const newTotalPrice = newQuantity * discountedPrice;
       
       // Update the item
       onUpdateItem(existingItem.id, "quantity", newQuantity);
       onUpdateItem(existingItem.id, "totalPrice", newTotalPrice);
     } else {
       // Item doesn't exist, add as new
+      const unitPrice = item.type === 'product' ? item.sellPrice : item.amount;
+      
       const newItem = {
         id: `item-${Date.now()}`,
         productId: item.id,
         productName: item.name,
         quantity: 1,
-        unitPrice: item.type === 'product' ? item.sellPrice : item.amount,
-        totalPrice: item.type === 'product' ? item.sellPrice : item.amount,
+        unitPrice: unitPrice,
+        discount: 0, // Initialize discount to 0
+        totalPrice: unitPrice, // Initial total is just the unit price since no discount
         type: item.type
       };
       

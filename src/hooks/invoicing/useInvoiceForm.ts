@@ -42,6 +42,12 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
     setClientName(client.name);
   };
 
+  const calculateItemTotal = (quantity: number, unitPrice: number, discount: number = 0) => {
+    const discountAmount = (unitPrice * discount) / 100;
+    const discountedPrice = unitPrice - discountAmount;
+    return quantity * discountedPrice;
+  };
+
   const handleAddItem = (item: any) => {
     // Vérifie si l'item reçu est déjà au format InvoiceItem
     if (item.productId && item.productName) {
@@ -50,13 +56,15 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
     }
     
     // Sinon, convertir en InvoiceItem
+    const unitPrice = item.type === 'product' ? item.sellPrice : item.amount;
     const newItem: InvoiceItem = {
       id: `item-${Date.now()}`,
       productId: item.id,
       productName: item.name,
       quantity: 1,
-      unitPrice: item.type === 'product' ? item.sellPrice : item.amount,
-      totalPrice: item.type === 'product' ? item.sellPrice : item.amount,
+      unitPrice: unitPrice,
+      discount: 0, // Initialize discount to 0
+      totalPrice: unitPrice, // No discount initially
       type: item.type
     };
     
@@ -68,9 +76,15 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
       if (item.id === id) {
         const updatedItem = { ...item, [field]: value };
         
-        // Recalculate totalPrice if quantity or unitPrice changes
-        if (field === 'quantity' || field === 'unitPrice') {
-          updatedItem.totalPrice = updatedItem.quantity * updatedItem.unitPrice;
+        // Recalculate totalPrice if quantity, unitPrice, or discount changes
+        if (field === 'quantity' || field === 'unitPrice' || field === 'discount') {
+          if (field !== 'totalPrice') { // Avoid overwriting totalPrice if that's what we're updating
+            updatedItem.totalPrice = calculateItemTotal(
+              updatedItem.quantity, 
+              updatedItem.unitPrice, 
+              updatedItem.discount || 0
+            );
+          }
         }
         
         return updatedItem;

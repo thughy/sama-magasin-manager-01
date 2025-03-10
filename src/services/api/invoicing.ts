@@ -1,10 +1,8 @@
-
 /**
  * API client for invoice operations
  */
 
 import { fetchApi } from './fetch';
-import { ApiResponse } from './core';
 
 export interface InvoiceItem {
   id: string;
@@ -12,8 +10,9 @@ export interface InvoiceItem {
   productName: string;
   quantity: number;
   unitPrice: number;
+  discount: number; // New field for discount percentage
   totalPrice: number;
-  type?: 'product' | 'service'; // Ajout du type pour distinguer les produits des services
+  type?: 'product' | 'service';
 }
 
 export interface Invoice {

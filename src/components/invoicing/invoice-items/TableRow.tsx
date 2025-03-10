@@ -13,6 +13,12 @@ interface InvoiceItemRowProps {
 }
 
 export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItemRowProps) {
+  const calculateTotalPrice = (quantity: number, unitPrice: number, discount: number) => {
+    const discountAmount = (unitPrice * discount) / 100;
+    const discountedPrice = unitPrice - discountAmount;
+    return quantity * discountedPrice;
+  };
+
   return (
     <TableRow key={item.id}>
       <TableCell>
@@ -33,7 +39,11 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           onChange={(e) => {
             const newQuantity = Number(e.target.value) || 1;
             onUpdateItem(item.id, "quantity", newQuantity);
-            onUpdateItem(item.id, "totalPrice", newQuantity * item.unitPrice);
+            onUpdateItem(
+              item.id, 
+              "totalPrice", 
+              calculateTotalPrice(newQuantity, item.unitPrice, item.discount)
+            );
           }}
           className="w-20"
         />
@@ -46,9 +56,31 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           onChange={(e) => {
             const newUnitPrice = Number(e.target.value) || 0;
             onUpdateItem(item.id, "unitPrice", newUnitPrice);
-            onUpdateItem(item.id, "totalPrice", item.quantity * newUnitPrice);
+            onUpdateItem(
+              item.id, 
+              "totalPrice", 
+              calculateTotalPrice(item.quantity, newUnitPrice, item.discount)
+            );
           }}
           className="w-28"
+        />
+      </TableCell>
+      <TableCell>
+        <Input
+          type="number"
+          min="0"
+          max="100"
+          value={item.discount || 0}
+          onChange={(e) => {
+            const newDiscount = Number(e.target.value) || 0;
+            onUpdateItem(item.id, "discount", newDiscount);
+            onUpdateItem(
+              item.id, 
+              "totalPrice", 
+              calculateTotalPrice(item.quantity, item.unitPrice, newDiscount)
+            );
+          }}
+          className="w-20"
         />
       </TableCell>
       <TableCell className="text-right font-medium">

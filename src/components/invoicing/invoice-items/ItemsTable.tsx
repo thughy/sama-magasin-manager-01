@@ -28,6 +28,7 @@ export function ItemsTable({ items, onUpdateItem, onRemoveItem }: ItemsTableProp
             <TableHead>Article/Service</TableHead>
             <TableHead className="w-24">Quantité</TableHead>
             <TableHead className="w-32">Prix unitaire</TableHead>
+            <TableHead className="w-24">Remise (%)</TableHead>
             <TableHead className="w-32 text-right">Total</TableHead>
             <TableHead className="w-16"></TableHead>
           </TableRow>
@@ -42,7 +43,7 @@ export function ItemsTable({ items, onUpdateItem, onRemoveItem }: ItemsTableProp
             />
           ))}
           <TableRow>
-            <TableCell colSpan={3} className="text-right font-bold">
+            <TableCell colSpan={4} className="text-right font-bold">
               Total
             </TableCell>
             <TableCell className="text-right font-bold">
