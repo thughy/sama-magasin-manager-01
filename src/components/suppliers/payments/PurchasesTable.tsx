@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Purchase } from "@/types/purchase";
 import { PurchasesFiltersBar } from "./PurchasesFiltersBar";
 import { PurchasesTableDisplay } from "./PurchasesTableDisplay";
+import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
 
 interface PurchasesTableProps {
   purchases: Purchase[];
