@@ -1,0 +1,82 @@
+
+/* Print styles */
+@media print {
+  /* A4 paper size setup */
+  @page {
+    size: A4;
+    margin: 1.5cm; /* Standard margin for documents */
+  }
+  
+  body {
+    width: 210mm;
+    background: white !important;
+    font-size: 12pt;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Hide non-print elements */
+  .print-hidden,
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+  
+  /* Table styles for printing */
+  .print-supplier-invoices {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .print-supplier-invoices table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+    margin-bottom: 0.5cm;
+  }
+  
+  .print-supplier-invoices td,
+  .print-supplier-invoices th {
+    border: 1px solid #ddd;
+    padding: 4px;
+  }
+  
+  .print-payment-history table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+  
+  .print-payment-history td,
+  .print-payment-history th {
+    border: 1px solid #ddd;
+    padding: 4px;
+  }
+  
+  .print-supplier table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+  
+  /* Page break control */
+  .page-break {
+    page-break-after: always;
+  }
+  
+  /* Ensure element does not break across pages */
+  .no-break {
+    page-break-inside: avoid;
+  }
+}
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
