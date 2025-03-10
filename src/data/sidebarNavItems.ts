@@ -17,7 +17,8 @@ import {
   Wallet,
   ScrollText,
   User,
-  List
+  List,
+  FileCode
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar";
 
@@ -38,7 +39,8 @@ export const navItems: NavItem[] = [
     href: "/clients",
     subItems: [
       { title: "Nos clients", url: "/clients", icon: User },
-      { title: "Liste des clients", url: "/clients/list", icon: List }
+      { title: "Liste des clients", url: "/clients/list", icon: List },
+      { title: "Format", url: "/clients/format", icon: FileCode }
     ]
   },
   { title: "Caisse", icon: CreditCard, href: "/cashier" },
