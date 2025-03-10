@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, 
   Package, 
@@ -18,7 +17,8 @@ import {
   ScrollText,
   User,
   List,
-  FileCode
+  FileCode,
+  Receipt
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar";
 
@@ -40,7 +40,8 @@ export const navItems: NavItem[] = [
     subItems: [
       { title: "Nos clients", url: "/clients", icon: User },
       { title: "Liste des clients", url: "/clients/list", icon: List },
-      { title: "Proforma", url: "/clients/proforma", icon: FileCode }
+      { title: "Proforma", url: "/clients/proforma", icon: FileCode },
+      { title: "Facturation", url: "/clients/invoicing", icon: Receipt }
     ]
   },
   { title: "Caisse", icon: CreditCard, href: "/cashier" },

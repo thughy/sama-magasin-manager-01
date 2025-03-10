@@ -12,6 +12,7 @@
 // Export api clients
 export { proformaApi } from './proforma';
 export { clientApi } from './client';
+export { invoicingApi } from './invoicing';
 
 // Export types and utilities
 export type { ApiResponse } from './core';
