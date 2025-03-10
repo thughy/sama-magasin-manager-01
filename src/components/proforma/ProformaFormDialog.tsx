@@ -44,8 +44,20 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
     showPrintDialog,
     setShowPrintDialog,
     currentProforma,
-    triggerPrint
+    triggerPrint,
+    resetForm
   } = useProformaForm(() => onOpenChange(false));
+
+  // Gestionnaire pour fermer le dialogue d'impression et réinitialiser
+  const handleClosePrintDialog = () => {
+    setShowPrintDialog(false);
+  };
+
+  // Gestionnaire pour imprimer et fermer tous les dialogues
+  const handlePrintAndClose = () => {
+    triggerPrint();
+    setShowPrintDialog(false);
+  };
 
   return (
     <>
@@ -124,7 +136,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
       </Dialog>
 
       {/* Print Dialog */}
-      <Dialog open={showPrintDialog} onOpenChange={setShowPrintDialog}>
+      <Dialog open={showPrintDialog} onOpenChange={handleClosePrintDialog}>
         <DialogContent className="sm:max-w-[800px]">
           <DialogHeader>
             <DialogTitle>Aperçu avant impression</DialogTitle>
@@ -147,10 +159,10 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPrintDialog(false)}>
+            <Button variant="outline" onClick={handleClosePrintDialog}>
               Fermer
             </Button>
-            <Button onClick={triggerPrint}>
+            <Button onClick={handlePrintAndClose}>
               Confirmer l'impression
             </Button>
           </DialogFooter>

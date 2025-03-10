@@ -126,6 +126,9 @@ export function useProformaForm(onClose: () => void) {
         
         setCurrentProforma(newProforma);
         setShowPrintDialog(true);
+        
+        // Réinitialiser le formulaire après enregistrement réussi
+        resetForm();
       } else {
         toast({
           title: "Erreur",
