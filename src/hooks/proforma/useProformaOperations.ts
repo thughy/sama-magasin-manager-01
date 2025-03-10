@@ -22,18 +22,22 @@ export function useProformaOperations({
 
   const handleEditProforma = async (proforma: Proforma) => {
     if (isEditing) return; // Prevent multiple clicks while processing
-    setIsEditing(true);
-    
-    resetForm(); // Reset form before loading new data
     
     try {
-      // First open the form dialog
+      setIsEditing(true);
+      
+      // First reset the form completely before loading new data
+      resetForm();
+      
+      // Open the form dialog first
       setFormDialogOpen(true);
       
-      // Then load the proforma data with a slight delay to ensure proper UI rendering
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Use a longer delay to ensure the form is fully reset and rendered
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Now load the proforma data for editing
       await loadProformaForEdit(proforma);
-
+      
       toast({
         title: "Modification",
         description: `Modification de la proforma: ${proforma.reference}`,
@@ -46,6 +50,8 @@ export function useProformaOperations({
         description: "Une erreur s'est produite lors du chargement",
         duration: 3000,
       });
+      // Close the form dialog if there's an error
+      setFormDialogOpen(false);
     } finally {
       setIsEditing(false);
     }

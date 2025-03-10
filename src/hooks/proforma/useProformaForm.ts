@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { ProformaFormValues } from "@/types/proforma";
 import { useProformaSubmission } from "./useProformaSubmission";
@@ -71,6 +70,7 @@ export function useProformaForm(onClose: () => void) {
     setProformaItems([]);
     setSearchTerm("");
     setIsEditMode(false);
+    setCurrentProforma(null);
     form.reset({
       clientName: "",
       clientEmail: "",
@@ -84,21 +84,28 @@ export function useProformaForm(onClose: () => void) {
   const loadProformaForEdit = async (proforma: Proforma) => {
     setIsLoading(true);
     try {
+      console.log("Loading proforma for edit:", proforma.id);
+      
       const response = await proformaApi.getById(proforma.id);
       if (response.success && response.data) {
         const proformaData = response.data;
+        console.log("Proforma data loaded:", proformaData);
         
         form.reset({
           clientName: proformaData.clientName,
           clientEmail: proformaData.clientEmail || "",
           clientPhone: proformaData.clientPhone || "",
           reference: proformaData.reference,
-          description: proformaData.description,
+          description: proformaData.description || "",
           amount: proformaData.amount,
         });
         
         if (proformaData.items && Array.isArray(proformaData.items)) {
+          console.log("Setting proforma items:", proformaData.items);
           setProformaItems(proformaData.items);
+        } else {
+          console.log("No items found in proforma data");
+          setProformaItems([]);
         }
         
         setIsEditMode(true);
@@ -110,6 +117,7 @@ export function useProformaForm(onClose: () => void) {
           duration: 3000,
         });
       } else {
+        console.error("Failed to load proforma:", response.error);
         toast({
           title: "Erreur de chargement",
           description: response.error || "Impossible de charger la proforma",

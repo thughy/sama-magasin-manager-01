@@ -21,6 +21,24 @@ const STORAGE_KEYS = {
   CLIENTS: 'app_clients',
 };
 
+// Sample proforma items for demo purposes
+const SAMPLE_ITEMS = [
+  {
+    id: 'item-1',
+    name: 'Produit 1',
+    type: 'product',
+    quantity: 2,
+    unitPrice: 5000
+  },
+  {
+    id: 'item-2',
+    name: 'Service 1',
+    type: 'service',
+    quantity: 1,
+    unitPrice: 15000
+  }
+];
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -88,6 +106,25 @@ async function handleLocalStorage<T>(
       case 'GET':
         if (entityId) {
           const item = data.find((item: any) => item.id === entityId);
+          
+          // For proformas, add sample items for testing if not present
+          if (entityType === 'proformas' && item) {
+            // Add client details if not present
+            if (!item.clientEmail) {
+              item.clientEmail = 'client@example.com';
+            }
+            if (!item.clientPhone) {
+              item.clientPhone = '77 123 45 67';
+            }
+            
+            // Add items if not present
+            if (!item.items || !Array.isArray(item.items) || item.items.length === 0) {
+              item.items = SAMPLE_ITEMS;
+            }
+            
+            console.log("Returning proforma with items:", item);
+          }
+          
           return { success: true, data: item as T };
         }
         return { success: true, data: data as T };
