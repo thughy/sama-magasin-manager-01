@@ -46,6 +46,10 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
     triggerPrint
   } = useProformaForm(() => onOpenChange(false));
 
+  const handlePrintClick = () => {
+    setShowPrintDialog(true);
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -116,6 +120,9 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
                   Annuler
                 </Button>
                 <Button type="submit">Créer proforma</Button>
+                <Button type="button" onClick={handlePrintClick}>
+                  Imprimer / Télécharger PDF
+                </Button>
               </DialogFooter>
             </form>
           </Form>
@@ -150,7 +157,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
               Fermer
             </Button>
             <Button onClick={triggerPrint}>
-              Imprimer / Télécharger PDF
+              Confirmer l'impression
             </Button>
           </DialogFooter>
         </DialogContent>
