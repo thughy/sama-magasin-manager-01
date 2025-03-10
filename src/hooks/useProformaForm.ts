@@ -45,8 +45,10 @@ export function useProformaForm(onClose: () => void) {
     onAfterPrint: () => {
       setShowPrintDialog(false);
       setCurrentProforma(null);
+      onClose();
     },
     content: () => printRef.current,
+    pageStyle: '@page { size: A4; margin: 1.5cm; }',
   });
 
   const triggerPrint = () => {
@@ -129,19 +131,6 @@ export function useProformaForm(onClose: () => void) {
     setCurrentProforma(newProforma);
     
     setShowPrintDialog(true);
-    
-    form.reset({
-      clientName: "",
-      clientEmail: "",
-      clientPhone: "",
-      reference: `PRO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      description: "",
-      amount: "",
-    });
-    
-    setSelectedClient(null);
-    setProformaItems([]);
-    setSearchTerm("");
   }
 
   return {

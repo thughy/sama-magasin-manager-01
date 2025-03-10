@@ -161,20 +161,6 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
         onOpenChange={setClientDialogOpen}
         onSave={handleSaveClient}
       />
-      
-      {/* Hidden printable content */}
-      <div style={{ display: 'none' }}>
-        {currentProforma && (
-          <PrintableProforma
-            ref={printRef}
-            proforma={currentProforma}
-            clientName={form.getValues().clientName}
-            clientEmail={form.getValues().clientEmail}
-            clientPhone={form.getValues().clientPhone}
-            items={proformaItems}
-          />
-        )}
-      </div>
     </>
   );
 }
