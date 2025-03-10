@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Client } from "@/data/clientsData";
@@ -52,9 +51,6 @@ export function useProformaForm(onClose: () => void) {
       @page {
         size: A4;
         margin: 1.5cm;
-        @bottom-right {
-          content: "Page " counter(page) " sur " counter(pages);
-        }
       }
     `,
     contentRef: printRef,
