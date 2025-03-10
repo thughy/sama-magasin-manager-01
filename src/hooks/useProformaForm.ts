@@ -47,11 +47,12 @@ export function useProformaForm(onClose: () => void) {
       setShowPrintDialog(false);
       setCurrentProforma(null);
     },
+    content: () => printRef.current
   });
 
   const triggerPrint = () => {
     if (printRef.current) {
-      handlePrint({ content: () => printRef.current });
+      handlePrint();
     }
   };
 
