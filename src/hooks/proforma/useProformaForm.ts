@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { ProformaFormValues } from "@/types/proforma";
 import { useProformaSubmission } from "./useProformaSubmission";
@@ -91,23 +92,26 @@ export function useProformaForm(onClose: () => void) {
         const proformaData = response.data;
         console.log("Proforma data loaded:", proformaData);
         
-        form.reset({
-          clientName: proformaData.clientName,
+        // Set form values
+        await form.reset({
+          clientName: proformaData.clientName || "",
           clientEmail: proformaData.clientEmail || "",
           clientPhone: proformaData.clientPhone || "",
-          reference: proformaData.reference,
+          reference: proformaData.reference || "",
           description: proformaData.description || "",
-          amount: proformaData.amount,
-        });
+          amount: proformaData.amount || "0",
+        }, { keepDefaultValues: false });
         
+        // Set proforma items
         if (proformaData.items && Array.isArray(proformaData.items)) {
           console.log("Setting proforma items:", proformaData.items);
-          setProformaItems(proformaData.items);
+          setProformaItems([...proformaData.items]);
         } else {
           console.log("No items found in proforma data");
           setProformaItems([]);
         }
         
+        // Set edit mode and current proforma
         setIsEditMode(true);
         setCurrentProforma(proformaData);
         

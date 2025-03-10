@@ -26,14 +26,14 @@ export function useProformaOperations({
     try {
       setIsEditing(true);
       
-      // First reset the form completely before loading new data
+      // First reset the form completely
       resetForm();
       
-      // Open the form dialog first
+      // Then open the dialog and wait for it to render
       setFormDialogOpen(true);
       
-      // Use a longer delay to ensure the form is fully reset and rendered
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Use a longer delay to ensure the dialog is fully rendered
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Now load the proforma data for editing
       await loadProformaForEdit(proforma);

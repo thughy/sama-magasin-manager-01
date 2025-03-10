@@ -107,7 +107,7 @@ async function handleLocalStorage<T>(
         if (entityId) {
           const item = data.find((item: any) => item.id === entityId);
           
-          // For proformas, add sample items for testing if not present
+          // For proformas, ensure necessary data exists
           if (entityType === 'proformas' && item) {
             // Add client details if not present
             if (!item.clientEmail) {
@@ -119,7 +119,7 @@ async function handleLocalStorage<T>(
             
             // Add items if not present
             if (!item.items || !Array.isArray(item.items) || item.items.length === 0) {
-              item.items = SAMPLE_ITEMS;
+              item.items = JSON.parse(JSON.stringify(SAMPLE_ITEMS)); // Use deep copy
             }
             
             console.log("Returning proforma with items:", item);
