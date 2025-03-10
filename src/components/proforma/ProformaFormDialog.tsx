@@ -51,12 +51,14 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
   // Gestionnaire pour fermer le dialogue d'impression et réinitialiser
   const handleClosePrintDialog = () => {
     setShowPrintDialog(false);
+    resetForm(); // Reset form when closing print dialog
   };
 
   // Gestionnaire pour imprimer et fermer tous les dialogues
   const handlePrintAndClose = () => {
     triggerPrint();
     setShowPrintDialog(false);
+    resetForm(); // Reset form after printing
   };
 
   return (
@@ -150,9 +152,9 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
               <PrintableProforma
                 ref={printRef}
                 proforma={currentProforma}
-                clientName={form.getValues("clientName")}
-                clientEmail={form.getValues("clientEmail")}
-                clientPhone={form.getValues("clientPhone")}
+                clientName={currentProforma.clientName}
+                clientEmail={currentProforma.clientEmail || ""}
+                clientPhone={currentProforma.clientPhone || ""}
                 items={proformaItems}
               />
             )}

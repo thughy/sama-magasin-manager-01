@@ -5,12 +5,18 @@ import { Proforma } from "@/components/proforma/ProformasTable";
 import { ProformaItem } from "@/components/proforma/proforma-items/ProformaItemsTable";
 import { proformaApi } from "@/services/api";
 
+// Extended type that includes the additional client details
+interface ProformaWithClientDetails extends Proforma {
+  clientEmail?: string;
+  clientPhone?: string;
+}
+
 export function useProformaState() {
   const { toast } = useToast();
   const [proformas, setProformas] = useState<Proforma[]>([]);
   const [proformaItems, setProformaItems] = useState<ProformaItem[]>([]);
   const [showPrintDialog, setShowPrintDialog] = useState(false);
-  const [currentProforma, setCurrentProforma] = useState<Proforma | null>(null);
+  const [currentProforma, setCurrentProforma] = useState<ProformaWithClientDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
   // Charger les proformas existantes

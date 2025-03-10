@@ -9,6 +9,12 @@ import { useProformaState } from "./useProformaState";
 import { useClientSelection } from "./useClientSelection";
 import { useProformaPrinting } from "./useProformaPrinting";
 
+// Extended type that includes the additional client details needed for printing
+interface ProformaWithClientDetails extends Proforma {
+  clientEmail?: string;
+  clientPhone?: string;
+}
+
 export interface ProformaFormValues {
   clientName: string;
   clientEmail: string;
@@ -127,10 +133,9 @@ export function useProformaForm(onClose: () => void) {
         // Sauvegarder les données actuelles pour l'impression
         setCurrentProforma({
           ...newProforma,
-          clientName: data.clientName,
           clientEmail: data.clientEmail,
           clientPhone: data.clientPhone
-        });
+        } as ProformaWithClientDetails);
         
         // Afficher le dialogue d'impression
         setShowPrintDialog(true);
