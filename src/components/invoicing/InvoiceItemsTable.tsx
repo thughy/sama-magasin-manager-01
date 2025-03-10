@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Table,
@@ -9,11 +10,10 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2 } from "lucide-react";
+import { Barcode, Search, Trash2 } from "lucide-react";
 import { InvoiceItem } from "@/services/api/invoicing";
 import { Item } from "@/types/product";
-import { ItemSearchBox } from "./ItemSearchBox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { initialItems } from "@/data/productsData";
 
 interface InvoiceItemsTableProps {
   items: InvoiceItem[];
@@ -28,9 +28,31 @@ export function InvoiceItemsTable({
   onUpdateItem, 
   onRemoveItem 
 }: InvoiceItemsTableProps) {
-  const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<Item[]>([]);
+  const [showResults, setShowResults] = useState(false);
   
-  const handleItemSelect = (item: Item) => {
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    
+    if (value.length >= 2) {
+      const results = initialItems.filter((item) => {
+        const nameMatch = item.name.toLowerCase().includes(value.toLowerCase());
+        const barcodeMatch = 
+          item.type === "product" && 
+          item.barcode.includes(value);
+        
+        return nameMatch || barcodeMatch;
+      });
+      
+      setSearchResults(results);
+      setShowResults(true);
+    } else {
+      setShowResults(false);
+    }
+  };
+  
+  const handleSelectItem = (item: Item) => {
     const newItem = {
       id: `item-${Date.now()}`,
       productId: item.id,
@@ -42,25 +64,64 @@ export function InvoiceItemsTable({
     };
     
     onAddItem(newItem);
-    setIsAddItemDialogOpen(false);
+    setSearchTerm("");
+    setShowResults(false);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium">Articles et services</h3>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => setIsAddItemDialogOpen(true)}
-        >
-          Ajouter un article/service
-        </Button>
+        <div className="relative w-1/2">
+          <Input
+            placeholder="Rechercher un article ou service par nom ou code barre..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="pr-10"
+          />
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-1">
+            <Search className="h-4 w-4 text-gray-400" />
+            <Barcode className="h-4 w-4 text-gray-400" />
+          </div>
+          
+          {showResults && (
+            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+              {searchResults.length > 0 ? (
+                <ul className="py-1">
+                  {searchResults.map((item) => (
+                    <li
+                      key={item.id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleSelectItem(item)}
+                    >
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-gray-500 flex flex-wrap gap-2">
+                        {item.type === "product" ? (
+                          <>
+                            <span>Code: {item.barcode}</span>
+                            <span>Prix: {item.sellPrice.toLocaleString()} FCFA</span>
+                            <span>Stock: {item.stock}</span>
+                          </>
+                        ) : (
+                          <span>Prix: {item.amount.toLocaleString()} FCFA</span>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="p-4 text-center text-muted-foreground">
+                  Aucun article ou service trouvé
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       
       {items.length === 0 ? (
         <div className="border rounded-md p-8 text-center">
-          <p className="text-muted-foreground">Aucun article/service dans la facture. Cliquez sur "Ajouter un article/service" pour commencer.</p>
+          <p className="text-muted-foreground">Aucun article/service dans la facture. Recherchez un article ou service pour l'ajouter.</p>
         </div>
       ) : (
         <div className="border rounded-md">
@@ -132,23 +193,6 @@ export function InvoiceItemsTable({
           </Table>
         </div>
       )}
-
-      <Dialog open={isAddItemDialogOpen} onOpenChange={setIsAddItemDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Ajouter un article ou service</DialogTitle>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <ItemSearchBox 
-              onSelectItem={handleItemSelect} 
-              onShowAddItemDialog={() => {
-                console.log("Fonctionnalité: Ajouter un nouvel article");
-              }} 
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
