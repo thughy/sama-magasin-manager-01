@@ -1,12 +1,14 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaymentJournalHeader } from "@/components/suppliers/payment-journal/PaymentJournalHeader";
 import { PaymentJournalFilters } from "@/components/suppliers/payment-journal/PaymentJournalFilters";
 import { PaymentJournalTable } from "@/components/suppliers/payment-journal/PaymentJournalTable";
+import { PrintablePaymentJournal } from "@/components/suppliers/payment-journal/PrintablePaymentJournal";
 import { usePaymentJournal } from "@/hooks/usePaymentJournal";
 import { format } from "date-fns";
+import { useReactToPrint } from "react-to-print";
 
 const PaymentJournal = () => {
   const {
@@ -17,11 +19,27 @@ const PaymentJournal = () => {
     fetchPayments,
     totalAmount
   } = usePaymentJournal();
+  
+  const printRef = useRef<HTMLDivElement>(null);
+  
+  const handlePrint = useReactToPrint({
+    documentTitle: "Journal_des_paiements",
+    content: () => printRef.current,
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 1.5cm;
+      }
+    `
+  });
 
   return (
     <MainLayout>
       <div className="space-y-6">
-        <PaymentJournalHeader />
+        <PaymentJournalHeader 
+          onPrint={handlePrint} 
+          canPrint={payments.length > 0} 
+        />
         
         <Card>
           <CardHeader>
@@ -55,6 +73,17 @@ const PaymentJournal = () => {
             <PaymentJournalTable payments={payments} isLoading={isLoading} />
           </CardContent>
         </Card>
+      </div>
+      
+      {/* Section imprimable (cachée à l'écran) */}
+      <div className="hidden">
+        <div ref={printRef}>
+          <PrintablePaymentJournal 
+            payments={payments} 
+            totalAmount={totalAmount} 
+            dateRange={dateRange}
+          />
+        </div>
       </div>
     </MainLayout>
   );

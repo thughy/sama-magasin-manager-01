@@ -1,8 +1,17 @@
 
 import React from "react";
-import { ScrollText } from "lucide-react";
+import { ScrollText, Printer } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export const PaymentJournalHeader: React.FC = () => {
+interface PaymentJournalHeaderProps {
+  onPrint: () => void;
+  canPrint: boolean;
+}
+
+export const PaymentJournalHeader: React.FC<PaymentJournalHeaderProps> = ({ 
+  onPrint, 
+  canPrint 
+}) => {
   return (
     <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
       <div>
@@ -14,6 +23,15 @@ export const PaymentJournalHeader: React.FC = () => {
           Consultez et filtrez l'historique des paiements effectués aux fournisseurs
         </p>
       </div>
+      
+      <Button 
+        onClick={onPrint} 
+        disabled={!canPrint}
+        className="print:hidden"
+      >
+        <Printer className="mr-2 h-4 w-4" />
+        Imprimer
+      </Button>
     </div>
   );
 };
