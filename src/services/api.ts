@@ -52,6 +52,7 @@ async function fetchApi<T>(
   body?: any
 ): Promise<ApiResponse<T>> {
   if (MODE === 'localStorage') {
+    console.log(`[API] ${method} ${endpoint}`, body);
     // Implémentation avec localStorage
     return handleLocalStorage<T>(endpoint, method, body);
   }
@@ -105,24 +106,34 @@ async function handleLocalStorage<T>(
     switch (method) {
       case 'GET':
         if (entityId) {
+          console.log(`[LocalStorage] GET ${entityType}/${entityId}`);
           const item = data.find((item: any) => item.id === entityId);
+          
+          if (!item) {
+            console.log(`[LocalStorage] ${entityType} with id ${entityId} not found`);
+            return { success: false, error: `${entityType} non trouvé` };
+          }
           
           // For proformas, ensure necessary data exists
           if (entityType === 'proformas' && item) {
+            // Create a deep copy to ensure we don't modify the original data
+            const itemCopy = JSON.parse(JSON.stringify(item));
+            
             // Add client details if not present
-            if (!item.clientEmail) {
-              item.clientEmail = 'client@example.com';
+            if (!itemCopy.clientEmail) {
+              itemCopy.clientEmail = 'client@example.com';
             }
-            if (!item.clientPhone) {
-              item.clientPhone = '77 123 45 67';
+            if (!itemCopy.clientPhone) {
+              itemCopy.clientPhone = '77 123 45 67';
             }
             
             // Add items if not present
-            if (!item.items || !Array.isArray(item.items) || item.items.length === 0) {
-              item.items = JSON.parse(JSON.stringify(SAMPLE_ITEMS)); // Use deep copy
+            if (!itemCopy.items || !Array.isArray(itemCopy.items) || itemCopy.items.length === 0) {
+              itemCopy.items = JSON.parse(JSON.stringify(SAMPLE_ITEMS)); // Use deep copy
             }
             
-            console.log("Returning proforma with items:", item);
+            console.log("Returning proforma with items:", itemCopy);
+            return { success: true, data: itemCopy as T };
           }
           
           return { success: true, data: item as T };
@@ -134,12 +145,24 @@ async function handleLocalStorage<T>(
         if (!body.id) {
           body.id = `${entityType}-${Date.now()}`;
         }
+        
+        // For proformas, save items in the body
+        if (entityType === 'proformas' && body.items) {
+          console.log(`[LocalStorage] Creating proforma with ${body.items.length} items`);
+        }
+        
         data.push(body);
         localStorage.setItem(storageKey, JSON.stringify(data));
         return { success: true, data: body as T };
         
       case 'PUT':
         if (!entityId) return { success: false, error: 'ID manquant' };
+        
+        // For proformas, ensure items are saved too
+        if (entityType === 'proformas' && body.items) {
+          console.log(`[LocalStorage] Updating proforma with ${body.items.length} items`);
+        }
+        
         data = data.map((item: any) => 
           item.id === entityId ? { ...item, ...body } : item
         );

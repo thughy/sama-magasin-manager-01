@@ -24,16 +24,24 @@ export function useProformaOperations({
     if (isEditing) return; // Prevent multiple clicks while processing
     
     try {
+      // Start the editing process
       setIsEditing(true);
       
-      // First reset the form completely
+      // Get the full proforma data first
+      const response = await proformaApi.getById(proforma.id);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Impossible de charger la proforma");
+      }
+      
+      // Complete reset of form state
       resetForm();
       
-      // Then open the dialog and wait for it to render
+      // Open dialog and wait for it to be fully rendered
       setFormDialogOpen(true);
       
-      // Use a longer delay to ensure the dialog is fully rendered
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Use a more substantial delay to ensure the dialog is fully rendered
+      // and form state is completely reset
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Now load the proforma data for editing
       await loadProformaForEdit(proforma);
@@ -44,7 +52,7 @@ export function useProformaOperations({
         duration: 3000,
       });
     } catch (error) {
-      console.error("Erreur lors du chargement de la proforma:", error);
+      console.error("Erreur lors du chargement de la proforma pour édition:", error);
       toast({
         title: "Erreur",
         description: "Une erreur s'est produite lors du chargement",
