@@ -9,7 +9,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { AddClientDialog } from "@/components/clients/AddClientDialog";
 import { ClientSearchInput } from "./client-search/ClientSearchInput";
 import { ClientDetailsInputs } from "./client-search/ClientDetailsInputs";
@@ -55,7 +56,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="clientName"
@@ -70,6 +71,19 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
                       onCreateClient={handleCreateClient}
                       selectedClient={selectedClient}
                     />
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="reference"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Référence</FormLabel>
+                      <FormControl>
+                        <Input {...field} readOnly />
+                      </FormControl>
+                    </FormItem>
                   )}
                 />
               </div>

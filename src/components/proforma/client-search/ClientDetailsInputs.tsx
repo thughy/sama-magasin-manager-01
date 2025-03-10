@@ -57,19 +57,6 @@ export function ClientDetailsInputs({ control, selectedClient }: ClientDetailsIn
           </FormItem>
         )}
       />
-      
-      <FormField
-        control={control}
-        name="reference"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Référence</FormLabel>
-            <FormControl>
-              <Input {...field} readOnly />
-            </FormControl>
-          </FormItem>
-        )}
-      />
     </div>
   );
 }
