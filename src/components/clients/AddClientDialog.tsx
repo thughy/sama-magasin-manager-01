@@ -75,7 +75,17 @@ export function AddClientDialog({
 
   const handleSubmit = (data: FormValues) => {
     onSave(data);
-    form.reset();
+    // Reset form for next input instead of closing the dialog
+    form.reset({
+      name: "",
+      phone: "",
+      email: "",
+      address: "",
+    });
+    // Focus back on the name field for next entry
+    setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 100);
     toast.success("Client ajouté avec succès");
   };
 
@@ -85,7 +95,7 @@ export function AddClientDialog({
         <DialogHeader>
           <DialogTitle>Ajouter un nouveau client</DialogTitle>
           <DialogDescription>
-            Complétez les informations du client ci-dessous.
+            Complétez les informations du client ci-dessous. Vous pouvez ajouter plusieurs clients sans fermer ce formulaire.
           </DialogDescription>
         </DialogHeader>
 
@@ -162,12 +172,12 @@ export function AddClientDialog({
               )}
             />
 
-            <DialogFooter>
+            <DialogFooter className="flex justify-between sm:justify-between flex-row">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Annuler
+                Fermer
               </Button>
               <Button type="submit" className="bg-sama-600 hover:bg-sama-700">
-                Enregistrer
+                Enregistrer et continuer
               </Button>
             </DialogFooter>
           </form>

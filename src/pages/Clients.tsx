@@ -30,13 +30,15 @@ const Clients = () => {
 
   const handleSaveClient = useCallback((data: NewClient) => {
     const newClient = addClient(data);
-    setIsAddDialogOpen(false);
     
     toast({
       title: "Client ajouté",
       description: `${newClient.name} a été ajouté avec succès.`,
       duration: 3000,
     });
+    
+    // Note: We don't close the dialog anymore to allow multiple entries
+    // setIsAddDialogOpen(false);
   }, [addClient, toast]);
 
   const handleRefresh = useCallback(() => {
