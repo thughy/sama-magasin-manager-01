@@ -37,13 +37,14 @@ export function InvoiceItemsTable({
     if (existingItemIndex !== -1) {
       // Item already exists, update quantity
       const existingItem = items[existingItemIndex];
-      // Ensure we convert to numbers before adding
-      const currentQuantity = Number(existingItem.quantity);
+      
+      // Make sure all values are converted to numbers
+      const currentQuantity = parseInt(existingItem.quantity.toString(), 10);
       const newQuantity = currentQuantity + 1;
       
       // Calculate new total price considering discount
-      const unitPrice = Number(existingItem.unitPrice);
-      const discount = Number(existingItem.discount || 0);
+      const unitPrice = parseFloat(existingItem.unitPrice.toString());
+      const discount = parseFloat((existingItem.discount || 0).toString());
       const discountAmount = (unitPrice * discount) / 100;
       const discountedPrice = unitPrice - discountAmount;
       const newTotalPrice = newQuantity * discountedPrice;
@@ -54,7 +55,9 @@ export function InvoiceItemsTable({
       onUpdateItem(existingItem.id, "totalPrice", newTotalPrice);
     } else {
       // Item doesn't exist, add as new
-      const unitPrice = item.type === 'product' ? item.sellPrice : item.amount;
+      const unitPrice = item.type === 'product' ? 
+        parseFloat(item.sellPrice.toString()) : 
+        parseFloat(item.amount.toString());
       
       const newItem: InvoiceItem = {
         id: `item-${Date.now()}`,

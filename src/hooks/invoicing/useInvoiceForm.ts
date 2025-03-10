@@ -26,11 +26,17 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
 
   useEffect(() => {
     // Calculate total amount from items
-    const calculatedTotal = items.reduce((sum, item) => sum + Number(item.totalPrice), 0);
+    const calculatedTotal = items.reduce((sum, item) => {
+      const itemTotal = parseFloat(item.totalPrice.toString());
+      return sum + (isNaN(itemTotal) ? 0 : itemTotal);
+    }, 0);
     setTotalAmount(calculatedTotal);
     
     // Calculate total from payment methods
-    const totalPaid = paymentMethods.reduce((sum, payment) => sum + Number(payment.amount), 0);
+    const totalPaid = paymentMethods.reduce((sum, payment) => {
+      const paymentAmount = parseFloat(payment.amount.toString());
+      return sum + (isNaN(paymentAmount) ? 0 : paymentAmount);
+    }, 0);
     setAmountPaid(totalPaid);
     
     // Calculate balance
@@ -43,6 +49,12 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
   };
 
   const calculateItemTotal = (quantity: number, unitPrice: number, discount: number = 0) => {
+    // Ensure all inputs are numbers
+    quantity = parseFloat(quantity.toString());
+    unitPrice = parseFloat(unitPrice.toString());
+    discount = parseFloat(discount.toString());
+    
+    // Apply calculations
     const discountAmount = (unitPrice * discount) / 100;
     const discountedPrice = unitPrice - discountAmount;
     return quantity * discountedPrice;
@@ -51,12 +63,29 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
   const handleAddItem = (item: any) => {
     // Vérifie si l'item reçu est déjà au format InvoiceItem
     if (item.productId && item.productName) {
+      // Ensure numeric properties are numbers
+      if (typeof item.quantity !== 'number') {
+        item.quantity = parseFloat(item.quantity);
+      }
+      if (typeof item.unitPrice !== 'number') {
+        item.unitPrice = parseFloat(item.unitPrice);
+      }
+      if (typeof item.discount !== 'number') {
+        item.discount = parseFloat(item.discount || 0);
+      }
+      if (typeof item.totalPrice !== 'number') {
+        item.totalPrice = parseFloat(item.totalPrice);
+      }
+      
       setItems([...items, item]);
       return;
     }
     
     // Sinon, convertir en InvoiceItem
-    const unitPrice = item.type === 'product' ? Number(item.sellPrice) : Number(item.amount);
+    const unitPrice = item.type === 'product' ? 
+      parseFloat(item.sellPrice.toString()) : 
+      parseFloat(item.amount.toString());
+    
     const newItem: InvoiceItem = {
       id: `item-${Date.now()}`,
       productId: item.id,
@@ -75,14 +104,21 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
     setItems(items.map(item => {
       if (item.id === id) {
         // First create a new item with the updated field
-        const updatedItem = { ...item, [field]: value };
+        const updatedItem = { ...item };
+        
+        // Ensure numeric values are always stored as numbers
+        if (field === 'quantity' || field === 'unitPrice' || field === 'discount' || field === 'totalPrice') {
+          updatedItem[field] = parseFloat(value.toString());
+        } else {
+          updatedItem[field] = value;
+        }
         
         // Recalculate totalPrice if quantity, unitPrice, or discount changes
         if (field === 'quantity' || field === 'unitPrice' || field === 'discount') {
           updatedItem.totalPrice = calculateItemTotal(
-            Number(updatedItem.quantity), 
-            Number(updatedItem.unitPrice), 
-            Number(updatedItem.discount || 0)
+            updatedItem.quantity, 
+            updatedItem.unitPrice, 
+            updatedItem.discount || 0
           );
         }
         

@@ -15,7 +15,7 @@ interface InvoiceItemRowProps {
 export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItemRowProps) {
   // Function to ensure we're working with numbers
   const ensureNumber = (value: any): number => {
-    const parsed = Number(value);
+    const parsed = parseFloat(value.toString());
     return isNaN(parsed) ? 0 : parsed;
   };
 
@@ -50,7 +50,7 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
         <Input
           type="number"
           min="1"
-          value={item.quantity}
+          value={ensureNumber(item.quantity)}
           onChange={handleQuantityChange}
           className="w-20"
         />
@@ -59,7 +59,7 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
         <Input
           type="number"
           min="0"
-          value={item.unitPrice}
+          value={ensureNumber(item.unitPrice)}
           onChange={handleUnitPriceChange}
           className="w-28"
         />
@@ -69,7 +69,7 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
           type="number"
           min="0"
           max="100"
-          value={item.discount || 0}
+          value={ensureNumber(item.discount || 0)}
           onChange={handleDiscountChange}
           className="w-20"
         />
