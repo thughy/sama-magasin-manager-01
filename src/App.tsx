@@ -13,6 +13,7 @@ import Suppliers from "./pages/Suppliers";
 import PurchaseOrders from "./pages/PurchaseOrders";
 import Purchases from "./pages/Purchases";
 import SupplierPayments from "./pages/SupplierPayments";
+import PaymentJournal from "./pages/PaymentJournal";
 import Sales from "./pages/Sales";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/suppliers/purchase-orders" element={<PurchaseOrders />} />
           <Route path="/suppliers/purchases" element={<Purchases />} />
           <Route path="/suppliers/payments" element={<SupplierPayments />} />
+          <Route path="/suppliers/payment-journal" element={<PaymentJournal />} />
           <Route path="/sales" element={<Sales />} />
           <Route path="/depots" element={<Depots />} />
           <Route path="/depots/release-orders" element={<DepotReleaseOrders />} />
