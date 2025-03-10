@@ -16,7 +16,7 @@ export const ClientInvoicingHeader = ({
   return (
     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Facturation</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Facturation Client</h1>
         <p className="text-muted-foreground mt-1">
           Gérez les factures clients et suivez les paiements
         </p>

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Invoice, InvoiceItem } from "@/services/api";
 import { format } from "date-fns";
 import { usePaymentMethods } from "@/hooks/purchase-form/usePaymentMethods";
+import { Client } from "@/data/clientsData";
 
 export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partial<Invoice> & { id?: string }) => void) => {
   const [reference, setReference] = useState(invoice?.reference || `FAC-${Date.now().toString().slice(-6)}`);
@@ -35,7 +36,7 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
     setBalance(calculatedTotal - totalPaid);
   }, [items, paymentMethods]);
 
-  const handleClientSelect = (client: any) => {
+  const handleClientSelect = (client: Client) => {
     setClientId(client.id);
     setClientName(client.name);
   };

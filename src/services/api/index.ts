@@ -1,4 +1,3 @@
-
 /**
  * API Service - Main export file
  * 
@@ -20,3 +19,6 @@ export type { Invoice, InvoiceItem } from './invoicing';
 // Export types and utilities
 export type { ApiResponse } from './core';
 export { deepClone } from './core';
+
+// Export from invoicing module
+export * from './invoicing';

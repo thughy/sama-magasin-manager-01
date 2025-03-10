@@ -3,6 +3,7 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ClientSearchInput } from "@/components/proforma/client-search/ClientSearchInput";
+import { Client } from "@/data/clientsData";
 
 interface InvoiceHeaderProps {
   reference: string;
@@ -10,7 +11,7 @@ interface InvoiceHeaderProps {
   clientName: string;
   onReferenceChange: (value: string) => void;
   onDateChange: (value: string) => void;
-  onClientSelect: (client: any) => void;
+  onClientSelect: (client: Client) => void;
 }
 
 export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
@@ -47,7 +48,7 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
         <Label>Client</Label>
         <ClientSearchInput 
           value={clientName}
-          onChange={onClientSelect}
+          onChange={(value) => {}}
           onSelectClient={onClientSelect}
           onCreateClient={() => {}}
           selectedClient={null}
