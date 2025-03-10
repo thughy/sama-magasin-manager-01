@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ClientCard } from "./ClientCard";
@@ -8,6 +8,7 @@ import { ProformaItems } from "./ProformaItems";
 import { Client } from "@/data/clientsData";
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
+import { SaveProformaDialog } from "./SaveProformaDialog";
 
 interface ProformaItem {
   id: string;
@@ -27,6 +28,7 @@ interface ProformaFormStepProps {
   getTotalAmount: () => number;
   onGoBack: () => void;
   onCreateProforma: (data: ProformaValues) => void;
+  onSaveProforma: (data: ProformaValues, saveData: SaveProformaData) => void;
 }
 
 export function ProformaFormStep({
@@ -39,13 +41,25 @@ export function ProformaFormStep({
   getTotalAmount,
   onGoBack,
   onCreateProforma,
+  onSaveProforma,
 }: ProformaFormStepProps) {
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+
   const handleSubmit = () => {
     if (items.length === 0) {
       toast.error("Veuillez ajouter au moins un article au proforma");
       return;
     }
     onCreateProforma(proformaForm.getValues());
+  };
+
+  const handleSave = (saveData: SaveProformaData) => {
+    if (items.length === 0) {
+      toast.error("Veuillez ajouter au moins un article au proforma");
+      return;
+    }
+    onSaveProforma(proformaForm.getValues(), saveData);
+    setSaveDialogOpen(false);
   };
 
   return (
@@ -70,13 +84,33 @@ export function ProformaFormStep({
         <Button type="button" variant="outline" onClick={onGoBack}>
           Retour
         </Button>
-        <Button 
-          onClick={handleSubmit} 
-          className="bg-sama-600 hover:bg-sama-700"
-        >
-          Créer le proforma
-        </Button>
+        <div className="flex space-x-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setSaveDialogOpen(true)}
+          >
+            Enregistrer
+          </Button>
+          <Button 
+            onClick={handleSubmit} 
+            className="bg-sama-600 hover:bg-sama-700"
+          >
+            Créer le proforma
+          </Button>
+        </div>
       </div>
+
+      <SaveProformaDialog 
+        open={saveDialogOpen} 
+        onOpenChange={setSaveDialogOpen} 
+        onSave={handleSave}
+        totalAmount={getTotalAmount()}
+      />
     </div>
   );
+}
+
+export interface SaveProformaData {
+  title: string;
+  note: string;
 }

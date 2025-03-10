@@ -8,6 +8,7 @@ import { useClientsData } from "@/hooks/useClientsData";
 import { toast } from "sonner";
 import { ClientSearchValues } from "@/components/proforma/client-selection/ClientSearch";
 import { ProformaValues, proformaSchema } from "@/components/proforma/proforma-form/ProformaFormHeader";
+import { SaveProformaData } from "@/components/proforma/proforma-form/ProformaFormStep";
 
 const clientSearchSchema = z.object({
   clientSearch: z.string().min(1, "Veuillez saisir un nom ou un identifiant de client"),
@@ -147,6 +148,22 @@ export function useProformaDialog(open: boolean, onOpenChange: (open: boolean) =
     onOpenChange(false);
   };
 
+  const handleSaveProforma = (data: ProformaValues, saveData: SaveProformaData) => {
+    if (!selectedClient) {
+      toast.error("Veuillez sélectionner un client avant d'enregistrer le proforma");
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error("Veuillez ajouter au moins un article au proforma");
+      return;
+    }
+
+    // En réalité, vous sauvegarderiez le proforma dans votre base de données ici
+    toast.success(`Proforma "${saveData.title}" enregistré pour ${selectedClient.name}`);
+    onOpenChange(false);
+  };
+
   const handleGoBack = () => {
     setCurrentStep('client-selection');
   };
@@ -168,6 +185,7 @@ export function useProformaDialog(open: boolean, onOpenChange: (open: boolean) =
     updateItem,
     getTotalAmount,
     handleCreateProforma,
+    handleSaveProforma,
     handleGoBack,
   };
 }

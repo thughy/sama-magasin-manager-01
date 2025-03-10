@@ -35,6 +35,7 @@ export function NewProformaDialog({ open, onOpenChange }: NewProformaDialogProps
     updateItem,
     getTotalAmount,
     handleCreateProforma,
+    handleSaveProforma,
     handleGoBack,
   } = useProformaDialog(open, onOpenChange);
 
@@ -74,6 +75,7 @@ export function NewProformaDialog({ open, onOpenChange }: NewProformaDialogProps
                 getTotalAmount={getTotalAmount}
                 onGoBack={handleGoBack}
                 onCreateProforma={handleCreateProforma}
+                onSaveProforma={handleSaveProforma}
               />
             )
           )}
