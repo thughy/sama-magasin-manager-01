@@ -38,6 +38,8 @@ export function useProformaForm(onClose: () => void) {
     setCurrentProforma,
     isLoading,
     setIsLoading,
+    isEditMode,
+    setIsEditMode,
     loadProformas,
     handleAddItem,
     handleUpdateItem,
@@ -79,6 +81,7 @@ export function useProformaForm(onClose: () => void) {
     setSelectedClient(null);
     setProformaItems([]);
     setSearchTerm("");
+    setIsEditMode(false);
     form.reset({
       clientName: "",
       clientEmail: "",
@@ -87,6 +90,57 @@ export function useProformaForm(onClose: () => void) {
       description: "",
       amount: "",
     });
+  };
+
+  // Load an existing proforma for editing
+  const loadProformaForEdit = async (proforma: Proforma) => {
+    setIsLoading(true);
+    try {
+      const response = await proformaApi.getById(proforma.id);
+      if (response.success && response.data) {
+        const proformaData = response.data;
+        
+        // Set form values
+        form.reset({
+          clientName: proformaData.clientName,
+          clientEmail: proformaData.clientEmail || "",
+          clientPhone: proformaData.clientPhone || "",
+          reference: proformaData.reference,
+          description: proformaData.description,
+          amount: proformaData.amount,
+        });
+        
+        // Set items if available
+        if (proformaData.items && Array.isArray(proformaData.items)) {
+          setProformaItems(proformaData.items);
+        }
+        
+        // Set edit mode
+        setIsEditMode(true);
+        setCurrentProforma(proformaData as ProformaWithClientDetails);
+        
+        toast({
+          title: "Proforma chargée",
+          description: `La proforma ${proformaData.reference} est prête à être modifiée`,
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: "Erreur de chargement",
+          description: response.error || "Impossible de charger la proforma",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement de la proforma:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors du chargement",
+        duration: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle client selection and populate form fields
@@ -102,8 +156,8 @@ export function useProformaForm(onClose: () => void) {
     setIsLoading(true);
     const totalAmount = calculateTotalAmount();
     
-    const newProforma: Proforma = {
-      id: `PRO-${Date.now()}`,
+    const proformaData: Proforma = {
+      id: isEditMode && currentProforma ? currentProforma.id : `PRO-${Date.now()}`,
       reference: data.reference,
       clientName: data.clientName,
       amount: totalAmount.toString(),
@@ -112,27 +166,49 @@ export function useProformaForm(onClose: () => void) {
     };
     
     try {
-      // Enregistrer dans la base de données via l'API
-      const response = await proformaApi.create({
-        ...newProforma,
-        items: proformaItems,
-        clientEmail: data.clientEmail,
-        clientPhone: data.clientPhone
-      });
+      let response;
       
-      if (response.success) {
+      if (isEditMode) {
+        // Update existing proforma
+        response = await proformaApi.update({
+          ...proformaData,
+          items: proformaItems,
+          clientEmail: data.clientEmail,
+          clientPhone: data.clientPhone
+        });
+        
+        if (response.success) {
+          toast({
+            title: "Facture proforma mise à jour",
+            description: `Facture ${data.reference} mise à jour pour ${data.clientName}`,
+            duration: 3000,
+          });
+        }
+      } else {
+        // Create new proforma
+        response = await proformaApi.create({
+          ...proformaData,
+          items: proformaItems,
+          clientEmail: data.clientEmail,
+          clientPhone: data.clientPhone
+        });
+        
+        if (response.success) {
+          toast({
+            title: "Facture proforma créée",
+            description: `Facture ${data.reference} créée pour ${data.clientName}`,
+            duration: 3000,
+          });
+        }
+      }
+      
+      if (response && response.success) {
         // Mise à jour de l'état local
         await loadProformas(); // Recharger les proformas depuis l'API
         
-        toast({
-          title: "Facture proforma créée",
-          description: `Facture ${data.reference} créée pour ${data.clientName}`,
-          duration: 3000,
-        });
-        
         // Sauvegarder les données actuelles pour l'impression
         setCurrentProforma({
-          ...newProforma,
+          ...proformaData,
           clientEmail: data.clientEmail,
           clientPhone: data.clientPhone
         } as ProformaWithClientDetails);
@@ -144,7 +220,7 @@ export function useProformaForm(onClose: () => void) {
       } else {
         toast({
           title: "Erreur",
-          description: response.error || "Impossible d'enregistrer la proforma",
+          description: response?.error || "Impossible d'enregistrer la proforma",
           duration: 3000,
         });
       }
@@ -186,6 +262,8 @@ export function useProformaForm(onClose: () => void) {
     triggerPrint,
     resetForm,
     isLoading,
-    loadProformas
+    loadProformas,
+    isEditMode,
+    loadProformaForEdit
   };
 }

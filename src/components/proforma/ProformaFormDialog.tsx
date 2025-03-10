@@ -45,7 +45,8 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
     setShowPrintDialog,
     currentProforma,
     triggerPrint,
-    resetForm
+    resetForm,
+    isEditMode
   } = useProformaForm(() => onOpenChange(false));
 
   // Gestionnaire pour fermer le dialogue d'impression et réinitialiser
@@ -66,9 +67,11 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Créer une facture proforma</DialogTitle>
+            <DialogTitle>
+              {isEditMode ? "Modifier la facture proforma" : "Créer une facture proforma"}
+            </DialogTitle>
             <DialogDescription>
-              Créez une facture proforma pour un client avec articles et services
+              {isEditMode ? "Modifiez les détails de la facture proforma" : "Créez une facture proforma pour un client avec articles et services"}
             </DialogDescription>
           </DialogHeader>
           
@@ -102,7 +105,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
                       <FormItem>
                         <FormLabel>Référence</FormLabel>
                         <FormControl>
-                          <Input {...field} readOnly className="bg-gray-100" />
+                          <Input {...field} readOnly={isEditMode} className={isEditMode ? "bg-gray-100" : ""} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -130,7 +133,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                   Annuler
                 </Button>
-                <Button type="submit">Créer proforma</Button>
+                <Button type="submit">{isEditMode ? "Mettre à jour" : "Créer proforma"}</Button>
               </DialogFooter>
             </form>
           </Form>

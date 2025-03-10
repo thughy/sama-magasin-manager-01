@@ -18,6 +18,7 @@ export function useProformaState() {
   const [showPrintDialog, setShowPrintDialog] = useState(false);
   const [currentProforma, setCurrentProforma] = useState<ProformaWithClientDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   
   // Charger les proformas existantes
   const loadProformas = async () => {
@@ -85,6 +86,8 @@ export function useProformaState() {
     setCurrentProforma,
     isLoading,
     setIsLoading,
+    isEditMode,
+    setIsEditMode,
     loadProformas,
     handleAddItem,
     handleUpdateItem,

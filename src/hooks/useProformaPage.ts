@@ -14,7 +14,7 @@ export function useProformaPage() {
     setFormDialogOpen(false);
     handleRefresh(); // Rafraîchir la liste après avoir fermé le formulaire
   });
-  const { proformas, loadProformas } = proformaForm;
+  const { proformas, loadProformas, loadProformaForEdit, resetForm } = proformaForm;
 
   const handleRefresh = async () => {
     setIsLoading(true);
@@ -49,22 +49,12 @@ export function useProformaPage() {
   };
 
   const handleEditProforma = async (proforma: Proforma) => {
+    resetForm(); // Reset form before loading new data
     try {
-      const response = await proformaApi.getById(proforma.id);
-      if (response.success && response.data) {
-        // Logique pour éditer la proforma
-        toast({
-          title: "Modifier",
-          description: `Modification de la proforma: ${proforma.reference}`,
-          duration: 3000,
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: response.error || "Impossible de charger la proforma",
-          duration: 3000,
-        });
-      }
+      // Ouvrir le formulaire en mode edition
+      setFormDialogOpen(true);
+      // Charger les données de la proforma
+      await loadProformaForEdit(proforma);
     } catch (error) {
       console.error("Erreur lors du chargement de la proforma:", error);
       toast({
