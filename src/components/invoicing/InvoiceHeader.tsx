@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ClientSearchInput } from "@/components/proforma/client-search/ClientSearchInput";
 import { Client } from "@/data/clientsData";
+import { useFormContext } from "react-hook-form";
 
 interface InvoiceHeaderProps {
   reference: string;
@@ -22,6 +23,13 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
   onDateChange,
   onClientSelect,
 }) => {
+  const { setValue } = useFormContext();
+
+  const handleClientSelection = (client: Client) => {
+    onClientSelect(client);
+    setValue("clientName", client.name);
+  };
+
   return (
     <div className="grid gap-4 py-4">
       <div className="grid grid-cols-2 gap-4">
@@ -30,7 +38,10 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
           <Input
             id="reference"
             value={reference}
-            onChange={(e) => onReferenceChange(e.target.value)}
+            onChange={(e) => {
+              onReferenceChange(e.target.value);
+              setValue("reference", e.target.value);
+            }}
           />
         </div>
         <div>
@@ -39,31 +50,22 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
             id="date"
             type="date"
             value={date}
-            onChange={(e) => onDateChange(e.target.value)}
+            onChange={(e) => {
+              onDateChange(e.target.value);
+              setValue("date", e.target.value);
+            }}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label>Client</Label>
-        <div className="relative">
-          <Input
-            value={clientName}
-            onChange={(e) => {}}
-            placeholder="Sélectionner un client"
-            className="w-full"
-            readOnly
-          />
-          <div className="absolute inset-0">
-            <ClientSearchInput 
-              value={clientName}
-              onChange={() => {}}
-              onSelectClient={onClientSelect}
-              onCreateClient={() => {}}
-              selectedClient={null}
-            />
-          </div>
-        </div>
+        <ClientSearchInput 
+          value={clientName}
+          onChange={() => {}}
+          onSelectClient={handleClientSelection}
+          onCreateClient={() => {}}
+          selectedClient={clientName ? { id: "", name: clientName } as Client : null}
+        />
       </div>
     </div>
   );

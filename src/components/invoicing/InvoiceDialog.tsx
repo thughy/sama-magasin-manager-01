@@ -1,5 +1,5 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Invoice } from "@/services/api";
 import { InvoiceItemsTable } from "./InvoiceItemsTable";
@@ -17,7 +17,13 @@ interface InvoiceDialogProps {
 }
 
 export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDialogProps) => {
-  const methods = useForm();
+  const methods = useForm({
+    defaultValues: {
+      reference: invoice?.reference || "",
+      date: invoice?.date || "",
+      clientName: invoice?.clientName || "",
+    }
+  });
   
   const {
     reference,
@@ -46,6 +52,9 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
       <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>{invoice ? "Modifier la facture" : "Nouvelle facture"}</DialogTitle>
+          <DialogDescription>
+            Complétez les informations pour {invoice ? "modifier" : "créer"} une facture client
+          </DialogDescription>
         </DialogHeader>
 
         <FormProvider {...methods}>
