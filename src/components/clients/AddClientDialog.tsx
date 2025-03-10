@@ -28,7 +28,7 @@ import { toast } from "sonner";
 const formSchema = z.object({
   name: z.string().min(1, "Le nom du client est requis"),
   phone: z.string().min(1, "Le numéro de téléphone est requis"),
-  email: z.string().email("Email invalide").min(1, "L'email est requis"),
+  email: z.string().email("Email invalide").optional(),
   address: z.string().optional(),
 });
 
@@ -143,7 +143,7 @@ export function AddClientDialog({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Email (optionnel)</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -160,7 +160,7 @@ export function AddClientDialog({
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Adresse</FormLabel>
+                  <FormLabel>Adresse (optionnelle)</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />

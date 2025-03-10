@@ -5,7 +5,7 @@ import { clientsData, Client } from "@/data/clientsData";
 export interface NewClient {
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   address?: string;
 }
 
@@ -19,7 +19,7 @@ export const useClientsData = () => {
       const matchesSearch = 
         client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.phone.includes(searchTerm) ||
-        client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         client.id.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesType = selectedType === "all" ? true : client.type === selectedType;
@@ -49,7 +49,7 @@ export const useClientsData = () => {
       id: clientId,
       name: newClient.name,
       phone: newClient.phone,
-      email: newClient.email,
+      email: newClient.email || "",
       address: newClient.address || "",
       type: clientType,
       balance: 0,
