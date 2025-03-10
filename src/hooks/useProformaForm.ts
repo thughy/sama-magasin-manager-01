@@ -48,7 +48,15 @@ export function useProformaForm(onClose: () => void) {
       setCurrentProforma(null);
       onClose();
     },
-    pageStyle: '@page { size: A4; margin: 1.5cm; }',
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 1.5cm;
+        @bottom-right {
+          content: "Page " counter(page) " sur " counter(pages);
+        }
+      }
+    `,
     contentRef: printRef,
   });
 
