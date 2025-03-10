@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Client } from "@/data/clientsData";
 import { useToast } from "@/components/ui/use-toast";
@@ -6,6 +7,7 @@ import { useClientsData } from "@/hooks/useClientsData";
 import { Proforma } from "@/components/proforma/ProformasTable";
 import { Item } from "@/types/product";
 import { ProformaItem } from "@/components/proforma/proforma-items/ProformaItemsTable";
+import { useReactToPrint } from "react-to-print";
 
 export interface ProformaFormValues {
   clientName: string;
@@ -24,6 +26,9 @@ export function useProformaForm(onClose: () => void) {
   const [clientDialogOpen, setClientDialogOpen] = useState(false);
   const [proformas, setProformas] = useState<Proforma[]>([]);
   const [proformaItems, setProformaItems] = useState<ProformaItem[]>([]);
+  const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const [currentProforma, setCurrentProforma] = useState<Proforma | null>(null);
+  const printRef = useRef<HTMLDivElement>(null);
   
   const form = useForm<ProformaFormValues>({
     defaultValues: {
@@ -33,6 +38,15 @@ export function useProformaForm(onClose: () => void) {
       reference: `PRO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
       description: "",
       amount: "",
+    },
+  });
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: currentProforma ? `Proforma_${currentProforma.reference}` : "Proforma",
+    onAfterPrint: () => {
+      setShowPrintDialog(false);
+      setCurrentProforma(null);
     },
   });
 
@@ -110,6 +124,12 @@ export function useProformaForm(onClose: () => void) {
       duration: 3000,
     });
     
+    // Set current proforma for printing
+    setCurrentProforma(newProforma);
+    
+    // Show print dialog
+    setShowPrintDialog(true);
+    
     // Reset form but don't close it
     form.reset({
       clientName: "",
@@ -146,6 +166,12 @@ export function useProformaForm(onClose: () => void) {
     handleAddItem,
     handleUpdateItem,
     handleRemoveItem,
-    calculateTotalAmount
+    calculateTotalAmount,
+    // Print functionality
+    printRef,
+    showPrintDialog,
+    setShowPrintDialog,
+    currentProforma,
+    handlePrint
   };
 }

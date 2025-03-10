@@ -16,6 +16,7 @@ import { ClientSearchInput } from "./client-search/ClientSearchInput";
 import { ClientDetailsInputs } from "./client-search/ClientDetailsInputs";
 import { ProformaItems } from "./proforma-items/ProformaItems";
 import { useProformaForm } from "@/hooks/useProformaForm";
+import { PrintableProforma } from "./PrintableProforma";
 
 interface ProformaFormDialogProps {
   open: boolean;
@@ -39,7 +40,13 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
     handleAddItem,
     handleUpdateItem,
     handleRemoveItem,
-    calculateTotalAmount
+    calculateTotalAmount,
+    // Print functionality
+    printRef,
+    showPrintDialog,
+    setShowPrintDialog,
+    currentProforma,
+    handlePrint
   } = useProformaForm(() => onOpenChange(false));
 
   return (
@@ -118,11 +125,59 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
         </DialogContent>
       </Dialog>
 
+      {/* Print Dialog */}
+      <Dialog open={showPrintDialog} onOpenChange={setShowPrintDialog}>
+        <DialogContent className="sm:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Aperçu avant impression</DialogTitle>
+            <DialogDescription>
+              Vérifiez le document avant de l'imprimer ou de le télécharger en PDF
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="border rounded-md p-4 max-h-[60vh] overflow-y-auto">
+            {currentProforma && (
+              <PrintableProforma
+                ref={printRef}
+                proforma={currentProforma}
+                clientName={form.getValues().clientName}
+                clientEmail={form.getValues().clientEmail}
+                clientPhone={form.getValues().clientPhone}
+                items={proformaItems}
+              />
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPrintDialog(false)}>
+              Fermer
+            </Button>
+            <Button onClick={handlePrint}>
+              Imprimer / Télécharger PDF
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <AddClientDialog 
         open={clientDialogOpen}
         onOpenChange={setClientDialogOpen}
         onSave={handleSaveClient}
       />
+      
+      {/* Hidden printable content */}
+      <div style={{ display: 'none' }}>
+        {currentProforma && (
+          <PrintableProforma
+            ref={printRef}
+            proforma={currentProforma}
+            clientName={form.getValues().clientName}
+            clientEmail={form.getValues().clientEmail}
+            clientPhone={form.getValues().clientPhone}
+            items={proformaItems}
+          />
+        )}
+      </div>
     </>
   );
 }
