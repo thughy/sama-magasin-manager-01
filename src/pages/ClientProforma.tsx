@@ -13,6 +13,7 @@ const ClientProforma = () => {
     formDialogOpen,
     setFormDialogOpen,
     isLoading,
+    isEditing,
     filteredProformas,
     handleRefresh,
     handleSearch,
@@ -25,7 +26,7 @@ const ClientProforma = () => {
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
         <ProformaPageHeader 
-          isLoading={isLoading} 
+          isLoading={isLoading || isEditing} 
           onRefresh={handleRefresh} 
         />
 
@@ -38,6 +39,7 @@ const ClientProforma = () => {
           onEdit={handleEditProforma}
           onView={handleViewProforma}
           onDelete={handleDeleteProforma}
+          isEditing={isEditing}
         />
       </div>
       

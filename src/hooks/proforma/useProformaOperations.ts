@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Proforma } from "@/components/proforma/ProformasTable";
 import { proformaApi } from "@/services/api";
@@ -17,14 +18,27 @@ export function useProformaOperations({
   setFormDialogOpen
 }: UseProformaOperationsProps) {
   const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleEditProforma = async (proforma: Proforma) => {
+    if (isEditing) return; // Prevent multiple clicks while processing
+    setIsEditing(true);
+    
     resetForm(); // Reset form before loading new data
+    
     try {
-      // Open the form in edit mode
+      // First open the form dialog
       setFormDialogOpen(true);
-      // Load proforma data
+      
+      // Then load the proforma data with a slight delay to ensure proper UI rendering
+      await new Promise(resolve => setTimeout(resolve, 50));
       await loadProformaForEdit(proforma);
+
+      toast({
+        title: "Modification",
+        description: `Modification de la proforma: ${proforma.reference}`,
+        duration: 3000,
+      });
     } catch (error) {
       console.error("Erreur lors du chargement de la proforma:", error);
       toast({
@@ -32,6 +46,8 @@ export function useProformaOperations({
         description: "Une erreur s'est produite lors du chargement",
         duration: 3000,
       });
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -66,7 +82,7 @@ export function useProformaOperations({
     try {
       const response = await proformaApi.delete(proforma.id);
       if (response.success) {
-        loadProformas(); // Reload proformas
+        await loadProformas(); // Reload proformas
         toast({
           title: "Supprimer",
           description: `Suppression de la proforma: ${proforma.reference}`,
@@ -92,6 +108,7 @@ export function useProformaOperations({
   return {
     handleEditProforma,
     handleViewProforma,
-    handleDeleteProforma
+    handleDeleteProforma,
+    isEditing
   };
 }

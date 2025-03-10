@@ -8,13 +8,19 @@ import { useProformaDataLoader } from "@/hooks/proforma/useProformaDataLoader";
 export function useProformaPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   
-  // Initialize the proforma form hook
+  // Initialize the proforma form hook with a callback
   const proformaForm = useProformaForm(() => {
     setFormDialogOpen(false);
     handleRefresh(); // Refresh list after closing the form
   });
   
   const { proformas, loadProformas, loadProformaForEdit, resetForm } = proformaForm;
+  
+  // Initialize the data loader hook
+  const { 
+    isLoading, 
+    handleRefresh 
+  } = useProformaDataLoader({ loadProformas });
   
   // Initialize the search hook
   const { 
@@ -24,17 +30,12 @@ export function useProformaPage() {
     handleSearch 
   } = useProformaSearch(proformas);
   
-  // Initialize the data loader hook
-  const { 
-    isLoading, 
-    handleRefresh 
-  } = useProformaDataLoader({ loadProformas });
-  
   // Initialize the operations hook
   const { 
     handleEditProforma, 
     handleViewProforma, 
-    handleDeleteProforma 
+    handleDeleteProforma,
+    isEditing
   } = useProformaOperations({
     loadProformas,
     resetForm,
@@ -53,6 +54,7 @@ export function useProformaPage() {
     formDialogOpen,
     setFormDialogOpen,
     isLoading,
+    isEditing,
     proformaForm,
     filteredProformas,
     handleRefresh,
