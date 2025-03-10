@@ -1,137 +1,51 @@
 
 import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { Proforma } from "@/components/proforma/ProformasTable";
-import { proformaApi } from "@/services/api";
 import { useProformaForm } from "@/hooks/useProformaForm";
+import { useProformaSearch } from "@/hooks/proforma/useProformaSearch";
+import { useProformaOperations } from "@/hooks/proforma/useProformaOperations";
+import { useProformaDataLoader } from "@/hooks/proforma/useProformaDataLoader";
 
 export function useProformaPage() {
-  const [searchTerm, setSearchTerm] = useState("");
   const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  
+  // Initialize the proforma form hook
   const proformaForm = useProformaForm(() => {
     setFormDialogOpen(false);
-    handleRefresh(); // Rafraîchir la liste après avoir fermé le formulaire
+    handleRefresh(); // Refresh list after closing the form
   });
+  
   const { proformas, loadProformas, loadProformaForEdit, resetForm } = proformaForm;
+  
+  // Initialize the search hook
+  const { 
+    searchTerm, 
+    setSearchTerm, 
+    filteredProformas, 
+    handleSearch 
+  } = useProformaSearch(proformas);
+  
+  // Initialize the data loader hook
+  const { 
+    isLoading, 
+    handleRefresh 
+  } = useProformaDataLoader({ loadProformas });
+  
+  // Initialize the operations hook
+  const { 
+    handleEditProforma, 
+    handleViewProforma, 
+    handleDeleteProforma 
+  } = useProformaOperations({
+    loadProformas,
+    resetForm,
+    loadProformaForEdit,
+    setFormDialogOpen
+  });
 
-  const handleRefresh = async () => {
-    setIsLoading(true);
-    try {
-      await loadProformas();
-      toast({
-        title: "Actualiser",
-        description: "Les données ont été actualisées",
-        duration: 3000,
-      });
-    } catch (error) {
-      console.error("Erreur lors de l'actualisation:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de l'actualisation",
-        duration: 3000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      toast({
-        title: "Recherche",
-        description: `Recherche de: ${searchTerm}`,
-        duration: 3000,
-      });
-    }
-  };
-
-  const handleEditProforma = async (proforma: Proforma) => {
-    resetForm(); // Reset form before loading new data
-    try {
-      // Ouvrir le formulaire en mode edition
-      setFormDialogOpen(true);
-      // Charger les données de la proforma
-      await loadProformaForEdit(proforma);
-    } catch (error) {
-      console.error("Erreur lors du chargement de la proforma:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors du chargement",
-        duration: 3000,
-      });
-    }
-  };
-
-  const handleViewProforma = async (proforma: Proforma) => {
-    try {
-      const response = await proformaApi.getById(proforma.id);
-      if (response.success && response.data) {
-        // Logique pour voir la proforma
-        toast({
-          title: "Voir",
-          description: `Affichage de la proforma: ${proforma.reference}`,
-          duration: 3000,
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: response.error || "Impossible de charger la proforma",
-          duration: 3000,
-        });
-      }
-    } catch (error) {
-      console.error("Erreur lors du chargement de la proforma:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors du chargement",
-        duration: 3000,
-      });
-    }
-  };
-
-  const handleDeleteProforma = async (proforma: Proforma) => {
-    try {
-      const response = await proformaApi.delete(proforma.id);
-      if (response.success) {
-        proformaForm.loadProformas(); // Recharger les proformas
-        toast({
-          title: "Supprimer",
-          description: `Suppression de la proforma: ${proforma.reference}`,
-          duration: 3000,
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: response.error || "Impossible de supprimer la proforma",
-          duration: 3000,
-        });
-      }
-    } catch (error) {
-      console.error("Erreur lors de la suppression:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de la suppression",
-        duration: 3000,
-      });
-    }
-  };
-
+  // Load proformas on initial render
   useEffect(() => {
-    // Chargement initial des proformas
     handleRefresh();
   }, []);
-
-  // Filtrer les proformas selon le terme de recherche
-  const filteredProformas = searchTerm.trim() === "" 
-    ? proformas 
-    : proformas.filter(p => 
-        p.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
 
   return {
     searchTerm,
