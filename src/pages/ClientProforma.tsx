@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Plus, RefreshCw, Search } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { NewProformaDialog } from "@/components/proforma/NewProformaDialog";
 
 const ClientProforma = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [newProformaOpen, setNewProformaOpen] = useState(false);
   const { toast } = useToast();
 
   const handleRefresh = () => {
@@ -20,11 +22,7 @@ const ClientProforma = () => {
   };
 
   const handleNewProforma = () => {
-    toast({
-      title: "Nouveau proforma",
-      description: "Création d'un nouveau proforma",
-      duration: 3000,
-    });
+    setNewProformaOpen(true);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -86,6 +84,8 @@ const ClientProforma = () => {
           </div>
         </Card>
       </div>
+
+      <NewProformaDialog open={newProformaOpen} onOpenChange={setNewProformaOpen} />
     </MainLayout>
   );
 };
