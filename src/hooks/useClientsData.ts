@@ -4,7 +4,7 @@ import { clientsData, Client } from "@/data/clientsData";
 
 export const useClientsData = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("all");
   const [clients, setClients] = useState<Client[]>(clientsData);
 
   const filteredClients = useMemo(() => {
@@ -15,7 +15,7 @@ export const useClientsData = () => {
         client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.id.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesType = selectedType ? client.type === selectedType : true;
+      const matchesType = selectedType === "all" ? true : client.type === selectedType;
       
       return matchesSearch && matchesType;
     });

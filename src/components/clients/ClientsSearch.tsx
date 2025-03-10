@@ -42,7 +42,7 @@ export const ClientsSearch = ({
             <SelectValue placeholder="Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tous les types</SelectItem>
+            <SelectItem value="all">Tous les types</SelectItem>
             {clientTypes.map((type) => (
               <SelectItem key={type} value={type}>
                 {type}
