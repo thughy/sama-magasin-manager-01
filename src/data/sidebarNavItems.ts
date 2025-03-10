@@ -40,7 +40,7 @@ export const navItems: NavItem[] = [
     subItems: [
       { title: "Nos clients", url: "/clients", icon: User },
       { title: "Liste des clients", url: "/clients/list", icon: List },
-      { title: "Format", url: "/clients/format", icon: FileCode }
+      { title: "Proforma", url: "/clients/proforma", icon: FileCode }
     ]
   },
   { title: "Caisse", icon: CreditCard, href: "/cashier" },
