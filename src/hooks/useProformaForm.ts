@@ -47,13 +47,12 @@ export function useProformaForm(onClose: () => void) {
       setCurrentProforma(null);
       onClose();
     },
-    content: () => printRef.current,
     pageStyle: '@page { size: A4; margin: 1.5cm; }',
   });
 
   const triggerPrint = () => {
     if (printRef.current) {
-      handlePrint();
+      handlePrint(null, () => printRef.current);
     }
   };
 
