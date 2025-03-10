@@ -132,7 +132,7 @@ export const proformaApi = {
   getAll: () => fetchApi<any[]>('/proformas'),
   getById: (id: string) => fetchApi<any>(`/proformas/${id}`),
   create: (proforma: any) => fetchApi<any>('/proformas', 'POST', proforma),
-  update: (id: string, proforma: any) => fetchApi<any>(`/proformas/${id}`, 'PUT', proforma),
+  update: (proforma: any) => fetchApi<any>(`/proformas/${proforma.id}`, 'PUT', proforma),
   delete: (id: string) => fetchApi<void>(`/proformas/${id}`, 'DELETE'),
 };
 

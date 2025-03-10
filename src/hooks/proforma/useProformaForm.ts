@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 import { Client } from "@/data/clientsData";
@@ -111,7 +112,7 @@ export function useProformaForm(onClose: () => void) {
         
         toast({
           title: "Proforma chargée",
-          description: `La proforma ${proformaData.reference} est prête à être modifiée",
+          description: `La proforma ${proformaData.reference} est prête à être modifiée`,
           duration: 3000,
         });
       } else {
@@ -197,7 +198,8 @@ export function useProformaForm(onClose: () => void) {
           clientPhone: data.clientPhone
         };
         
-        setCurrentProforma(proformaWithDetails, isEditMode);
+        // Fix: Only passing one argument when it expects two
+        setCurrentProforma(proformaWithDetails);
         setShowPrintDialog(true);
       } else {
         toast({
