@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Plus, Receipt, FileText, Printer } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { invoicingApi, Invoice, clientApi } from "@/services/api";
+import { invoicingApi, Invoice } from "@/services/api";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { InvoiceDialog } from "@/components/invoicing/InvoiceDialog";

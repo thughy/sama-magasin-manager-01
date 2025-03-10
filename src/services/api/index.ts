@@ -14,6 +14,9 @@ export { proformaApi } from './proforma';
 export { clientApi } from './client';
 export { invoicingApi } from './invoicing';
 
+// Export types from invoicing
+export type { Invoice, InvoiceItem } from './invoicing';
+
 // Export types and utilities
 export type { ApiResponse } from './core';
 export { deepClone } from './core';

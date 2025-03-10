@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Invoice, InvoiceItem, clientApi } from "@/services/api";
+import { Invoice, InvoiceItem, invoicingApi } from "@/services/api";
 import { format } from "date-fns";
 import { ClientSearchInput } from "@/components/proforma/client-search/ClientSearchInput";
 import { InvoiceItemsTable } from "./InvoiceItemsTable";
@@ -137,8 +137,8 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
           <div className="space-y-2">
             <Label>Client</Label>
             <ClientSearchInput 
-              onClientSelect={handleClientSelect}
               initialValue={clientName}
+              onChange={(selected) => handleClientSelect(selected)}
             />
           </div>
 

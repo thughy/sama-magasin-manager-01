@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Trash2, Plus, Search } from "lucide-react";
 import { InvoiceItem } from "@/services/api/invoicing";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Item } from "@/types/product";
+import { Item, Product, Service } from "@/types/product";
 import { Label } from "@/components/ui/label";
 
 interface InvoiceItemsTableProps {
@@ -33,7 +33,7 @@ export function InvoiceItemsTable({
   const [searchTerm, setSearchTerm] = useState("");
   
   // Mock products data (in real app, this would come from API)
-  const [products, setProducts] = useState<Item[]>([
+  const [products, setProducts] = useState<Product[]>([
     { id: "prod1", type: "product", name: "Ordinateur portable", barcode: "12345", category: "Électronique", buyPrice: 350000, sellPrice: 450000, stock: 10, minStock: 2, depot: "Principal" },
     { id: "prod2", type: "product", name: "Téléphone mobile", barcode: "23456", category: "Électronique", buyPrice: 120000, sellPrice: 180000, stock: 15, minStock: 3, depot: "Principal" },
     { id: "prod3", type: "product", name: "Imprimante", barcode: "34567", category: "Électronique", buyPrice: 75000, sellPrice: 95000, stock: 8, minStock: 2, depot: "Principal" },
@@ -46,7 +46,7 @@ export function InvoiceItemsTable({
     product.barcode.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleProductSelect = (product: Item) => {
+  const handleProductSelect = (product: Product) => {
     onAddItem(product);
     setIsProductDialogOpen(false);
   };
