@@ -45,7 +45,7 @@ export function ProformaFormDialog({ open, onOpenChange }: ProformaFormDialogPro
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Créer une facture proforma</DialogTitle>
             <DialogDescription>
