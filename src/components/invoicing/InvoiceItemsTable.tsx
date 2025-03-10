@@ -46,14 +46,15 @@ export function InvoiceItemsTable({
       const discountedPrice = unitPrice - discountAmount;
       const newTotalPrice = newQuantity * discountedPrice;
       
-      // Update the item
+      // Update the item quantity
       onUpdateItem(existingItem.id, "quantity", newQuantity);
+      // Update the total price after quantity change
       onUpdateItem(existingItem.id, "totalPrice", newTotalPrice);
     } else {
       // Item doesn't exist, add as new
       const unitPrice = item.type === 'product' ? item.sellPrice : item.amount;
       
-      const newItem = {
+      const newItem: InvoiceItem = {
         id: `item-${Date.now()}`,
         productId: item.id,
         productName: item.name,

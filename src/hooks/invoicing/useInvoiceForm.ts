@@ -78,13 +78,11 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
         
         // Recalculate totalPrice if quantity, unitPrice, or discount changes
         if (field === 'quantity' || field === 'unitPrice' || field === 'discount') {
-          if (field !== 'totalPrice') { // Avoid overwriting totalPrice if that's what we're updating
-            updatedItem.totalPrice = calculateItemTotal(
-              updatedItem.quantity, 
-              updatedItem.unitPrice, 
-              updatedItem.discount || 0
-            );
-          }
+          updatedItem.totalPrice = calculateItemTotal(
+            updatedItem.quantity, 
+            updatedItem.unitPrice, 
+            updatedItem.discount || 0
+          );
         }
         
         return updatedItem;
