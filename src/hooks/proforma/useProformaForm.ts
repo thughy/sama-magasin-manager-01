@@ -1,31 +1,30 @@
 
 import { useForm } from "react-hook-form";
-import { useToast } from "@/components/ui/use-toast";
-import { Client } from "@/data/clientsData";
-import { Item } from "@/types/product";
+import { ProformaFormValues } from "@/types/proforma";
+import { useProformaSubmission } from "./useProformaSubmission";
+import { useProformaClientSelection } from "./useProformaClientSelection";
+import { useProformaEditor } from "./useProformaEditor";
+import { useProformaPrinting } from "./useProformaPrinting";
+import { generateReference } from "@/utils/proformaUtils";
 import { Proforma } from "@/components/proforma/ProformasTable";
 import { proformaApi } from "@/services/api";
-import { useProformaState } from "./useProformaState";
-import { useClientSelection } from "./useClientSelection";
-import { useProformaPrinting } from "./useProformaPrinting";
+import { useToast } from "@/components/ui/use-toast";
 
-interface ProformaWithClientDetails extends Proforma {
-  clientEmail?: string;
-  clientPhone?: string;
-}
-
-export interface ProformaFormValues {
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  reference: string;
-  description: string;
-  amount: string;
-}
+export type { ProformaFormValues } from "@/types/proforma";
 
 export function useProformaForm(onClose: () => void) {
   const { toast } = useToast();
-  
+  const form = useForm<ProformaFormValues>({
+    defaultValues: {
+      clientName: "",
+      clientEmail: "",
+      clientPhone: "",
+      reference: generateReference(),
+      description: "",
+      amount: "",
+    },
+  });
+
   const {
     proformas,
     proformaItems,
@@ -43,7 +42,7 @@ export function useProformaForm(onClose: () => void) {
     handleUpdateItem,
     handleRemoveItem,
     calculateTotalAmount
-  } = useProformaState();
+  } = useProformaEditor();
 
   const {
     searchTerm,
@@ -52,26 +51,21 @@ export function useProformaForm(onClose: () => void) {
     setSelectedClient,
     clientDialogOpen,
     setClientDialogOpen,
-    handleSelectClient,
+    handleSelectClient: baseHandleSelectClient,
     handleCreateClient,
     handleSaveClient
-  } = useClientSelection();
+  } = useProformaClientSelection();
 
   const { printRef, triggerPrint } = useProformaPrinting();
 
-  const generateReference = () => `PRO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const handleClientSelect = (client: any) => {
+    const selectedClient = baseHandleSelectClient(client);
+    form.setValue("clientName", selectedClient.name);
+    form.setValue("clientEmail", selectedClient.email || "");
+    form.setValue("clientPhone", selectedClient.phone || "");
+    return selectedClient;
+  };
   
-  const form = useForm<ProformaFormValues>({
-    defaultValues: {
-      clientName: "",
-      clientEmail: "",
-      clientPhone: "",
-      reference: generateReference(),
-      description: "",
-      amount: "",
-    },
-  });
-
   const resetForm = () => {
     setSelectedClient(null);
     setProformaItems([]);
@@ -108,7 +102,7 @@ export function useProformaForm(onClose: () => void) {
         }
         
         setIsEditMode(true);
-        setCurrentProforma(proformaData as ProformaWithClientDetails);
+        setCurrentProforma(proformaData);
         
         toast({
           title: "Proforma chargée",
@@ -134,91 +128,17 @@ export function useProformaForm(onClose: () => void) {
     }
   };
 
-  const handleClientSelect = (client: Client) => {
-    const selectedClient = handleSelectClient(client);
-    form.setValue("clientName", selectedClient.name);
-    form.setValue("clientEmail", selectedClient.email || "");
-    form.setValue("clientPhone", selectedClient.phone || "");
-  };
-
-  async function onSubmit(data: ProformaFormValues) {
-    setIsLoading(true);
-    const totalAmount = calculateTotalAmount();
-    
-    const proformaData: Proforma = {
-      id: isEditMode && currentProforma ? currentProforma.id : `PRO-${Date.now()}`,
-      reference: data.reference,
-      clientName: data.clientName,
-      amount: totalAmount.toString(),
-      description: data.description,
-      date: new Date().toLocaleDateString('fr-FR')
-    };
-    
-    try {
-      let response;
-      
-      if (isEditMode) {
-        response = await proformaApi.update({
-          ...proformaData,
-          items: proformaItems,
-          clientEmail: data.clientEmail,
-          clientPhone: data.clientPhone
-        });
-        
-        if (response.success) {
-          toast({
-            title: "Facture proforma mise à jour",
-            description: `Facture ${data.reference} mise à jour pour ${data.clientName}`,
-            duration: 3000,
-          });
-        }
-      } else {
-        response = await proformaApi.create({
-          ...proformaData,
-          items: proformaItems,
-          clientEmail: data.clientEmail,
-          clientPhone: data.clientPhone
-        });
-        
-        if (response.success) {
-          toast({
-            title: "Facture proforma créée",
-            description: `Facture ${data.reference} créée pour ${data.clientName}`,
-            duration: 3000,
-          });
-        }
-      }
-      
-      if (response && response.success) {
-        await loadProformas();
-        
-        const proformaWithDetails: ProformaWithClientDetails = {
-          ...proformaData,
-          clientEmail: data.clientEmail,
-          clientPhone: data.clientPhone
-        };
-        
-        // Fix: Only passing one argument when it expects two
-        setCurrentProforma(proformaWithDetails);
-        setShowPrintDialog(true);
-      } else {
-        toast({
-          title: "Erreur",
-          description: response?.error || "Impossible d'enregistrer la proforma",
-          duration: 3000,
-        });
-      }
-    } catch (error) {
-      console.error("Erreur lors de l'enregistrement:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de l'enregistrement",
-        duration: 3000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const { onSubmit } = useProformaSubmission({ 
+    form, 
+    proformaItems, 
+    setCurrentProforma, 
+    setShowPrintDialog,
+    isEditMode,
+    currentProforma,
+    loadProformas,
+    setIsLoading,
+    calculateTotalAmount
+  });
 
   return {
     form,
