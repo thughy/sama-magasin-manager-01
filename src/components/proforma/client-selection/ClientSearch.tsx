@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Search, Plus } from "lucide-react";
+import { Search } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
