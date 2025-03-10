@@ -7,8 +7,7 @@ export function useProformaPrinting() {
   const printRef = useRef<HTMLDivElement>(null);
   
   const handlePrint = useReactToPrint({
-    documentTitle: (currentProforma: Proforma | null) => 
-      currentProforma ? `Proforma_${currentProforma.reference}` : "Proforma",
+    documentTitle: "Proforma",
     pageStyle: `
       @page {
         size: A4;
