@@ -80,18 +80,20 @@ export function ProformaFormStep({
         </form>
       </Form>
 
-      <div className="flex justify-between sm:justify-between flex-row mt-6">
+      <div className="flex justify-between sm:justify-between mt-6">
         <Button type="button" variant="outline" onClick={onGoBack}>
           Retour
         </Button>
         <div className="flex space-x-2">
           <Button 
+            type="button"
             variant="outline" 
             onClick={() => setSaveDialogOpen(true)}
           >
             Enregistrer
           </Button>
           <Button 
+            type="button"
             onClick={handleSubmit} 
             className="bg-sama-600 hover:bg-sama-700"
           >
