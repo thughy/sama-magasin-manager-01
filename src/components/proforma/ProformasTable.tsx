@@ -25,9 +25,16 @@ interface ProformasTableProps {
   onEdit?: (proforma: Proforma) => void;
   onView?: (proforma: Proforma) => void;
   onDelete?: (proforma: Proforma) => void;
+  isEditing?: boolean;
 }
 
-export function ProformasTable({ proformas, onEdit, onView, onDelete }: ProformasTableProps) {
+export function ProformasTable({ 
+  proformas, 
+  onEdit, 
+  onView, 
+  onDelete,
+  isEditing = false 
+}: ProformasTableProps) {
   if (proformas.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -63,17 +70,32 @@ export function ProformasTable({ proformas, onEdit, onView, onDelete }: Proforma
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   {onView && (
-                    <Button variant="ghost" size="icon" onClick={() => onView(proforma)}>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => onView(proforma)}
+                      disabled={isEditing}
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
                   )}
                   {onEdit && (
-                    <Button variant="ghost" size="icon" onClick={() => onEdit(proforma)}>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => onEdit(proforma)}
+                      disabled={isEditing}
+                    >
                       <FileEdit className="h-4 w-4" />
                     </Button>
                   )}
                   {onDelete && (
-                    <Button variant="ghost" size="icon" onClick={() => onDelete(proforma)}>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => onDelete(proforma)}
+                      disabled={isEditing}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
