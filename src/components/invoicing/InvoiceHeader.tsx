@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Client, clientsData } from "@/data/clientsData";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { AddClientDialog } from "@/components/clients/AddClientDialog";
 
 interface InvoiceHeaderProps {
@@ -29,6 +29,8 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
   const [inputValue, setInputValue] = useState(clientName);
   const [clientExists, setClientExists] = useState(true);
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<Client[]>([]);
+  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
     setInputValue(clientName);
@@ -38,13 +40,27 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
     // Check if client exists whenever input value changes
     if (inputValue.trim() === "") {
       setClientExists(true);
+      setShowResults(false);
       return;
     }
 
-    const exists = clientsData.some(
-      client => client.name.toLowerCase() === inputValue.toLowerCase()
-    );
-    setClientExists(exists);
+    // Search for clients when at least 2 characters are typed
+    if (inputValue.trim().length >= 2) {
+      const results = clientsData.filter(client => 
+        client.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+        client.phone.includes(inputValue)
+      );
+      setSearchResults(results);
+      setShowResults(true);
+      
+      // Check if exact client exists
+      const exists = clientsData.some(
+        client => client.name.toLowerCase() === inputValue.toLowerCase()
+      );
+      setClientExists(exists);
+    } else {
+      setShowResults(false);
+    }
   }, [inputValue]);
 
   const handleClientNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +74,14 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
 
   const handleAddClient = () => {
     setIsAddClientDialogOpen(true);
+  };
+
+  const handleClientSelect = (client: Client) => {
+    onClientSelect(client);
+    setValue("clientName", client.name);
+    setInputValue(client.name);
+    setClientExists(true);
+    setShowResults(false);
   };
 
   const handleSaveClient = (data: { name: string; phone: string; email?: string; address?: string }) => {
@@ -105,13 +129,54 @@ export const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
       <div>
         <Label htmlFor="clientName">Nom du client</Label>
         <div className="relative">
-          <Input
-            id="clientName"
-            value={inputValue}
-            onChange={handleClientNameChange}
-            placeholder="Entrez le nom du client"
-          />
-          {!clientExists && inputValue.trim() !== "" && (
+          <div className="relative">
+            <Input
+              id="clientName"
+              value={inputValue}
+              onChange={handleClientNameChange}
+              placeholder="Entrez le nom du client"
+              className="pr-10"
+            />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
+          
+          {/* Search Results Dropdown */}
+          {showResults && inputValue.trim().length >= 2 && (
+            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+              {searchResults.length > 0 ? (
+                <ul className="py-1">
+                  {searchResults.map((client) => (
+                    <li 
+                      key={client.id} 
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleClientSelect(client)}
+                    >
+                      <div className="font-medium">{client.name}</div>
+                      <div className="text-sm text-gray-500">{client.phone} {client.email ? `• ${client.email}` : ''}</div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="p-4">
+                  <p className="text-sm text-muted-foreground mb-2">Aucun client trouvé</p>
+                  {!clientExists && (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="w-full flex items-center justify-center"
+                      onClick={handleAddClient}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Créer un nouveau client
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Non-existent client prompt (only show when search results aren't displayed) */}
+          {!showResults && !clientExists && inputValue.trim() !== "" && (
             <div className="absolute right-0 top-full mt-1 bg-white border rounded p-2 shadow-md z-10 w-full">
               <p className="text-sm text-muted-foreground mb-2">Ce client n'existe pas dans le système</p>
               <Button 
