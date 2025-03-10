@@ -3,14 +3,12 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, RefreshCw, Search } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { NewProformaDialog } from "@/components/proforma/NewProformaDialog";
 
 const ClientProforma = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [newProformaOpen, setNewProformaOpen] = useState(false);
   const { toast } = useToast();
 
   const handleRefresh = () => {
@@ -19,10 +17,6 @@ const ClientProforma = () => {
       description: "Les données ont été actualisées",
       duration: 3000,
     });
-  };
-
-  const handleNewProforma = () => {
-    setNewProformaOpen(true);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -55,10 +49,6 @@ const ClientProforma = () => {
               <RefreshCw size={16} className="mr-2" />
               Actualiser
             </Button>
-            <Button className="bg-sama-600 hover:bg-sama-700" onClick={handleNewProforma}>
-              <Plus size={16} className="mr-2" />
-              Nouveau
-            </Button>
           </div>
         </div>
 
@@ -79,13 +69,11 @@ const ClientProforma = () => {
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <h3 className="text-lg font-medium">Aucun document proforma trouvé</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Créez un nouveau document proforma en cliquant sur le bouton "Nouveau"
+              La liste des proformas s'affichera ici
             </p>
           </div>
         </Card>
       </div>
-
-      <NewProformaDialog open={newProformaOpen} onOpenChange={setNewProformaOpen} />
     </MainLayout>
   );
 };
