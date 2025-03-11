@@ -3,63 +3,111 @@ import { Invoice } from "@/services/api";
 import { renderToString } from "react-dom/server";
 import { InvoiceA4Template } from "./InvoiceA4Template";
 import { ReceiptTemplate } from "./ReceiptTemplate";
+import { toast } from "sonner";
 
+/**
+ * Service that handles printing of different document formats
+ */
 export class PrintService {
-  static printA4(invoice: Invoice | null): void {
-    if (!invoice) {
-      console.error("Cannot print: No invoice provided");
-      return;
-    }
-
+  /**
+   * Opens a print window with the provided HTML content
+   * @param htmlContent - The HTML content to print
+   * @param errorMessage - Custom error message to display if printing fails
+   * @returns The print window reference if successful
+   */
+  private static openPrintWindow(htmlContent: string, errorMessage: string = "Could not open print window"): Window | null {
     // Open a new window
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
-      console.error("Could not open print window");
-      return;
+      console.error(errorMessage);
+      toast.error(errorMessage);
+      return null;
     }
 
-    // Render the React component to HTML
-    const htmlContent = renderToString(<InvoiceA4Template invoice={invoice} />);
-    
     // Write the content to the new window
     printWindow.document.write(htmlContent);
     printWindow.document.close();
     
-    // Wait for content to load then print
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.onafterprint = () => {
-        printWindow.close();
-      };
-    }, 500);
+    return printWindow;
   }
 
+  /**
+   * Common handler for printing operations
+   * @param invoice - The invoice to print
+   * @param renderTemplate - Function that renders the template
+   * @param printType - Type of print for error messages
+   */
+  private static handlePrint(
+    invoice: Invoice | null, 
+    renderTemplate: (invoice: Invoice) => JSX.Element,
+    printType: string = "document"
+  ): void {
+    try {
+      if (!invoice) {
+        throw new Error(`No invoice provided`);
+      }
+
+      // Render the React component to HTML
+      const htmlContent = renderToString(renderTemplate(invoice));
+      
+      // Open print window
+      const printWindow = this.openPrintWindow(
+        htmlContent, 
+        `Could not open ${printType} print window`
+      );
+      
+      if (!printWindow) return;
+      
+      // Wait for content to load then print
+      setTimeout(() => {
+        try {
+          printWindow.print();
+          printWindow.onafterprint = () => {
+            printWindow.close();
+          };
+        } catch (error) {
+          console.error(`Error printing ${printType}:`, error);
+          toast.error(`Unable to print ${printType}. Please try again.`);
+          printWindow.close();
+        }
+      }, 500);
+    } catch (error) {
+      console.error(`Error preparing ${printType} for printing:`, error);
+      toast.error(`Unable to prepare ${printType} for printing: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Print invoice in A4 format
+   * @param invoice - The invoice to print
+   */
+  static printA4(invoice: Invoice | null): void {
+    this.handlePrint(
+      invoice, 
+      (inv) => <InvoiceA4Template invoice={inv} />,
+      "A4 invoice"
+    );
+  }
+
+  /**
+   * Print invoice as receipt
+   * @param invoice - The invoice to print
+   */
   static printReceipt(invoice: Invoice | null): void {
-    if (!invoice) {
-      console.error("Cannot print: No invoice provided");
-      return;
-    }
+    this.handlePrint(
+      invoice, 
+      (inv) => <ReceiptTemplate invoice={inv} />,
+      "receipt"
+    );
+  }
 
-    // Open a new window
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) {
-      console.error("Could not open print window");
-      return;
-    }
-
-    // Render the React component to HTML
-    const htmlContent = renderToString(<ReceiptTemplate invoice={invoice} />);
-    
-    // Write the content to the new window
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    
-    // Wait for content to load then print
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.onafterprint = () => {
-        printWindow.close();
-      };
-    }, 500);
+  /**
+   * Check if printing is available in the current environment
+   * @returns Boolean indicating if printing is available
+   */
+  static isPrintingAvailable(): boolean {
+    return typeof window !== 'undefined' && 
+           typeof window.print === 'function' && 
+           typeof window.open === 'function';
   }
 }
