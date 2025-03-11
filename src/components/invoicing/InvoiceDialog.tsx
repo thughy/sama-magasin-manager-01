@@ -49,63 +49,65 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0">
+        <DialogHeader className="p-6 pb-2">
           <DialogTitle>{invoice ? "Modifier la facture" : "Nouvelle facture"}</DialogTitle>
           <DialogDescription>
             Complétez les informations pour {invoice ? "modifier" : "créer"} une facture client
           </DialogDescription>
         </DialogHeader>
 
-        <FormProvider {...methods}>
-          <InvoiceHeader
-            reference={reference}
-            date={date}
-            clientName={clientName}
-            onReferenceChange={setReference}
-            onDateChange={setDate}
-            onClientSelect={handleClientSelect}
-          />
-
-          <div className="space-y-4 mt-4">
-            <InvoiceItemsTable 
-              items={items}
-              onAddItem={handleAddItem}
-              onUpdateItem={handleUpdateItem}
-              onRemoveItem={handleRemoveItem}
+        <div className="flex-1 overflow-y-auto px-6">
+          <FormProvider {...methods}>
+            <InvoiceHeader
+              reference={reference}
+              date={date}
+              clientName={clientName}
+              onReferenceChange={setReference}
+              onDateChange={setDate}
+              onClientSelect={handleClientSelect}
             />
-          </div>
 
-          <PaymentMethodsSection
-            paymentMethods={paymentMethods}
-            onAddPaymentMethod={addPaymentMethod}
-            onRemovePaymentMethod={removePaymentMethod}
-            onUpdatePaymentMethod={updatePaymentMethod}
-          />
+            <div className="space-y-4 mt-4">
+              <InvoiceItemsTable 
+                items={items}
+                onAddItem={handleAddItem}
+                onUpdateItem={handleUpdateItem}
+                onRemoveItem={handleRemoveItem}
+              />
+            </div>
 
-          <InvoiceSummary
-            totalAmount={totalAmount}
-            amountPaid={amountPaid}
-            balance={balance}
-          />
+            <PaymentMethodsSection
+              paymentMethods={paymentMethods}
+              onAddPaymentMethod={addPaymentMethod}
+              onRemovePaymentMethod={removePaymentMethod}
+              onUpdatePaymentMethod={updatePaymentMethod}
+            />
 
-          <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-            >
-              Annuler
-            </Button>
-            <Button 
-              type="button" 
-              onClick={handleSubmit} 
-              disabled={items.length === 0}
-            >
-              {invoice ? "Mettre à jour" : "Enregistrer"}
-            </Button>
-          </DialogFooter>
-        </FormProvider>
+            <InvoiceSummary
+              totalAmount={totalAmount}
+              amountPaid={amountPaid}
+              balance={balance}
+            />
+          </FormProvider>
+        </div>
+
+        <div className="p-6 border-t flex justify-between items-center mt-auto">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+          >
+            Annuler
+          </Button>
+          <Button 
+            type="button" 
+            onClick={handleSubmit} 
+            disabled={items.length === 0}
+          >
+            {invoice ? "Mettre à jour" : "Enregistrer"}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
