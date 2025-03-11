@@ -1,5 +1,5 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Invoice } from "@/services/api";
 import { InvoiceItemsTable } from "./InvoiceItemsTable";
@@ -8,6 +8,8 @@ import { useInvoiceForm, DEFAULT_CLIENT } from "@/hooks/invoicing/useInvoiceForm
 import { InvoiceHeader } from "./InvoiceHeader";
 import { InvoiceSummary } from "./InvoiceSummary";
 import { FormProvider, useForm } from "react-hook-form";
+import { useState } from "react";
+import { PrintConfirmationDialog } from "./PrintConfirmationDialog";
 
 interface InvoiceDialogProps {
   open: boolean;
@@ -17,6 +19,9 @@ interface InvoiceDialogProps {
 }
 
 export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDialogProps) => {
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
+  const [savedInvoice, setSavedInvoice] = useState<Invoice | null>(null);
+  
   const methods = useForm({
     defaultValues: {
       reference: invoice?.reference || "",
@@ -45,70 +50,95 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
     addPaymentMethod,
     removePaymentMethod,
     updatePaymentMethod
-  } = useInvoiceForm(invoice, onSave);
+  } = useInvoiceForm(invoice, (savedInvoiceData) => {
+    // First save the invoice
+    onSave(savedInvoiceData);
+    
+    // Then store the saved invoice data for printing
+    setSavedInvoice(savedInvoiceData as Invoice);
+    
+    // Finally open the print dialog
+    setIsPrintDialogOpen(true);
+  });
+
+  const handlePrintDialogClose = () => {
+    setIsPrintDialogOpen(false);
+    onOpenChange(false);
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle>{invoice ? "Modifier la facture" : "Nouvelle facture"}</DialogTitle>
-          <DialogDescription>
-            Complétez les informations pour {invoice ? "modifier" : "créer"} une facture client
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0">
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle>{invoice ? "Modifier la facture" : "Nouvelle facture"}</DialogTitle>
+            <DialogDescription>
+              Complétez les informations pour {invoice ? "modifier" : "créer"} une facture client
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-6">
-          <FormProvider {...methods}>
-            <InvoiceHeader
-              reference={reference}
-              date={date}
-              clientName={clientName}
-              onReferenceChange={setReference}
-              onDateChange={setDate}
-              onClientSelect={handleClientSelect}
-            />
-
-            <div className="space-y-4 mt-4">
-              <InvoiceItemsTable 
-                items={items}
-                onAddItem={handleAddItem}
-                onUpdateItem={handleUpdateItem}
-                onRemoveItem={handleRemoveItem}
+          <div className="flex-1 overflow-y-auto px-6">
+            <FormProvider {...methods}>
+              <InvoiceHeader
+                reference={reference}
+                date={date}
+                clientName={clientName}
+                onReferenceChange={setReference}
+                onDateChange={setDate}
+                onClientSelect={handleClientSelect}
               />
-            </div>
 
-            <PaymentMethodsSection
-              paymentMethods={paymentMethods}
-              onAddPaymentMethod={addPaymentMethod}
-              onRemovePaymentMethod={removePaymentMethod}
-              onUpdatePaymentMethod={updatePaymentMethod}
-            />
+              <div className="space-y-4 mt-4">
+                <InvoiceItemsTable 
+                  items={items}
+                  onAddItem={handleAddItem}
+                  onUpdateItem={handleUpdateItem}
+                  onRemoveItem={handleRemoveItem}
+                />
+              </div>
 
-            <InvoiceSummary
-              totalAmount={totalAmount}
-              amountPaid={amountPaid}
-              balance={balance}
-            />
-          </FormProvider>
-        </div>
+              <PaymentMethodsSection
+                paymentMethods={paymentMethods}
+                onAddPaymentMethod={addPaymentMethod}
+                onRemovePaymentMethod={removePaymentMethod}
+                onUpdatePaymentMethod={updatePaymentMethod}
+              />
 
-        <div className="p-6 border-t flex justify-between items-center mt-auto">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => onOpenChange(false)}
-          >
-            Annuler
-          </Button>
-          <Button 
-            type="button" 
-            onClick={handleSubmit} 
-            disabled={items.length === 0}
-          >
-            {invoice ? "Mettre à jour" : "Enregistrer"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+              <InvoiceSummary
+                totalAmount={totalAmount}
+                amountPaid={amountPaid}
+                balance={balance}
+              />
+            </FormProvider>
+          </div>
+
+          <div className="p-6 border-t flex justify-between items-center mt-auto">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+            >
+              Annuler
+            </Button>
+            <Button 
+              type="button" 
+              onClick={handleSubmit} 
+              disabled={items.length === 0}
+            >
+              {invoice ? "Mettre à jour" : "Enregistrer"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {isPrintDialogOpen && (
+        <PrintConfirmationDialog
+          open={isPrintDialogOpen}
+          onOpenChange={setIsPrintDialogOpen}
+          invoice={savedInvoice}
+          onClose={handlePrintDialogClose}
+        />
+      )}
+    </>
   );
 };
