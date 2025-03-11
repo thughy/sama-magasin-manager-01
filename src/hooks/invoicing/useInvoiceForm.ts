@@ -13,11 +13,22 @@ const ensureNumber = (value: any): number => {
   return isNaN(parsed) ? 0 : parsed;
 };
 
+// Default counter client when no client is selected
+export const DEFAULT_CLIENT = {
+  id: "CLIENT-COMPTOIR",
+  name: "CLIENT COMPTOIR",
+  phone: "",
+  email: "",
+  type: "Occasionnel",
+  balance: 0,
+  lastPurchase: format(new Date(), "dd/MM/yyyy")
+};
+
 export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partial<Invoice> & { id?: string }) => void) => {
   const [reference, setReference] = useState(invoice?.reference || `FAC-${Date.now().toString().slice(-6)}`);
   const [date, setDate] = useState(invoice?.date || format(new Date(), "yyyy-MM-dd"));
-  const [clientId, setClientId] = useState(invoice?.clientId || "");
-  const [clientName, setClientName] = useState(invoice?.clientName || "");
+  const [clientId, setClientId] = useState(invoice?.clientId || DEFAULT_CLIENT.id);
+  const [clientName, setClientName] = useState(invoice?.clientName || DEFAULT_CLIENT.name);
   const [items, setItems] = useState<InvoiceItem[]>(invoice?.items || []);
   const [totalAmount, setTotalAmount] = useState(ensureNumber(invoice?.totalAmount));
   const [amountPaid, setAmountPaid] = useState(ensureNumber(invoice?.amountPaid));
@@ -49,8 +60,14 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
   }, [items, paymentMethods]);
 
   const handleClientSelect = (client: Client) => {
-    setClientId(client.id);
-    setClientName(client.name);
+    if (!client.id || client.id.trim() === "") {
+      // If no client is selected or client has no ID, use the default counter client
+      setClientId(DEFAULT_CLIENT.id);
+      setClientName(DEFAULT_CLIENT.name);
+    } else {
+      setClientId(client.id);
+      setClientName(client.name);
+    }
   };
 
   const calculateItemTotal = (quantity: number, unitPrice: number, discount: number = 0) => {
@@ -124,12 +141,16 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
   };
 
   const handleSubmit = () => {
+    // Ensure client info is set, defaulting to counter client if empty
+    const finalClientId = clientId || DEFAULT_CLIENT.id;
+    const finalClientName = clientName || DEFAULT_CLIENT.name;
+    
     const invoiceData: Partial<Invoice> & { id?: string } = {
       id: invoice?.id,
       reference,
       date,
-      clientId,
-      clientName,
+      clientId: finalClientId,
+      clientName: finalClientName,
       items,
       totalAmount,
       amountPaid,

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Invoice } from "@/services/api";
 import { InvoiceItemsTable } from "./InvoiceItemsTable";
 import { PaymentMethodsSection } from "@/components/suppliers/purchases/PaymentMethodsSection";
-import { useInvoiceForm } from "@/hooks/invoicing/useInvoiceForm";
+import { useInvoiceForm, DEFAULT_CLIENT } from "@/hooks/invoicing/useInvoiceForm";
 import { InvoiceHeader } from "./InvoiceHeader";
 import { InvoiceSummary } from "./InvoiceSummary";
 import { FormProvider, useForm } from "react-hook-form";
@@ -21,7 +21,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
     defaultValues: {
       reference: invoice?.reference || "",
       date: invoice?.date || "",
-      clientName: invoice?.clientName || "",
+      clientName: invoice?.clientName || DEFAULT_CLIENT.name,
     }
   });
   
@@ -100,7 +100,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
             <Button 
               type="button" 
               onClick={handleSubmit} 
-              disabled={!clientId || items.length === 0}
+              disabled={items.length === 0}
             >
               {invoice ? "Mettre à jour" : "Enregistrer"}
             </Button>

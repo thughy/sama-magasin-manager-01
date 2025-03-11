@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, User } from "lucide-react";
 import { Client, clientsData } from "@/data/clientsData";
 import { useFormContext } from "react-hook-form";
+import { DEFAULT_CLIENT } from "@/hooks/invoicing/useInvoiceForm";
 
 interface ClientSearchInputProps {
   clientName: string;
@@ -76,6 +77,14 @@ export const ClientSearchInput = ({
     setShowResults(false);
   };
 
+  const handleUseDefaultClient = () => {
+    onClientSelect(DEFAULT_CLIENT as Client);
+    setValue("clientName", DEFAULT_CLIENT.name);
+    setInputValue(DEFAULT_CLIENT.name);
+    setClientExists(true);
+    setShowResults(false);
+  };
+
   return (
     <div className="relative">
       <div className="relative">
@@ -83,7 +92,7 @@ export const ClientSearchInput = ({
           id="clientName"
           value={inputValue}
           onChange={handleClientNameChange}
-          placeholder="Entrez le nom du client"
+          placeholder="Entrez le nom du client ou laissez vide pour Client Comptoir"
           className="pr-10"
         />
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -108,7 +117,7 @@ export const ClientSearchInput = ({
           ) : (
             <div className="p-4">
               <p className="text-sm text-muted-foreground mb-2">Aucun client trouvé</p>
-              {!clientExists && (
+              <div className="flex flex-col gap-2">
                 <Button 
                   size="sm" 
                   variant="outline" 
@@ -118,7 +127,16 @@ export const ClientSearchInput = ({
                   <Plus className="h-4 w-4 mr-2" />
                   Créer un nouveau client
                 </Button>
-              )}
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  className="w-full flex items-center justify-center"
+                  onClick={handleUseDefaultClient}
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Utiliser Client Comptoir
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -128,15 +146,34 @@ export const ClientSearchInput = ({
       {!showResults && !clientExists && inputValue.trim() !== "" && (
         <div className="absolute right-0 top-full mt-1 bg-white border rounded p-2 shadow-md z-10 w-full">
           <p className="text-sm text-muted-foreground mb-2">Ce client n'existe pas dans le système</p>
-          <Button 
-            size="sm" 
-            variant="outline" 
-            className="w-full flex items-center justify-center"
-            onClick={onAddClient}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Créer un nouveau client
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="w-full flex items-center justify-center"
+              onClick={onAddClient}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Créer un nouveau client
+            </Button>
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              className="w-full flex items-center justify-center"
+              onClick={handleUseDefaultClient}
+            >
+              <User className="h-4 w-4 mr-2" />
+              Utiliser Client Comptoir
+            </Button>
+          </div>
+        </div>
+      )}
+      
+      {/* Empty input prompt */}
+      {inputValue.trim() === "" && (
+        <div className="mt-1 text-sm text-gray-500 flex items-center">
+          <User className="h-4 w-4 mr-1 inline" />
+          <span>Vente attribuée au Client Comptoir par défaut</span>
         </div>
       )}
     </div>
