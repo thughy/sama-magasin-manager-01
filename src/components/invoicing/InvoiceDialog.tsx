@@ -8,7 +8,7 @@ import { useInvoiceForm, DEFAULT_CLIENT } from "@/hooks/invoicing/useInvoiceForm
 import { InvoiceHeader } from "./InvoiceHeader";
 import { InvoiceSummary } from "./InvoiceSummary";
 import { FormProvider, useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PrintConfirmationDialog } from "./PrintConfirmationDialog";
 
 interface InvoiceDialogProps {
@@ -19,8 +19,15 @@ interface InvoiceDialogProps {
 }
 
 export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDialogProps) => {
-  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState<boolean>(false);
   const [savedInvoice, setSavedInvoice] = useState<Invoice | null>(null);
+  
+  // Reset print dialog state when the main dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setIsPrintDialogOpen(false);
+    }
+  }, [open]);
   
   const methods = useForm({
     defaultValues: {
@@ -51,30 +58,37 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
     removePaymentMethod,
     updatePaymentMethod
   } = useInvoiceForm(invoice, (savedInvoiceData) => {
-    // Stocke les données de la facture sauvegardée
-    setSavedInvoice({
-      ...savedInvoiceData,
-      id: savedInvoiceData.id || `invoice-${Date.now()}`, // Assure qu'il y a toujours un ID
-    } as Invoice);
+    console.log("Invoice saved, preparing to show print dialog");
     
-    // Sauvegarde la facture dans la base de données
+    // Make sure we have a valid invoice object with an ID for the print dialog
+    const invoiceWithId = {
+      ...savedInvoiceData,
+      id: savedInvoiceData.id || `invoice-${Date.now()}`,
+    } as Invoice;
+    
+    // Store saved invoice data
+    setSavedInvoice(invoiceWithId);
+    
+    // Save to database
     onSave(savedInvoiceData);
     
-    // Ouvre la boîte de dialogue d'impression après la sauvegarde
+    // Show print dialog with a small delay
     setTimeout(() => {
+      console.log("Opening print dialog now");
       setIsPrintDialogOpen(true);
-    }, 300);
+    }, 500);
   });
 
   const handlePrintDialogClose = () => {
+    console.log("Closing print dialog");
     setIsPrintDialogOpen(false);
-    onOpenChange(false); // Ferme aussi le dialogue principal
+    onOpenChange(false); // Close main dialog too
   };
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0">
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
           <DialogHeader className="p-6 pb-2">
             <DialogTitle>{invoice ? "Modifier la facture" : "Nouvelle facture"}</DialogTitle>
             <DialogDescription>
@@ -136,6 +150,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
         </DialogContent>
       </Dialog>
       
+      {/* Always render the dialog component but control visibility with 'open' prop */}
       <PrintConfirmationDialog
         open={isPrintDialogOpen}
         onOpenChange={setIsPrintDialogOpen}
