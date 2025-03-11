@@ -4,6 +4,7 @@ import { renderToString } from "react-dom/server";
 import { InvoiceA4Template } from "./InvoiceA4Template";
 import { ReceiptTemplate } from "./ReceiptTemplate";
 import { toast } from "sonner";
+import React from "react";
 
 /**
  * Service that handles printing of different document formats
@@ -39,7 +40,7 @@ export class PrintService {
    */
   private static handlePrint(
     invoice: Invoice | null, 
-    renderTemplate: (invoice: Invoice) => JSX.Element,
+    renderTemplate: (invoice: Invoice) => React.ReactElement,
     printType: string = "document"
   ): void {
     try {
@@ -84,7 +85,7 @@ export class PrintService {
   static printA4(invoice: Invoice | null): void {
     this.handlePrint(
       invoice, 
-      (inv) => <InvoiceA4Template invoice={inv} />,
+      (inv) => React.createElement(InvoiceA4Template, { invoice: inv }),
       "A4 invoice"
     );
   }
@@ -96,7 +97,7 @@ export class PrintService {
   static printReceipt(invoice: Invoice | null): void {
     this.handlePrint(
       invoice, 
-      (inv) => <ReceiptTemplate invoice={inv} />,
+      (inv) => React.createElement(ReceiptTemplate, { invoice: inv }),
       "receipt"
     );
   }
