@@ -23,6 +23,9 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
   const [savedInvoice, setSavedInvoice] = useState<Invoice | null>(null);
   const [hasJustSaved, setHasJustSaved] = useState<boolean>(false);
   const isClosingRef = useRef(false);
+  const forceKeepOpenRef = useRef(false);
+  
+  console.log("Dialog state:", { open, hasJustSaved, isPrintDialogOpen, forceKeepOpen: forceKeepOpenRef.current });
   
   // Reset print dialog state when the main dialog opens/closes
   useEffect(() => {
@@ -32,25 +35,31 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
       setSavedInvoice(null);
       setHasJustSaved(false);
       isClosingRef.current = false;
+      forceKeepOpenRef.current = false;
     }
   }, [open]);
   
   // Intercept the dialog close event
   const handleOpenChange = (newOpenState: boolean) => {
-    console.log("Dialog open change requested:", newOpenState, "hasJustSaved:", hasJustSaved);
+    console.log("Dialog open change requested:", newOpenState, "hasJustSaved:", hasJustSaved, "forceKeepOpen:", forceKeepOpenRef.current);
     
     // If trying to close the dialog and we've just saved OR print dialog is open,
     // prevent automatic closing
-    if (!newOpenState && (hasJustSaved || isPrintDialogOpen)) {
-      console.log("Preventing dialog from closing - just saved or print dialog open");
-      return;
-    }
-    
-    // For explicit closing via cancel button
-    if (!newOpenState && isClosingRef.current) {
-      console.log("Manual close requested, allowing");
-      onOpenChange(false);
-      isClosingRef.current = false;
+    if (!newOpenState) {
+      if (hasJustSaved || isPrintDialogOpen || forceKeepOpenRef.current) {
+        console.log("Preventing dialog from closing - hasJustSaved, printDialog open or forceKeepOpen is true");
+        return;
+      }
+      
+      // For explicit closing via cancel button
+      if (isClosingRef.current) {
+        console.log("Manual close requested, allowing");
+        onOpenChange(false);
+        isClosingRef.current = false;
+        return;
+      }
+      
+      console.log("Preventing default close behavior");
       return;
     }
     
@@ -91,6 +100,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
     
     // Mark that we've just saved to prevent auto-closing
     setHasJustSaved(true);
+    forceKeepOpenRef.current = true;
     
     // Make sure we have a valid invoice object with an ID for the print dialog
     const invoiceWithId = {
@@ -114,7 +124,8 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
   const handlePrintDialogClose = () => {
     console.log("Closing print dialog");
     setIsPrintDialogOpen(false);
-    // We don't automatically close the main dialog anymore
+    // We specifically DON'T set hasJustSaved to false here
+    // to continue preventing automatic closing
   };
 
   const handleCloseMainDialog = () => {
@@ -123,6 +134,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
     isClosingRef.current = true;
     // Clear the just saved flag
     setHasJustSaved(false);
+    forceKeepOpenRef.current = false;
     // Close the dialog
     onOpenChange(false);
   };
@@ -130,17 +142,19 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0 overflow-hidden" onPointerDownOutside={(e) => {
-          // Prevent closing when clicking outside if we've just saved
-          if (hasJustSaved || isPrintDialogOpen) {
+        <DialogContent 
+          className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0 overflow-hidden" 
+          onPointerDownOutside={(e) => {
+            // Always prevent closing when clicking outside after save or when print dialog is open
+            console.log("Outside click detected, hasJustSaved:", hasJustSaved, "printDialogOpen:", isPrintDialogOpen);
             e.preventDefault();
-          }
-        }} onEscapeKeyDown={(e) => {
-          // Prevent closing with Escape key if we've just saved
-          if (hasJustSaved || isPrintDialogOpen) {
+          }} 
+          onEscapeKeyDown={(e) => {
+            // Always prevent closing with Escape key after save or when print dialog is open
+            console.log("Escape key detected, hasJustSaved:", hasJustSaved, "printDialogOpen:", isPrintDialogOpen);
             e.preventDefault();
-          }
-        }}>
+          }}
+        >
           <DialogHeader className="p-6 pb-2">
             <DialogTitle>{invoice ? "Modifier la facture" : "Nouvelle facture"}</DialogTitle>
             <DialogDescription>

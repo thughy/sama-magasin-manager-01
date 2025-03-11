@@ -20,12 +20,15 @@ export const PrintConfirmationDialog = ({
   invoice,
   onClose,
 }: PrintConfirmationDialogProps) => {
+  console.log("Print dialog state:", { open, invoice: invoice?.id });
+  
   // Empêcher la fermeture automatique du dialogue en cliquant à l'extérieur
   const handleOpenChangeWrapper = (newOpenState: boolean) => {
     console.log("Print dialog open change requested:", newOpenState);
     
     // Si l'utilisateur essaie de fermer le dialogue
     if (!newOpenState) {
+      console.log("Preventing automatic print dialog close, using custom close handler");
       // Au lieu de fermer automatiquement, appeler notre fonction de fermeture personnalisée
       onClose();
       return;
@@ -74,10 +77,12 @@ export const PrintConfirmationDialog = ({
         className="sm:max-w-[500px]"
         onPointerDownOutside={(e) => {
           // Empêcher la fermeture en cliquant à l'extérieur
+          console.log("Print dialog: blocking outside click");
           e.preventDefault();
         }}
         onEscapeKeyDown={(e) => {
           // Empêcher la fermeture avec la touche Échap
+          console.log("Print dialog: blocking escape key");
           e.preventDefault();
         }}
       >

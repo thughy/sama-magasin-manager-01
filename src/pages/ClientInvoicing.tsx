@@ -18,6 +18,8 @@ const ClientInvoicing = () => {
     handleInvoiceSave,
   } = useInvoicingData();
 
+  console.log("ClientInvoicing render, dialog open:", isInvoiceDialogOpen);
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-scale-in">
@@ -36,14 +38,12 @@ const ClientInvoicing = () => {
         />
       </div>
 
-      {isInvoiceDialogOpen && (
-        <InvoiceDialog
-          open={isInvoiceDialogOpen}
-          onOpenChange={setIsInvoiceDialogOpen}
-          invoice={selectedInvoice}
-          onSave={handleInvoiceSave}
-        />
-      )}
+      <InvoiceDialog
+        open={isInvoiceDialogOpen}
+        onOpenChange={setIsInvoiceDialogOpen}
+        invoice={selectedInvoice}
+        onSave={handleInvoiceSave}
+      />
     </MainLayout>
   );
 };
