@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Invoice } from "@/services/api";
@@ -21,14 +20,30 @@ interface InvoiceDialogProps {
 export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDialogProps) => {
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState<boolean>(false);
   const [savedInvoice, setSavedInvoice] = useState<Invoice | null>(null);
+  const [hasJustSaved, setHasJustSaved] = useState<boolean>(false);
   
   // Reset print dialog state when the main dialog opens/closes
   useEffect(() => {
     if (!open) {
       setIsPrintDialogOpen(false);
       setSavedInvoice(null);
+      setHasJustSaved(false);
     }
   }, [open]);
+  
+  // This will prevent the dialog from closing if we've just saved
+  const handleOpenChange = (newOpenState: boolean) => {
+    console.log("Dialog open change requested:", newOpenState, "hasJustSaved:", hasJustSaved);
+    
+    // If we're trying to close the dialog and have just saved, don't allow it
+    if (!newOpenState && hasJustSaved) {
+      console.log("Preventing dialog from closing after save");
+      return;
+    }
+    
+    // Otherwise, let the parent component handle the open state change
+    onOpenChange(newOpenState);
+  };
   
   const methods = useForm({
     defaultValues: {
@@ -61,6 +76,9 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
   } = useInvoiceForm(invoice, (savedInvoiceData) => {
     console.log("Invoice saved, preparing to show print dialog");
     
+    // Mark that we've just saved to prevent auto-closing
+    setHasJustSaved(true);
+    
     // Make sure we have a valid invoice object with an ID for the print dialog
     const invoiceWithId = {
       ...savedInvoiceData,
@@ -83,13 +101,18 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
   const handlePrintDialogClose = () => {
     console.log("Closing print dialog");
     setIsPrintDialogOpen(false);
-    // NE PAS fermer le dialogue principal ici
-    // onOpenChange(false); <-- Cette ligne a été supprimée
+    // We don't automatically close the main dialog anymore
+  };
+
+  const handleCloseMainDialog = () => {
+    // Clear the just saved flag when the user explicitly clicks cancel
+    setHasJustSaved(false);
+    onOpenChange(false);
   };
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
           <DialogHeader className="p-6 pb-2">
             <DialogTitle>{invoice ? "Modifier la facture" : "Nouvelle facture"}</DialogTitle>
@@ -137,7 +160,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => onOpenChange(false)}
+              onClick={handleCloseMainDialog}
             >
               Annuler
             </Button>
