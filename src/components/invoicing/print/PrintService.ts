@@ -48,6 +48,14 @@ export class PrintService {
         throw new Error(`No invoice provided`);
       }
 
+      // Check if printing is available before proceeding
+      if (!this.isPrintingAvailable()) {
+        toast.error(`L'impression n'est pas disponible dans votre navigateur`);
+        return;
+      }
+
+      console.log(`Preparing ${printType} for printing...`, invoice.reference);
+
       // Render the React component to HTML
       const htmlContent = renderToString(renderTemplate(invoice));
       
@@ -62,8 +70,10 @@ export class PrintService {
       // Wait for content to load then print
       setTimeout(() => {
         try {
+          console.log(`Printing ${printType}...`);
           printWindow.print();
           printWindow.onafterprint = () => {
+            console.log(`Print completed for ${printType}`);
             printWindow.close();
           };
         } catch (error) {
@@ -71,7 +81,7 @@ export class PrintService {
           toast.error(`Unable to print ${printType}. Please try again.`);
           printWindow.close();
         }
-      }, 500);
+      }, 1000); // Increased timeout to ensure content is fully loaded
     } catch (error) {
       console.error(`Error preparing ${printType} for printing:`, error);
       toast.error(`Unable to prepare ${printType} for printing: ${error instanceof Error ? error.message : 'Unknown error'}`);

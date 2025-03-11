@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Printer, Receipt, FileText } from "lucide-react";
 import { Invoice } from "@/services/api";
 import { PrintService } from "./print/PrintService";
+import { toast } from "sonner";
 
 interface PrintConfirmationDialogProps {
   open: boolean;
@@ -19,17 +20,33 @@ export const PrintConfirmationDialog = ({
   invoice,
   onClose,
 }: PrintConfirmationDialogProps) => {
+  // Vérifier si l'impression est disponible
+  const isPrintingAvailable = PrintService.isPrintingAvailable();
+
   const handlePrintA4 = () => {
-    PrintService.printA4(invoice);
+    console.log("Printing A4 format", invoice);
+    if (invoice) {
+      PrintService.printA4(invoice);
+      toast.success("Impression A4 en cours");
+    } else {
+      toast.error("Aucune facture à imprimer");
+    }
     onClose();
   };
 
   const handlePrintReceipt = () => {
-    PrintService.printReceipt(invoice);
+    console.log("Printing receipt format", invoice);
+    if (invoice) {
+      PrintService.printReceipt(invoice);
+      toast.success("Impression du ticket en cours");
+    } else {
+      toast.error("Aucune facture à imprimer");
+    }
     onClose();
   };
 
   const handleSkip = () => {
+    console.log("Skipping print");
     onClose();
   };
 
@@ -40,6 +57,11 @@ export const PrintConfirmationDialog = ({
           <DialogTitle>Imprimer la facture</DialogTitle>
           <DialogDescription>
             Choisissez votre format d'impression pour la facture {invoice?.reference}
+            {!isPrintingAvailable && (
+              <p className="text-red-500 mt-2">
+                L'impression n'est pas disponible dans ce navigateur.
+              </p>
+            )}
           </DialogDescription>
         </DialogHeader>
         
@@ -49,6 +71,7 @@ export const PrintConfirmationDialog = ({
             size="lg"
             onClick={handlePrintA4}
             className="flex flex-col items-center justify-center p-6 h-auto"
+            disabled={!isPrintingAvailable}
           >
             <FileText className="h-16 w-16 mb-2" />
             <span className="text-lg">Format A4</span>
@@ -60,6 +83,7 @@ export const PrintConfirmationDialog = ({
             size="lg"
             onClick={handlePrintReceipt}
             className="flex flex-col items-center justify-center p-6 h-auto"
+            disabled={!isPrintingAvailable}
           >
             <Receipt className="h-16 w-16 mb-2" />
             <span className="text-lg">Ticket de caisse</span>

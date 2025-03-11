@@ -26,6 +26,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
   useEffect(() => {
     if (!open) {
       setIsPrintDialogOpen(false);
+      setSavedInvoice(null);
     }
   }, [open]);
   
@@ -76,7 +77,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
     setTimeout(() => {
       console.log("Opening print dialog now");
       setIsPrintDialogOpen(true);
-    }, 500);
+    }, 100);
   });
 
   const handlePrintDialogClose = () => {
@@ -150,7 +151,7 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
         </DialogContent>
       </Dialog>
       
-      {/* Always render the dialog component but control visibility with 'open' prop */}
+      {/* Toujours rendre le composant de dialogue d'impression, mais contrôler la visibilité avec la prop 'open' */}
       <PrintConfirmationDialog
         open={isPrintDialogOpen}
         onOpenChange={setIsPrintDialogOpen}
