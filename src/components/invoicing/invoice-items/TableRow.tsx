@@ -20,19 +20,48 @@ export function InvoiceItemRow({ item, onUpdateItem, onRemoveItem }: InvoiceItem
     return isNaN(parsed) ? 0 : parsed;
   };
 
+  const calculateTotalPrice = (quantity: number, unitPrice: number, discount: number): number => {
+    const discountMultiplier = (100 - discount) / 100;
+    return quantity * unitPrice * discountMultiplier;
+  };
+
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuantity = Math.max(1, ensureNumber(e.target.value));
     onUpdateItem(item.id, "quantity", newQuantity);
+    
+    // Also update the total price whenever quantity changes
+    const unitPrice = ensureNumber(item.unitPrice);
+    const discount = ensureNumber(item.discount || 0);
+    const newTotalPrice = calculateTotalPrice(newQuantity, unitPrice, discount);
+    onUpdateItem(item.id, "totalPrice", newTotalPrice);
+    
+    console.log("handleQuantityChange", { newQuantity, unitPrice, discount, newTotalPrice });
   };
 
   const handleUnitPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUnitPrice = Math.max(0, ensureNumber(e.target.value));
     onUpdateItem(item.id, "unitPrice", newUnitPrice);
+    
+    // Also update the total price whenever unit price changes
+    const quantity = ensureNumber(item.quantity);
+    const discount = ensureNumber(item.discount || 0);
+    const newTotalPrice = calculateTotalPrice(quantity, newUnitPrice, discount);
+    onUpdateItem(item.id, "totalPrice", newTotalPrice);
+    
+    console.log("handleUnitPriceChange", { quantity, newUnitPrice, discount, newTotalPrice });
   };
 
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDiscount = Math.min(100, Math.max(0, ensureNumber(e.target.value)));
     onUpdateItem(item.id, "discount", newDiscount);
+    
+    // Also update the total price whenever discount changes
+    const quantity = ensureNumber(item.quantity);
+    const unitPrice = ensureNumber(item.unitPrice);
+    const newTotalPrice = calculateTotalPrice(quantity, unitPrice, newDiscount);
+    onUpdateItem(item.id, "totalPrice", newTotalPrice);
+    
+    console.log("handleDiscountChange", { quantity, unitPrice, newDiscount, newTotalPrice });
   };
 
   // Ensure item values are numbers for display

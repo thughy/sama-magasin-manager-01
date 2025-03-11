@@ -59,68 +59,64 @@ export const useInvoiceForm = (invoice: Invoice | null, onSave: (invoice: Partia
     unitPrice = ensureNumber(unitPrice);
     discount = ensureNumber(discount);
     
-    // Apply calculations
-    const discountAmount = (unitPrice * discount) / 100;
-    const discountedPrice = unitPrice - discountAmount;
-    return quantity * discountedPrice;
+    // Calculate the total price with discount
+    const discountMultiplier = (100 - discount) / 100;
+    return quantity * unitPrice * discountMultiplier;
   };
 
   const handleAddItem = (item: any) => {
-    // Make a copy to avoid mutation
-    const newItem = { ...item };
+    // Make a deep copy to avoid mutation
+    const newItem: InvoiceItem = {
+      id: item.id,
+      productId: item.productId,
+      productName: item.productName,
+      quantity: ensureNumber(item.quantity),
+      unitPrice: ensureNumber(item.unitPrice),
+      discount: ensureNumber(item.discount || 0),
+      totalPrice: ensureNumber(item.totalPrice),
+      type: item.type
+    };
     
-    // Ensure all numeric values are actually numbers
-    if (typeof newItem.quantity !== 'number') {
-      newItem.quantity = ensureNumber(newItem.quantity);
-    }
-    if (typeof newItem.unitPrice !== 'number') {
-      newItem.unitPrice = ensureNumber(newItem.unitPrice);
-    }
-    if (typeof newItem.discount !== 'number') {
-      newItem.discount = ensureNumber(newItem.discount || 0);
-    }
-    if (typeof newItem.totalPrice !== 'number') {
-      newItem.totalPrice = ensureNumber(newItem.totalPrice);
-    }
-    
-    console.log("Adding item to invoice:", newItem);
-    setItems([...items, newItem]);
+    console.log("Adding new item to invoice:", newItem);
+    setItems(prevItems => [...prevItems, newItem]);
   };
 
   const handleUpdateItem = (id: string, field: keyof InvoiceItem, value: any) => {
-    setItems(items.map(item => {
-      if (item.id === id) {
-        // Create a copy of the item
-        const updatedItem = { ...item };
-        
-        // Handle numeric fields specially
-        if (field === 'quantity' || field === 'unitPrice' || field === 'discount' || field === 'totalPrice') {
-          updatedItem[field] = ensureNumber(value);
-        } else {
-          updatedItem[field] = value;
+    setItems(prevItems => 
+      prevItems.map(item => {
+        if (item.id === id) {
+          // Create a copy of the item
+          const updatedItem = { ...item };
+          
+          // Handle numeric fields specially
+          if (field === 'quantity' || field === 'unitPrice' || field === 'discount' || field === 'totalPrice') {
+            updatedItem[field] = ensureNumber(value);
+          } else {
+            updatedItem[field] = value;
+          }
+          
+          // If we're not directly updating the totalPrice, recalculate it
+          if (field !== 'totalPrice' && (field === 'quantity' || field === 'unitPrice' || field === 'discount')) {
+            updatedItem.totalPrice = calculateItemTotal(
+              updatedItem.quantity, 
+              updatedItem.unitPrice, 
+              updatedItem.discount
+            );
+          }
+          
+          console.log("Updated item:", { 
+            id, 
+            field, 
+            oldValue: item[field], 
+            newValue: updatedItem[field],
+            updatedItem 
+          });
+          
+          return updatedItem;
         }
-        
-        // Recalculate totalPrice if quantity, unitPrice, or discount changes
-        if (field === 'quantity' || field === 'unitPrice' || field === 'discount') {
-          updatedItem.totalPrice = calculateItemTotal(
-            updatedItem.quantity, 
-            updatedItem.unitPrice, 
-            updatedItem.discount
-          );
-        }
-        
-        console.log("Updated item:", { 
-          id, 
-          field, 
-          oldValue: item[field], 
-          newValue: updatedItem[field],
-          updatedItem 
-        });
-        
-        return updatedItem;
-      }
-      return item;
-    }));
+        return item;
+      })
+    );
   };
 
   const handleRemoveItem = (id: string) => {

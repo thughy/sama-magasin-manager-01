@@ -38,48 +38,39 @@ export function InvoiceItemsTable({
       // Item already exists, update quantity
       const existingItem = items[existingItemIndex];
       
-      // Convert all values to numbers explicitly
-      const currentQuantity = typeof existingItem.quantity === 'number' 
-        ? existingItem.quantity 
-        : Number(existingItem.quantity);
-        
-      // Increment by 1
+      // Convert quantity to number explicitly and ensure it's a valid number
+      const currentQuantity = Number(existingItem.quantity || 0);
+      // Add 1 to the current quantity
       const newQuantity = currentQuantity + 1;
       
-      // Ensure other values are numbers for calculations
-      const unitPrice = typeof existingItem.unitPrice === 'number'
-        ? existingItem.unitPrice
-        : Number(existingItem.unitPrice);
-        
-      const discount = typeof existingItem.discount === 'number'
-        ? existingItem.discount
-        : Number(existingItem.discount || 0);
-        
-      // Calculate the discounted price
-      const discountAmount = (unitPrice * discount) / 100;
-      const discountedPrice = unitPrice - discountAmount;
+      // Get the unit price as a number
+      const unitPrice = Number(existingItem.unitPrice || 0);
+      // Get the discount as a number
+      const discount = Number(existingItem.discount || 0);
       
-      // Calculate new total price
-      const newTotalPrice = newQuantity * discountedPrice;
+      // Calculate the total price with discount
+      const discountMultiplier = (100 - discount) / 100;
+      const newTotalPrice = newQuantity * unitPrice * discountMultiplier;
+      
+      console.log("Updating existing item:", {
+        id: existingItem.id,
+        currentQuantity,
+        newQuantity,
+        unitPrice,
+        discount,
+        discountMultiplier,
+        newTotalPrice
+      });
       
       // First update the quantity
       onUpdateItem(existingItem.id, "quantity", newQuantity);
       // Then update the total price
       onUpdateItem(existingItem.id, "totalPrice", newTotalPrice);
-      
-      console.log("Updated item quantity:", {
-        id: existingItem.id,
-        oldQuantity: currentQuantity,
-        newQuantity: newQuantity,
-        unitPrice,
-        discount,
-        newTotalPrice
-      });
     } else {
       // Item doesn't exist, add as new
       const unitPrice = item.type === 'product' ? 
-        (typeof item.sellPrice === 'number' ? item.sellPrice : Number(item.sellPrice)) : 
-        (typeof item.amount === 'number' ? item.amount : Number(item.amount));
+        Number(item.sellPrice || 0) : 
+        Number(item.amount || 0);
       
       const newItem: InvoiceItem = {
         id: `item-${Date.now()}`,
