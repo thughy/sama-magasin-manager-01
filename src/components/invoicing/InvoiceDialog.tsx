@@ -83,7 +83,8 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
   const handlePrintDialogClose = () => {
     console.log("Closing print dialog");
     setIsPrintDialogOpen(false);
-    onOpenChange(false); // Close main dialog too
+    // NE PAS fermer le dialogue principal ici
+    // onOpenChange(false); <-- Cette ligne a été supprimée
   };
 
   return (

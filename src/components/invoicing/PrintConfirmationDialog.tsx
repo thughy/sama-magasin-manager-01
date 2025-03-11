@@ -31,6 +31,7 @@ export const PrintConfirmationDialog = ({
     } else {
       toast.error("Aucune facture à imprimer");
     }
+    // Simplement fermer le dialogue d'impression, pas le formulaire principal
     onClose();
   };
 
@@ -42,11 +43,13 @@ export const PrintConfirmationDialog = ({
     } else {
       toast.error("Aucune facture à imprimer");
     }
+    // Simplement fermer le dialogue d'impression, pas le formulaire principal
     onClose();
   };
 
   const handleSkip = () => {
     console.log("Skipping print");
+    // Simplement fermer le dialogue d'impression, pas le formulaire principal
     onClose();
   };
 
