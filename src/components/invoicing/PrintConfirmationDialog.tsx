@@ -20,6 +20,21 @@ export const PrintConfirmationDialog = ({
   invoice,
   onClose,
 }: PrintConfirmationDialogProps) => {
+  // Empêcher la fermeture automatique du dialogue en cliquant à l'extérieur
+  const handleOpenChangeWrapper = (newOpenState: boolean) => {
+    console.log("Print dialog open change requested:", newOpenState);
+    
+    // Si l'utilisateur essaie de fermer le dialogue
+    if (!newOpenState) {
+      // Au lieu de fermer automatiquement, appeler notre fonction de fermeture personnalisée
+      onClose();
+      return;
+    }
+    
+    // Pour l'ouverture, passer l'état normalement
+    onOpenChange(newOpenState);
+  };
+
   // Vérifier si l'impression est disponible
   const isPrintingAvailable = PrintService.isPrintingAvailable();
 
@@ -54,8 +69,18 @@ export const PrintConfirmationDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={open} onOpenChange={handleOpenChangeWrapper}>
+      <DialogContent 
+        className="sm:max-w-[500px]"
+        onPointerDownOutside={(e) => {
+          // Empêcher la fermeture en cliquant à l'extérieur
+          e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          // Empêcher la fermeture avec la touche Échap
+          e.preventDefault();
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Imprimer la facture</DialogTitle>
           <DialogDescription>
