@@ -1,12 +1,10 @@
 
 import { FormProvider, useForm } from "react-hook-form";
 import { Invoice } from "@/services/api";
-import { InvoiceItem } from "@/services/api/invoicing";
 import { InvoiceHeader } from "../InvoiceHeader";
-import { InvoiceItemsTable } from "../InvoiceItemsTable";
-import { PaymentMethodsSection } from "@/components/suppliers/purchases/PaymentMethodsSection";
-import { InvoiceSummary } from "../InvoiceSummary";
 import { useInvoiceForm, DEFAULT_CLIENT } from "@/hooks/invoicing/useInvoiceForm";
+import { InvoiceItemsSection } from "./InvoiceItemsSection";
+import { PaymentSection } from "./PaymentSection";
 
 interface InvoiceFormContentProps {
   invoice: Invoice | null;
@@ -56,26 +54,21 @@ export const InvoiceFormContent = ({ invoice, onSave }: InvoiceFormContentProps)
           onClientSelect={handleClientSelect}
         />
 
-        <div className="space-y-4 mt-4">
-          <InvoiceItemsTable 
-            items={items}
-            onAddItem={handleAddItem}
-            onUpdateItem={handleUpdateItem}
-            onRemoveItem={handleRemoveItem}
-          />
-        </div>
-
-        <PaymentMethodsSection
-          paymentMethods={paymentMethods}
-          onAddPaymentMethod={addPaymentMethod}
-          onRemovePaymentMethod={removePaymentMethod}
-          onUpdatePaymentMethod={updatePaymentMethod}
+        <InvoiceItemsSection 
+          items={items}
+          onAddItem={handleAddItem}
+          onUpdateItem={handleUpdateItem}
+          onRemoveItem={handleRemoveItem}
         />
 
-        <InvoiceSummary
+        <PaymentSection 
+          paymentMethods={paymentMethods}
           totalAmount={totalAmount}
           amountPaid={amountPaid}
           balance={balance}
+          onAddPaymentMethod={addPaymentMethod}
+          onRemovePaymentMethod={removePaymentMethod}
+          onUpdatePaymentMethod={updatePaymentMethod}
         />
       </FormProvider>
     </div>
