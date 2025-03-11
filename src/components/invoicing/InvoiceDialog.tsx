@@ -51,19 +51,24 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
     removePaymentMethod,
     updatePaymentMethod
   } = useInvoiceForm(invoice, (savedInvoiceData) => {
-    // First save the invoice
+    // Stocke les données de la facture sauvegardée
+    setSavedInvoice({
+      ...savedInvoiceData,
+      id: savedInvoiceData.id || `invoice-${Date.now()}`, // Assure qu'il y a toujours un ID
+    } as Invoice);
+    
+    // Sauvegarde la facture dans la base de données
     onSave(savedInvoiceData);
     
-    // Then store the saved invoice data for printing
-    setSavedInvoice(savedInvoiceData as Invoice);
-    
-    // Finally open the print dialog
-    setIsPrintDialogOpen(true);
+    // Ouvre la boîte de dialogue d'impression après la sauvegarde
+    setTimeout(() => {
+      setIsPrintDialogOpen(true);
+    }, 300);
   });
 
   const handlePrintDialogClose = () => {
     setIsPrintDialogOpen(false);
-    onOpenChange(false);
+    onOpenChange(false); // Ferme aussi le dialogue principal
   };
 
   return (
@@ -131,14 +136,12 @@ export const InvoiceDialog = ({ open, onOpenChange, invoice, onSave }: InvoiceDi
         </DialogContent>
       </Dialog>
       
-      {isPrintDialogOpen && (
-        <PrintConfirmationDialog
-          open={isPrintDialogOpen}
-          onOpenChange={setIsPrintDialogOpen}
-          invoice={savedInvoice}
-          onClose={handlePrintDialogClose}
-        />
-      )}
+      <PrintConfirmationDialog
+        open={isPrintDialogOpen}
+        onOpenChange={setIsPrintDialogOpen}
+        invoice={savedInvoice}
+        onClose={handlePrintDialogClose}
+      />
     </>
   );
 };
